@@ -1,0 +1,31 @@
+{
+	"name": "@repo/lib",
+	"version": "0.0.0",
+	"private": true,
+	"main": "./dist/index.js",
+	"files": [
+		"dist/**"
+	],
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "workspace:*",
+		"@types/bcrypt": "^5.0.2",
+		"@types/dotenv": "^8.2.0",
+		"@types/express": "^4.17.21",
+		"@types/node": "^20.11.24",
+		"prisma": "^5.10.2",
+		"tsup": "^8.0.2",
+		"typescript": "^5.3.3",
+		"dotenv-cli": "^7.4.2"
+	},
+	"dependencies": {
+		"@prisma/client": "^5.10.2",
+		"bcrypt": "^5.1.1",
+		"dotenv": "^16.4.5",
+		"express": "^4.18.3"
+	}
+}

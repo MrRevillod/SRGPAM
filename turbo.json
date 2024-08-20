@@ -1,0 +1,50 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"build": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env*"
+			],
+			"dependsOn": [
+				"^build"
+			],
+			"outputs": [
+				"build/**",
+				".vercel/**",
+				"dist/**",
+				".next/**",
+				"!.next/cache/**"
+			]
+		},
+		"db:migrate:deploy": {},
+		"db:migrate:dev": {},
+		"db:push": {},
+		"db:seed": {},
+		"generate": {
+			"cache": false
+		},
+		"test": {
+			"outputs": [
+				"coverage/**"
+			],
+			"dependsOn": []
+		},
+		"typecheck": {
+			"dependsOn": [
+				"^build"
+			]
+		},
+		"dev": {
+			"dependsOn": [
+				"^build",
+				"^generate"
+			],
+			"cache": false,
+			"persistent": true
+		},
+		"clean": {
+			"cache": false
+		}
+	}
+}
