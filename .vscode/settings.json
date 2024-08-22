@@ -23,7 +23,6 @@
 		"**/build": true,
 		"**/dist": true,
 		"**/.turbo": true,
-		"**/*-lock.*": true
 	},
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.expand": false,
