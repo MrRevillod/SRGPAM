@@ -16,7 +16,7 @@ router.get("/", async (req, res, next) => {
 		}
 
 		const users = await prisma.user.findMany()
-		const jsonResponse: JsonResponse = {
+		const jsonResponse: JsonResponse<typeof users> = {
 			message: "Users found",
 			type: "success",
 			values: users,

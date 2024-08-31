@@ -5,7 +5,7 @@ import express from "express"
 
 import router from "./routes/users"
 
-import { log, config, errorHandler, extensions } from "@repo/lib"
+import { log, errorHandler, extensions, services } from "@repo/lib"
 
 export const createServer = (): express.Express => {
 	const app = express()
@@ -25,6 +25,6 @@ export const createServer = (): express.Express => {
 
 const server = createServer()
 
-server.listen(config.api_port, () => {
-	log(`api running on ${config.api_port}`)
+server.listen(9999, () => {
+	log(`api running on ${9999}`)
 })
