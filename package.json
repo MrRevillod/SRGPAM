@@ -15,6 +15,7 @@
 		"typecheck": "turbo run typecheck"
 	},
 	"devDependencies": {
+		"@types/multer": "^1.4.12",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "^9.9.0",
 		"turbo": "^2.0.12"
