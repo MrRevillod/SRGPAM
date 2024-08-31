@@ -4,9 +4,9 @@ import { NextFunction, Request, Response } from "express"
 
 export class AppError extends Error {
 	public code: number
-	public data: Record<string, unknown> | unknown[] | undefined
+	public data: Record<string, unknown> | unknown[] | null
 
-	constructor(code: number, message: string, data?: Record<string, unknown>) {
+	constructor(code: number, message: string, data: Record<string, unknown> = {}) {
 		super(message)
 		this.code = code
 		this.data = data
@@ -26,10 +26,11 @@ export const errorHandler = (err: unknown, req: Request, res: Response, next: Ne
 		return res.status(500).json({ message: "Internal Server Error", type: "error" })
 	}
 
-	const jsonResponse: JsonResponse = {
+	const jsonResponse: JsonResponse<typeof err.data | null> = {
+		status: err.code,
 		message: err.message,
 		type: "error",
-		values: err.data !== undefined ? err.data : null,
+		values: err.data ?? null,
 	}
 
 	return res.status(err.code).json(jsonResponse)

@@ -28,6 +28,7 @@ export const extensions = (req: Request, res: Response, next: NextFunction) => {
 	next()
 }
 
-export { config } from "./config"
+export { services } from "./config"
+export { httpRequest } from "./request"
 export type { JsonResponse } from "./types"
 export { AppError, AuthError, errorHandler } from "./errors"
