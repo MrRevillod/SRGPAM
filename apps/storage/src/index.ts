@@ -23,4 +23,4 @@ const server = createServer()
 
 server.listen(config.api_port, () => {
 	log(`Storage running on ${config.api_port}`)
-})
+})  

@@ -1,9 +1,9 @@
-import { RequestHandler } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express"
 
-export const validateFile: RequestHandler = (req,res,next) => {
-    next()
-}   
+// export const validateFile = (req: Request, res: Response, next: NextFunction) => {
+// 	next()
+// }
 
-export const validateArray: RequestHandler = (req,res,next) => {
-    next()
-}  
+export const validateArray = (req: Request, res: Response, next: NextFunction) => {
+	next()
+}

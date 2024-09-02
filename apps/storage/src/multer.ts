@@ -2,7 +2,7 @@ import { existsSync, mkdirSync } from "fs"
 import multer from "multer"
 import path from "path"
 
-const storage = multer.diskStorage({
+export const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		const dir = `public/${req.params["id"]}`
 
@@ -11,13 +11,12 @@ const storage = multer.diskStorage({
 			mkdirSync(dir)
 		}
 		cb(null, "public/" + req.params["id"] + "/")
-	},
-
+    },
+    
 	filename: (req, file, cb) => {
-		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
 		const ext = path.extname(file.originalname)
-		cb(null, file.fieldname + "-" + uniqueSuffix + ext)
-	}
+		cb(null, file.fieldname + ext)
+	},
 })
 
 export const upload = multer({ storage })
