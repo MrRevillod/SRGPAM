@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,10 +8,10 @@ datasource db {
 }
 
 model Administrator {
-  id        String   @id @db.VarChar(255)
-  name      String   @db.Text
-  email     String   @db.VarChar(255)
-  password  String   @db.VarChar(255)
+  id       String @id @db.VarChar(255)
+  name     String @db.Text
+  email    String @unique @db.VarChar(255)
+  password String @db.VarChar(255)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -21,7 +20,7 @@ model Administrator {
 model Senior {
   id        String   @id @db.VarChar(255)
   name      String   @db.Text
-  email     String   @db.VarChar(255) 
+  email     String   @unique @db.VarChar(255)
   password  String   @db.VarChar(255)
   address   String   @db.Text
   birthDate DateTime @db.Date
@@ -30,45 +29,49 @@ model Senior {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  events    Event[]
-}
-
-model Professional {
-  id        String   @id @db.VarChar(255)
-  name      String   @db.Text
-  email     String   @db.VarChar(255)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  events    Event[]
+  events Event[]
 }
 
 model Service {
-  id        Int      @id  @default(autoincrement())
-  name      String   @db.Text
-  title     String   @db.Text
+  id    Int    @id @default(autoincrement())
+  name  String @db.Text
+  title String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events        Event[]
+  professionals Professional[]
+}
+
+model Professional {
+  id    String @id @db.VarChar(255)
+  name  String @db.Text
+  email String @unique @db.VarChar(255)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   events    Event[]
+  serviceId Int
+
+  service Service @relation(fields: [serviceId], references: [id])
 }
 
 model Event {
-  id             Int      @id  @default(autoincrement())
-  startsAt       DateTime @db.DateTime
-  endsAt         DateTime @db.DateTime
-  assistance     Boolean  @default(false)
+  id         Int      @id @default(autoincrement())
+  startsAt   DateTime @db.DateTime
+  endsAt     DateTime @db.DateTime
+  assistance Boolean  @default(false)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   seniorId       String
   professionalId String
   serviceId      Int
 
-  senior         Senior      @relation(fields: [seniorId], references: [id])
-  professional   Professional @relation(fields: [professionalId], references: [id])
-  service        Service     @relation(fields: [serviceId], references: [id])
+  senior       Senior       @relation(fields: [seniorId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+  service      Service      @relation(fields: [serviceId], references: [id])
 }
