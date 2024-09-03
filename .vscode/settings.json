@@ -131,4 +131,7 @@
 	"editor.indentSize": "tabSize",
 	"editor.tabSize": 4,
 	"editor.formatOnSave": true,
+	"[prisma]": {
+		"editor.defaultFormatter": "Prisma.prisma"
+	},
 }

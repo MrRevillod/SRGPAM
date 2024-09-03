@@ -2,8 +2,9 @@ import cors from "cors"
 import helmet from "helmet"
 import morgan from "morgan"
 import express from "express"
-import { log, config, errorHandler, extensions } from "@repo/lib"
+
 import { router } from "./router"
+import { log, services, errorHandler, extensions } from "@repo/lib"
 
 export const createServer = (): express.Express => {
 	const app = express()
@@ -21,6 +22,6 @@ export const createServer = (): express.Express => {
 
 const server = createServer()
 
-server.listen(config.api_port, () => {
-	log(`Storage running on ${config.api_port}`)
-})  
+server.listen(services.STORAGE.port, () => {
+	log(`Storage running on ${services.STORAGE.port}`)
+})
