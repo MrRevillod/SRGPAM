@@ -7,7 +7,7 @@ import administrarorsRouter from "./routes/administrators"
 import professionalsRouter from "./routes/professionals"
 import seniorsRouter from "./routes/seniors"
 
-import { log, config, errorHandler, extensions } from "@repo/lib"
+import { log, services, errorHandler, extensions } from "@repo/lib"
 
 export const createServer = (): express.Express => {
 	const app = express()
@@ -29,6 +29,6 @@ export const createServer = (): express.Express => {
 
 const server = createServer()
 
-server.listen(7000, () => {
-	log(`api running on ${config.api_port}`)
+server.listen(services.DASHBOARD.port, () => {
+	log(`Dashboard service running on ${services.DASHBOARD.port}`)
 })
