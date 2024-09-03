@@ -1,6 +1,8 @@
 import React from "react"
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from "react-native"
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, Dimensions } from "react-native"
 import Colors from "@/components/colors"
+
+const { width, height } = Dimensions.get("window")
 
 type CustomButtonProps = {
 	title: string
@@ -20,10 +22,9 @@ const CustomButton = ({ title, onPress, style, textStyle }: CustomButtonProps) =
 const styles = StyleSheet.create({
 	button: {
 		borderRadius: 10,
-		alignItems: "center",
 		justifyContent: "center",
-		paddingVertical: 10,
 		width: "auto",
+		height: height * 0.04,
 		backgroundColor: Colors.green,
 	},
 	buttonText: {

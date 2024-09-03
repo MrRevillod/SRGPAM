@@ -1,6 +1,7 @@
 import React from "react"
 import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform } from "react-native"
 import Colors from "@/components/colors"
+import CustomButton from "@/components/register/button"
 const { width, height } = Dimensions.get("window")
 
 type GeneralViewProps = {
@@ -20,10 +21,13 @@ const GeneralView = ({ title, children, textCircle, textTitle, textDescription }
 					<View style={styles.circle}>
 						<Text style={styles.circleText}>{textCircle}</Text>
 					</View>
-					<Text style={{ fontSize: 18, alignSelf: "center", fontWeight: "500" }}>{textTitle}</Text>
+					<Text style={{ fontSize: 18, fontWeight: "500", flex: 1, alignSelf: "center" }}>{textTitle}</Text>
 				</View>
-				{textDescription && <Text style={{ fontSize: 16, alignSelf: "center", marginTop: 10, color: Colors.gray }}>{textDescription}</Text>}
-
+				{textDescription && (
+					<Text style={{ fontSize: 16, alignSelf: "center", marginTop: 10, color: Colors.gray, textAlign: "justify" }}>
+						{textDescription}
+					</Text>
+				)}
 				{children}
 			</View>
 		</KeyboardAvoidingView>

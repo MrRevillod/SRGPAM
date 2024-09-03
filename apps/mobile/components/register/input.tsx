@@ -43,6 +43,7 @@ export default InputField
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		position: "relative",
 	},
 	input: {
 		backgroundColor: Colors.white,
@@ -52,9 +53,8 @@ const styles = StyleSheet.create({
 		width: "auto",
 		paddingVertical: 10,
 		textAlign: "center",
-		marginTop: 30,
-		marginBottom: 10,
 		color: Colors.gray,
 		fontSize: 18,
+		marginVertical: 30,
 	},
 })
