@@ -1,10 +1,10 @@
 import { Router } from "express"
-
+import { getAdministrators, getAdministratorById, createAdministrator } from "../controllers/administrators"
 const router: Router = Router()
 
-router.get("/", async (req, res, next) => {})
-router.get("/:id", async (req, res, next) => {})
-router.post("/", async (req, res, next) => {})
+router.get("/", getAdministrators)
+router.get("/:id", getAdministratorById)
+router.post("/", createAdministrator)
 router.patch("/:id", async (req, res, next) => {})
 router.delete("/:id", async (req, res, next) => {})
 
