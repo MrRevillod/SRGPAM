@@ -59,3 +59,20 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		next(error)
 	}
 }
+
+export const handleSeniorRequest = async (req: Request, res: Response, next: NextFunction) => {
+	const { id } = req.params
+	const validated = req.query.validate === "true"
+
+	try {
+		if (validated) {
+			await prisma.senior.update({ where: { id }, data: { validated } })
+		} else {
+			await prisma.senior.delete({ where: { id } })
+		}
+
+		return res.status(200).json({ message: "Adulto mayor con ID ", type: "success" })
+	} catch (error: unknown) {
+		next(error)
+	}
+}
