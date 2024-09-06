@@ -60,30 +60,18 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 }
 
-export const seniorDeny = async (req: Request, res: Response, next: NextFunction) => {
-	const seniorId = req.params.id
+export const handleSeniorRequest = async (req: Request, res: Response, next: NextFunction) => {
+	const { id } = req.params
+	const validated = req.query.validate === "true"
 
 	try {
-		await prisma.senior.update({
-			where: { id: seniorId },
-			data: { validated: false },
-		})
+		if (validated) {
+			await prisma.senior.update({ where: { id }, data: { validated } })
+		} else {
+			await prisma.senior.delete({ where: { id } })
+		}
 
-		return res.status(200).json({ message: `Adulto mayor con ID ${seniorId} ha sido rechazado.`, type: "success" })
-	} catch (error: unknown) {
-		next(error)
-	}
-}
-
-export const seniorValidate = async (req: Request, res: Response, next: NextFunction) => {
-	const seniorId = req.params.id
-	try {
-		await prisma.senior.update({
-			where: { id: seniorId },
-			data: { validated: true },
-		})
-
-		return res.status(200).json({ message: `Adulto mayor con ID ${seniorId} ha sido validado.`, type: "success" })
+		return res.status(200).json({ message: "Adulto mayor con ID ", type: "success" })
 	} catch (error: unknown) {
 		next(error)
 	}
