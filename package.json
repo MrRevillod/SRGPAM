@@ -12,9 +12,11 @@
 		"dev": "turbo run dev",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"test": "turbo run test",
-		"typecheck": "turbo run typecheck"
+		"typecheck": "turbo run typecheck",
+		"dev:backend": "pnpm run dev --filter @backend"
 	},
 	"devDependencies": {
+		"@types/cookie-parser": "^1.4.7",
 		"@types/multer": "^1.4.12",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "^9.9.0",
@@ -25,6 +27,7 @@
 		"node": ">=18"
 	},
 	"dependencies": {
-		"@prisma/client": "5.10.2"
+		"@prisma/client": "5.10.2",
+		"cookie-parser": "^1.4.6"
 	}
 }

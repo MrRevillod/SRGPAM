@@ -30,4 +30,8 @@ export const services: Record<ServiceName, ServiceInfo> = {
 	},
 }
 
+export const constants = {
+	JWT_SECRET: process.env.JWT_SECRET ?? "secret",
+}
+
 console.table(services)

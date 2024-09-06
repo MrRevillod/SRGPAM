@@ -13,3 +13,5 @@ export type JsonResponse<T> = {
 	type: "success" | "error"
 	values: T
 }
+
+export type UserKind = "ADMIN" | "PROFESSIONAL" | "SENIOR"
