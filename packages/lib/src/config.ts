@@ -12,13 +12,13 @@ export const services: Record<ServiceName, ServiceInfo> = {
 		url: (process.env.AUTH_SERVICE_URL ?? "http://localhost") as string,
 		port: envPortAsInt("AUTH_SERVICE_PORT", 3000),
 	},
-	DASHBOARD: {
-		url: (process.env.DASHBOARD_SERVICE_URL ?? "http://localhost") as string,
-		port: envPortAsInt("DASHBOARD_SERVICE_PORT", 4000),
-	},
 	STORAGE: {
 		url: (process.env.STORAGE_SERVICE_URL ?? "http://localhost") as string,
-		port: envPortAsInt("STORAGE_SERVICE_PORT", 5000),
+		port: envPortAsInt("STORAGE_SERVICE_PORT", 4000),
+	},
+	DASHBOARD: {
+		url: (process.env.DASHBOARD_SERVICE_URL ?? "http://localhost") as string,
+		port: envPortAsInt("DASHBOARD_SERVICE_PORT", 5000),
 	},
 	ADMIN_WEB: {
 		url: (process.env.ADMIN_WEB_SERVICE_URL ?? "http://localhost") as string,

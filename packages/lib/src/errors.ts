@@ -1,3 +1,4 @@
+import { ZodError } from "zod"
 import { log } from "."
 import { JsonResponse } from "./types"
 import { NextFunction, Request, Response } from "express"
@@ -21,6 +22,10 @@ export class AuthError extends AppError {
 
 export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
 	log((err as Error).stack || "Uknown error from the error handler")
+
+	if (err instanceof ZodError) {
+		return res.status(400).json({ message: "Invalid fields", type: "error" })
+	}
 
 	if (!(err instanceof AppError)) {
 		return res.status(500).json({ message: "Internal Server Error", type: "error" })
