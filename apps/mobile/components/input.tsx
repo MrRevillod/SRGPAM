@@ -11,11 +11,12 @@ type InputFieldProps = {
 	errors: any
 	secureTextEntry?: boolean
 	children?: React.ReactNode
+	visible?: boolean
 }
 
-const InputField = ({ name, placeholder, control, errors, secureTextEntry = false, children }: InputFieldProps) => {
+const Input = ({ name, placeholder, control, errors, secureTextEntry = false, children }: InputFieldProps) => {
 	return (
-		<View style={styles.container}>
+		<View>
 			<Controller
 				name={name}
 				control={control}
@@ -38,23 +39,20 @@ const InputField = ({ name, placeholder, control, errors, secureTextEntry = fals
 	)
 }
 
-export default InputField
+export default Input
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		position: "relative",
-	},
 	input: {
 		backgroundColor: Colors.white,
 		borderRadius: 10,
 		borderColor: Colors.green,
-		borderWidth: 1,
+		borderWidth: 1.5,
 		width: "auto",
 		paddingVertical: 10,
 		textAlign: "center",
 		color: Colors.gray,
 		fontSize: 18,
-		marginVertical: 30,
+		marginTop: 30,
+		marginBottom: 15,
 	},
 })
