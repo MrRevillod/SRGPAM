@@ -2,7 +2,6 @@ import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import Camera from "@/components/register/camera"
 import RUT from "@/components/register/views/rut"
 import Email from "@/components/register/views/email"
@@ -11,16 +10,7 @@ import ConfirmPin from "@/components/register/views/confirmPin"
 import DNI from "@/components/register/views/dni"
 import RSH from "@/components/register/views/rsh"
 import Final from "@/components/register/views/final"
-
-const registerSchema = z.object({
-	rut: z.string(),
-	email: z.string(),
-	pin: z.string(),
-	pinConfirm: z.string(),
-	dni_a: z.string(),
-	dni_b: z.string(),
-	social: z.string(),
-})
+import registerSchema from "@/utils/validation"
 
 const Stack = createNativeStackNavigator()
 

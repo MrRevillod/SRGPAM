@@ -14,7 +14,7 @@ const Email = ({ navigation, control, errors }: commonProps) => {
 			textDescription="Este campo es opcional por lo que usted decide si ingresarlo."
 		>
 			<View style={styles.container}>
-				<Input name="email" placeholder="TuCorreo@gmail.com" control={control} errors={errors} visible />
+				<Input name="email" placeholder="TuCorreo@gmail.com" control={control} errors={errors} />
 				<CustomButton title="Siguiente" onPress={() => navigation.navigate("Pin")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}

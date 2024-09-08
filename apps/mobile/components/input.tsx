@@ -11,7 +11,6 @@ type InputFieldProps = {
 	errors: any
 	secureTextEntry?: boolean
 	children?: React.ReactNode
-	visible?: boolean
 }
 
 const Input = ({ name, placeholder, control, errors, secureTextEntry = false, children }: InputFieldProps) => {

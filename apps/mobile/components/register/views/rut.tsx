@@ -13,7 +13,7 @@ const RUT = ({ navigation, control, errors }: commonProps) => {
 			textDescription="Su RUT debe ingresarse sin puntos ni guión."
 		>
 			<View style={styles.container}>
-				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} visible />
+				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} />
 				<CustomButton title="Siguiente" onPress={() => navigation.navigate("Email")} />
 			</View>
 		</GeneralView>

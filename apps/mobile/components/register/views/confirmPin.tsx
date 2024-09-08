@@ -9,7 +9,7 @@ const ConfirmPin = ({ navigation, control, errors, handleSubmit }: commonProps) 
 	return (
 		<GeneralView title="Datos del Registro" textCircle="4/7" textTitle="Vuelve a ingresar tu Pin.">
 			<View style={styles.container}>
-				<Input name="pinConfirm" placeholder="Confirma tu PIN" control={control} errors={errors} secureTextEntry visible />
+				<Input name="pinConfirm" placeholder="Confirma tu PIN" control={control} errors={errors} secureTextEntry />
 				<CustomButton title="Siguiente" onPress={() => navigation.navigate("DNI")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}

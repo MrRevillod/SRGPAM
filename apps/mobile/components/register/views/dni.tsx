@@ -25,12 +25,6 @@ const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
 		}
 	}, [route.params?.photoUri])
 
-	useEffect(() => {
-		if (frontPhoto && backPhoto) {
-			navigation.navigate("RSH")
-		}
-	}, [frontPhoto, backPhoto, navigation])
-
 	const openCamera = (type: "front" | "back") => {
 		navigation.navigate("Camera", { from: "DNI" })
 	}
@@ -78,25 +72,13 @@ const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
 						</>
 					)}
 				/>
-				{/* <CustomButton
-					style={{ marginTop: 30 }}
-					title={frontPhoto ? "Re-tomar Foto Frontal" : "Tomar Foto Frontal"}
-					onPress={() => {
-						setIsCapturingFront(true)
-						openCamera("front")
-					}}
-				/>
-				{frontPhoto && <Text>Foto frontal tomada</Text>}
 
 				<CustomButton
-					style={{ marginTop: 30 }}
-					title={backPhoto ? "Re-tomar Foto Trasera" : "Tomar Foto Trasera"}
-					onPress={() => {
-						setIsCapturingFront(false)
-						openCamera("back")
-					}}
+					textStyle={styles.customButtonText}
+					title="Siguiente"
+					onPress={() => navigation.navigate("RSH")}
+					style={{ backgroundColor: Colors.white }}
 				/>
-				{backPhoto && <Text>Foto trasera tomada</Text>} */}
 
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
@@ -104,18 +86,6 @@ const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
 					title="Volver"
 					onPress={() => navigation.goBack()}
 				/>
-
-				{/*
-				<Controller
-					name="dni-b"
-					control={control}
-					defaultValue={backPhoto}
-					render={({ field: { onChange, onBlur, value } }) => (
-						<>
-							<TextInput style={{ display: "none" }} value={value} onBlur={onBlur} onChangeText={onChange} />
-						</>
-					)}
-				/> */}
 			</View>
 		</GeneralView>
 	)
