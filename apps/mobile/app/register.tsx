@@ -14,13 +14,40 @@ import registerSchema from "@/utils/validation"
 
 const Stack = createNativeStackNavigator()
 
-const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: any; handleSubmit: any; errors: any; setValue: any }) => {
+const FormNavigator = ({
+	control,
+	handleSubmit,
+	errors,
+	setValue,
+	trigger,
+}: {
+	control: any
+	handleSubmit: any
+	errors: any
+	setValue: any
+	trigger: any
+}) => {
+	const validateAndNavigate = async (field: string, navigation: any, nextScreen: string) => {
+		const isValid = await trigger(field)
+		if (isValid) {
+			navigation.navigate(nextScreen)
+		}
+	}
+
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
-			<Stack.Screen name="RUT">{(props) => <RUT {...props} control={control} errors={errors} />}</Stack.Screen>
-			<Stack.Screen name="Email">{(props) => <Email {...props} control={control} errors={errors} />}</Stack.Screen>
-			<Stack.Screen name="Pin">{(props) => <Pin {...props} control={control} errors={errors} />}</Stack.Screen>
-			<Stack.Screen name="ConfirmPin">{(props) => <ConfirmPin {...props} control={control} errors={errors} />}</Stack.Screen>
+			<Stack.Screen name="RUT">
+				{(props) => <RUT {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+			</Stack.Screen>
+			<Stack.Screen name="Email">
+				{(props) => <Email {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+			</Stack.Screen>
+			<Stack.Screen name="Pin">
+				{(props) => <Pin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+			</Stack.Screen>
+			<Stack.Screen name="ConfirmPin">
+				{(props) => <ConfirmPin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+			</Stack.Screen>
 			<Stack.Screen name="DNI">{(props) => <DNI {...props} control={control} errors={errors} setValue={setValue} />}</Stack.Screen>
 			<Stack.Screen name="RSH">
 				{(props) => <RSH {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
@@ -36,6 +63,7 @@ const Register = () => {
 		control,
 		handleSubmit,
 		setValue,
+		trigger, // Esto se usará para validar un campo individualmente
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
@@ -50,7 +78,7 @@ const Register = () => {
 		resolver: zodResolver(registerSchema),
 	})
 
-	return <FormNavigator control={control} handleSubmit={handleSubmit} errors={errors} setValue={setValue} />
+	return <FormNavigator control={control} handleSubmit={handleSubmit} errors={errors} setValue={setValue} trigger={trigger} />
 }
 
 export default Register

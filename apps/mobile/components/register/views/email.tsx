@@ -5,7 +5,7 @@ import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "@/components/register/types"
 
-const Email = ({ navigation, control, errors }: commonProps) => {
+const Email = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (
 		<GeneralView
 			title="Datos del Registro"
@@ -15,7 +15,7 @@ const Email = ({ navigation, control, errors }: commonProps) => {
 		>
 			<View style={styles.container}>
 				<Input name="email" placeholder="TuCorreo@gmail.com" control={control} errors={errors} />
-				<CustomButton title="Siguiente" onPress={() => navigation.navigate("Pin")} />
+				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("email", navigation, "Pin")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
 					textStyle={styles.customButtonText}

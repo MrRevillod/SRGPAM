@@ -16,4 +16,6 @@ export interface commonProps {
 	errors?: FieldErrors<FieldValues>
 	handleSubmit?: any
 	setValue?: any
+	trigger?: any
+	validateAndNavigate?: any
 }

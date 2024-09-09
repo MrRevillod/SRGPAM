@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react"
-import { View, StyleSheet, Text } from "react-native"
+import { View, StyleSheet, Text, Alert } from "react-native"
 import GeneralView from "@/components/register/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "@/components/register/types"
 import { Controller, useForm } from "react-hook-form"
+import * as mime from "react-native-mime-types"
 
 const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps) => {
-	const [rshPhoto, setRshPhoto] = useState<string | null>(null)
-
 	useEffect(() => {
 		if (route.params?.photoUri) {
-			setRshPhoto(route.params.photoUri)
 			console.log("RSH photo URI:", route.params.photoUri)
 			setValue("social", route.params.photoUri)
 		}
@@ -21,9 +19,57 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 		navigation.navigate("Camera", { from: "RSH" })
 	}
 
-	const onSubmit = (data: any) => {
+	const onSubmit = async (data: any) => {
 		console.log(data)
-		navigation.navigate("Final")
+
+		const formData = new FormData()
+
+		formData.append("rut", data.rut)
+		formData.append("pin", data.pin)
+		formData.append("email", data.email)
+
+		const uriToFileObject = (uri: string, name: string) => {
+			const fileName = uri.split("/").pop() || `${name}.jpg`
+			const fileType = mime.lookup(uri) || "image/jpeg"
+
+			return {
+				uri: uri, // URI local del archivo
+				type: fileType, // Tipo MIME (image/jpeg por defecto)
+				name: fileName, // Nombre del archivo
+			}
+		}
+
+		if (data.dni_a) {
+			const dniAFile = uriToFileObject(data.dni_a, "dni_a")
+			formData.append("dni-a", dniAFile as any)
+		}
+		if (data.dni_b) {
+			const dniBFile = uriToFileObject(data.dni_b, "dni_b")
+			formData.append("dni-b", dniBFile as any)
+		}
+		if (data.social) {
+			const socialFile = uriToFileObject(data.social, "social")
+			formData.append("social", socialFile as any)
+		}
+
+		try {
+			const response = await fetch("http://localhost/api/dashboard/seniors/new-mobile", {
+				method: "POST",
+				body: formData,
+			})
+
+			if (!response.ok) {
+				throw new Error("Error en la solicitud")
+			}
+
+			const result = await response.json()
+			console.log(result)
+
+			navigation.navigate("Final")
+		} catch (error) {
+			console.error(error)
+			Alert.alert("Error", "Hubo un problema al enviar los datos. Intenta nuevamente.")
+		}
 	}
 
 	return (
