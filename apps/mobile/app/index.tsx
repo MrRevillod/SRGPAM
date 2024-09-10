@@ -1,10 +1,15 @@
-import { Text, View } from "react-native"
-import Constants from "expo-constants"
+import React from "react"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import Register from "./register"
 
-const Home = () => (
-	<View style={{ paddingTop: Constants.statusBarHeight, flex: 1, justifyContent: "center", alignItems: "center" }}>
-		<Text>Todo está funcionando correctamente...</Text>
-	</View>
-)
+const Stack = createNativeStackNavigator()
 
-export default Home
+const App = () => {
+	return (
+		<Stack.Navigator initialRouteName="Register" screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="Register" component={Register} />
+		</Stack.Navigator>
+	)
+}
+
+export default App

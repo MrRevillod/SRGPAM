@@ -1,7 +1,6 @@
 import React from "react"
 import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform } from "react-native"
 import Colors from "@/components/colors"
-import CustomButton from "@/components/register/button"
 const { width, height } = Dimensions.get("window")
 
 type GeneralViewProps = {
@@ -14,8 +13,14 @@ type GeneralViewProps = {
 
 const GeneralView = ({ title, children, textCircle, textTitle, textDescription }: GeneralViewProps) => {
 	return (
-		<KeyboardAvoidingView style={styles.greenContainer} behavior={Platform.OS === "ios" ? "padding" : "height"} enabled={Platform.OS === "ios"}>
-			<Text style={styles.title}>{title} </Text>
+		<KeyboardAvoidingView
+			style={{ backgroundColor: Colors.green, flex: 1 }}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+			enabled={true}
+		>
+			<View style={styles.greenContainer}>
+				<Text style={styles.title}>{title} </Text>
+			</View>
 			<View style={styles.whiteContainer}>
 				<View style={styles.description}>
 					<View style={styles.circle}>
@@ -23,11 +28,7 @@ const GeneralView = ({ title, children, textCircle, textTitle, textDescription }
 					</View>
 					<Text style={{ fontSize: 18, fontWeight: "500", flex: 1, alignSelf: "center" }}>{textTitle}</Text>
 				</View>
-				{textDescription && (
-					<Text style={{ fontSize: 16, alignSelf: "center", marginTop: 10, color: Colors.gray, textAlign: "justify" }}>
-						{textDescription}
-					</Text>
-				)}
+				{textDescription && <Text style={{ fontSize: 16, marginTop: 10, color: Colors.gray, textAlign: "justify" }}>{textDescription}</Text>}
 				{children}
 			</View>
 		</KeyboardAvoidingView>
@@ -40,10 +41,10 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.green,
 		justifyContent: "center",
 		alignItems: "center",
+		height: "20%",
 	},
 	title: {
-		position: "absolute",
-		top: height * 0.0825,
+		alignSelf: "center",
 		fontWeight: "700",
 		fontSize: 24,
 		color: "#FFFFFF",
@@ -53,12 +54,11 @@ const styles = StyleSheet.create({
 		textShadowRadius: 4 * (width / 360),
 	},
 	whiteContainer: {
-		position: "absolute",
-		top: height * 0.2,
 		width: "100%",
 		height: "80%",
 		backgroundColor: "#FFFFFF",
-		borderRadius: 20,
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
 		padding: "10%",
 	},
 	description: {
