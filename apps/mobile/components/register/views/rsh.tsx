@@ -20,8 +20,6 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 	}
 
 	const onSubmit = async (data: any) => {
-		console.log(data)
-
 		const formData = new FormData()
 
 		formData.append("rut", data.rut)
@@ -29,7 +27,7 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 		formData.append("email", data.email)
 
 		const uriToFileObject = (uri: string, name: string) => {
-			const fileName = uri.split("/").pop() || `${name}.jpg`
+			const fileName = `${name}.jpg`
 			const fileType = mime.lookup(uri) || "image/jpeg"
 
 			return {
@@ -40,23 +38,24 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 		}
 
 		if (data.dni_a) {
-			const dniAFile = uriToFileObject(data.dni_a, "dni_a")
+			const dniAFile = uriToFileObject(data.dni_a, "dni-a")
 			formData.append("dni-a", dniAFile as any)
 		}
 		if (data.dni_b) {
-			const dniBFile = uriToFileObject(data.dni_b, "dni_b")
+			const dniBFile = uriToFileObject(data.dni_b, "dni-b")
 			formData.append("dni-b", dniBFile as any)
 		}
 		if (data.social) {
 			const socialFile = uriToFileObject(data.social, "social")
 			formData.append("social", socialFile as any)
 		}
-
 		try {
-			const response = await fetch("http://localhost/api/dashboard/seniors/new-mobile", {
+			const response = await fetch("http://192.168.243.117:5000/dashboard/seniors/new-mobile", {
 				method: "POST",
 				body: formData,
 			})
+
+			console.log("formData", formData)
 
 			if (!response.ok) {
 				throw new Error("Error en la solicitud")
