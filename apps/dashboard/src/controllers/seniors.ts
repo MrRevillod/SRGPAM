@@ -11,7 +11,11 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 
 	try {
-		await prisma.senior.delete({ where: { id: rut } })
+		await prisma.senior.findUnique({ where: { id: rut } }).then(async (senior) => {
+			if (senior) {
+				await prisma.senior.delete({ where: { id: rut } })
+			}
+		})
 
 		if (
 			!files["dni-a"] ||
@@ -36,6 +40,9 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 				birthDate: new Date(),
 			},
 		})
+
+		console.log("files from dashboard", files)
+
 		const formData = new FormData()
 
 		const dniA = bufferToBlob(files["dni-a"][0].buffer, files["dni-a"][0].mimetype)
@@ -45,6 +52,8 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		formData.append("dni-a", dniA, files["dni-a"][0].originalname)
 		formData.append("dni-b", dniB, files["dni-b"][0].originalname)
 		formData.append("social", social, files["social"][0].originalname)
+
+		console.log("formData from dashboard", formData)
 
 		const response = await httpRequest<null>("STORAGE", `/seniors/${rut}`, "POST", "MULTIPART", formData)
 
@@ -65,6 +74,12 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 	const validated = req.query.validate === "true"
 
 	try {
+		const user = await prisma.senior.findUnique({ where: { id } })
+
+		if (!user) {
+			throw new AppError(404, "Adulto mayor no encontrado")
+		}
+
 		if (validated) {
 			await prisma.senior.update({ where: { id }, data: { validated } })
 		} else {

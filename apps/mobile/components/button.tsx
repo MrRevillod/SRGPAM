@@ -22,9 +22,10 @@ const CustomButton = ({ title, onPress, style, textStyle }: CustomButtonProps) =
 const styles = StyleSheet.create({
 	button: {
 		borderRadius: 10,
+		marginVertical: 5,
 		justifyContent: "center",
 		width: "auto",
-		height: height * 0.04,
+		height: height * 0.05,
 		backgroundColor: Colors.green,
 	},
 	buttonText: {

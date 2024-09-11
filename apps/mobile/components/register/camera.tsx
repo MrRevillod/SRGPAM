@@ -1,11 +1,13 @@
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera"
-import { useState } from "react"
+import { CameraView, useCameraPermissions } from "expo-camera"
+import { useRef } from "react"
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { AntDesign } from "@expo/vector-icons"
+import { useRoute } from "@react-navigation/native"
 
-const Camera = () => {
-	const [facing, setFacing] = useState<CameraType>("back")
+const Camera = ({ navigation }: any) => {
 	const [permission, requestPermission] = useCameraPermissions()
-
+	const cameraRef = useRef<CameraView | null>(null)
+	const route = useRoute()
 	if (!permission) {
 		return <View />
 	}
@@ -14,21 +16,31 @@ const Camera = () => {
 		return (
 			<View style={styles.container}>
 				<Text style={styles.message}>Necesitamos tu permiso para mostrar la cámara</Text>
-				<Button onPress={requestPermission} title="conceder permiso" />
+				<Button onPress={requestPermission} title="Conceder permiso" />
 			</View>
 		)
 	}
 
-	const toggleCameraFacing = () => {
-		setFacing((current) => (current === "back" ? "front" : "back"))
+	const takePhoto = async () => {
+		if (cameraRef.current) {
+			const photo = await cameraRef.current.takePictureAsync({ quality: 0.01 })
+			if (photo) {
+				const { params } = route as any
+				if (params?.from === "DNI") {
+					navigation.navigate("DNI", { photoUri: photo.uri })
+				} else if (params?.from === "RSH") {
+					navigation.navigate("RSH", { photoUri: photo.uri })
+				}
+			}
+		}
 	}
 
 	return (
 		<View style={styles.container}>
-			<CameraView style={styles.camera} facing={facing}>
+			<CameraView style={styles.camera} ref={cameraRef}>
 				<View style={styles.buttonContainer}>
-					<TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-						<Text style={styles.text}>Flip Camera</Text>
+					<TouchableOpacity style={styles.button} onPress={takePhoto}>
+						<AntDesign name="camera" size={44} color="white" />
 					</TouchableOpacity>
 				</View>
 			</CameraView>
@@ -52,18 +64,17 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		flex: 1,
-		flexDirection: "row",
-		backgroundColor: "transparent",
-		margin: 64,
+		justifyContent: "flex-end",
+		alignItems: "center",
+		marginBottom: 30,
 	},
 	button: {
-		flex: 1,
-		alignSelf: "flex-end",
-		alignItems: "center",
+		padding: 15,
+		backgroundColor: "green",
+		borderRadius: 5,
 	},
 	text: {
-		fontSize: 24,
-		fontWeight: "bold",
+		fontSize: 18,
 		color: "white",
 	},
 })
