@@ -17,14 +17,14 @@ const PersonTable: React.FC<PersonTableProps> = ({ data, onEdit, onDelete }) => 
 			key: "name",
 		},
 		{
-			title: "Age",
-			dataIndex: "age",
-			key: "age",
-		},
-		{
 			title: "Email",
 			dataIndex: "email",
 			key: "email",
+		},
+		{
+			title: "Address",
+			dataIndex: "address",
+			key: "address",
 		},
 		{
 			title: "Action",

@@ -1,5 +1,5 @@
-// App.tsx
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import axios from "axios"
 import PersonTable from "../../../components/Seniors-Table/Seniors-Table"
 import EditPersonModal from "../../../components/Edit-Seniors/Edit-Seniors"
 import type { DataType } from "../../../types"
@@ -8,6 +8,34 @@ const App: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [modalType, setModalType] = useState("")
 	const [selectedPerson, setSelectedPerson] = useState<DataType | null>(null)
+	const [data, setData] = useState<DataType[]>([])
+	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+
+	const fetchSeniors = async () => {
+		try {
+			const response = await axios.get("http://localhost:5000/api/dashboard/seniors")
+			console.log(response.data.values)
+
+			const transformedData = response.data.values.map((senior: any) => ({
+				key: senior.id,
+				name: senior.name,
+				email: senior.email,
+				birthDate: senior.birthDate,
+				address: senior.address,
+			}))
+
+			setData(transformedData)
+		} catch (err) {
+			setError("Error al obtener los datos de seniors")
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchSeniors()
+	}, [])
 
 	const showModal = (type: string, person: DataType) => {
 		setModalType(type)
@@ -25,11 +53,13 @@ const App: React.FC = () => {
 		setSelectedPerson(null)
 	}
 
-	const data: DataType[] = [
-		{ key: "1", name: "John Brown", age: 62, email: "john.brown@hotmail.com", password: "1234" },
-		{ key: "2", name: "Jim Green", age: 72, email: "jim.green@gmail.com", password: "1234" },
-		{ key: "3", name: "Joe Black", age: 63, email: "joe.black@gmail.com", password: "1234" },
-	]
+	if (loading) {
+		return <div>Cargando datos...</div>
+	}
+
+	if (error) {
+		return <div>{error}</div>
+	}
 
 	return (
 		<>
