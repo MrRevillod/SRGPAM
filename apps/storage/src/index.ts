@@ -5,6 +5,7 @@ import express from "express"
 
 import { router } from "./router"
 import { log, services, errorHandler, extensions } from "@repo/lib"
+import { validateCors } from "./middlewares"
 
 export const createServer = (): express.Express => {
 	const app = express()
@@ -13,10 +14,11 @@ export const createServer = (): express.Express => {
 	app.use(morgan("dev"))
 	app.use(express.urlencoded({ extended: true }))
 	app.use(cors())
-	app.use(extensions)
+    app.use(extensions)
+    app.use(validateCors)
 	app.use("/api/storage/seniors", router)
-	app.use(errorHandler)
-
+    app.use(errorHandler)
+    
 	return app
 }
 

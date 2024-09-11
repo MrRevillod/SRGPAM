@@ -1,5 +1,5 @@
 import { AppError } from "."
-import { services } from "./config"
+import { constants, services } from "./config"
 import { JsonResponse, ContentTypeVariant, ServiceName, AllowedHttpMethod } from "./types"
 
 /**
@@ -52,7 +52,11 @@ export const httpRequest = async <T>(
 
 	if (variant === "JSON") {
 		headers.append("Content-Type", "application/json")
-	}
+    }
+    
+    if (service === "STORAGE") {
+        headers.append("X-storage-key",constants.STORAGE_KEY)
+    }
 
 	try {
 		const response = await fetch(url, {

@@ -33,6 +33,7 @@ export const services: Record<ServiceName, ServiceInfo> = {
 export const constants = {
     JWT_SECRET: process.env.JWT_SECRET ?? "secret",
     IMAGE_MAX_SIZE_MB: process.env.IMAGE_MAX_SIZE_MB ?? 5,
+    STORAGE_KEY: process.env.STORAGE_KEY ?? "secret",
 }
 
 console.table(services)
