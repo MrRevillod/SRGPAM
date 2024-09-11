@@ -65,9 +65,9 @@ export const httpRequest = async <T>(
 
 		if (!response.ok) {
 			throw new AppError(
-				result.status || 500,
-				result.message,
-				(result.values || {}) as Record<string, unknown>,
+				(result as any).status || 500,
+				(result as any).message,
+				((result as any).values || {}) as Record<string, unknown>,
 			)
 		}
 

@@ -1,7 +1,7 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
+import { AppError } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
-import { AppError, httpRequest } from "@repo/lib"
 
 export const getAdministrators = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -33,7 +33,6 @@ export const getAdministratorById = async (req: Request, res: Response, next: Ne
 			type: "success",
 			values: administratorsById,
 		})
-		
 	} catch (error) {
 		next(error)
 	}

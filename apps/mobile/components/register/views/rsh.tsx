@@ -6,6 +6,9 @@ import Colors from "@/components/colors"
 import { commonProps } from "@/components/register/types"
 import { Controller, useForm } from "react-hook-form"
 import * as mime from "react-native-mime-types"
+import axios from "axios"
+
+import { SERVER_URL } from "@/constants/colors"
 
 const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps) => {
 	useEffect(() => {
@@ -50,18 +53,19 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			formData.append("social", socialFile as any)
 		}
 		try {
-			const response = await fetch("http://192.168.243.117:5000/dashboard/seniors/new-mobile", {
-				method: "POST",
-				body: formData,
-			})
+			console.log("Enviado documentos")
 
+			console.log(SERVER_URL)
+			const response = await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData)
+
+			console.log(response)
 			console.log("formData", formData)
 
-			if (!response.ok) {
+			if (response.status !== 200) {
 				throw new Error("Error en la solicitud")
 			}
 
-			const result = await response.json()
+			const result = response.data
 			console.log(result)
 
 			navigation.navigate("Final")
