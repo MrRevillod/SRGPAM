@@ -3,7 +3,6 @@ import { RequestHandler } from "express"
 import { rmSync, existsSync, readdirSync, mkdirSync, writeFileSync } from "node:fs"
 
 export const arrayController: RequestHandler = (req, res, next) => {
-	console.log("files from storage", req.files)
 
 	try {
 		const files = req.files as {
