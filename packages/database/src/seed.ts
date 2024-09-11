@@ -6,6 +6,7 @@ const prisma = new PrismaClient()
 const seed = async () => {
 	const adminHashedPassword = await hash(".admin!Password2024", 10)
 	const seniorHashedPassword = await hash("2309", 10)
+	const professionalHashedPassword = await hash(".professional!Password2024", 10)
 
 	for (let i = 1; i <= 5; i++) {
 		try {
@@ -51,6 +52,7 @@ const seed = async () => {
 				create: {
 					id: `Professional-${i}`,
 					email: `pro${i}@professionals.com`,
+					password: professionalHashedPassword,
 					name: `Professional N${i}`,
 					serviceId: i,
 				},
