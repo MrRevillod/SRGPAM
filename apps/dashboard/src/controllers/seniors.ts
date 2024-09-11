@@ -5,7 +5,7 @@ import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
-	const { rut, pin, email } = req.body
+    const { rut, pin, email } = req.body
 	const files = req.files as {
 		[fieldname: string]: Express.Multer.File[]
 	}
@@ -16,17 +16,6 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 				await prisma.senior.delete({ where: { id: rut } })
 			}
 		})
-
-		if (
-			!files["dni-a"] ||
-			files["dni-a"][0] === undefined ||
-			!files["dni-b"] ||
-			files["dni-b"][0] === undefined ||
-			!files["social"] ||
-			files["social"][0] === undefined
-		) {
-			throw new AppError(400, "No se enviaron los archivos requeridos")
-		}
 
 		const hashedPin = await hash(pin, 10)
 
@@ -41,8 +30,6 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 			},
 		})
 
-		console.log("files from dashboard", files)
-
 		const formData = new FormData()
 
 		const dniA = bufferToBlob(files["dni-a"][0].buffer, files["dni-a"][0].mimetype)
@@ -52,8 +39,6 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		formData.append("dni-a", dniA, files["dni-a"][0].originalname)
 		formData.append("dni-b", dniB, files["dni-b"][0].originalname)
 		formData.append("social", social, files["social"][0].originalname)
-
-		console.log("formData from dashboard", formData)
 
 		const response = await httpRequest<null>("STORAGE", `/seniors/${rut}`, "POST", "MULTIPART", formData)
 
