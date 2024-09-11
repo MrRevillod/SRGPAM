@@ -76,3 +76,99 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 		next(error)
 	}
 }
+
+export const getAllSeniors = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const senior = await prisma.senior.findMany()
+		return res.status(200).json({
+			message: "Seniors obtenidos correctamente",
+			type: "success",
+			values: senior,
+		})
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const getSeniorById = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const seniorById = await prisma.senior.findUnique({
+			where: {
+				id: req.params.id,
+			},
+		})
+		return res.status(200).json({
+			message: "Senior for id obtenidos correctamente",
+			type: "success",
+			values: seniorById,
+		})
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const createSenior = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { id, name, email, address, birthDate } = req.body
+		const defaulAdminPassword = await hash("1234", 10)
+
+		const senior = await prisma.senior.create({
+			data: {
+				id,
+				name,
+				email,
+				password: defaulAdminPassword,
+				address,
+				birthDate: new Date(birthDate),
+				validated: true,
+			},
+		})
+		return res.status(200).json({
+			message: "Senior created correctamente",
+			type: "success",
+			values: senior,
+		})
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const updateSeniorById = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { name, email, password, address, birthDate } = req.body
+		const updatePassword = await hash(password, 10)
+
+		const senior = await prisma.senior.update({
+			where: { id: req.params.id },
+			data: {
+				name,
+				email,
+				password: updatePassword,
+				address,
+				birthDate: new Date(birthDate),
+			},
+		})
+		return res.status(200).json({
+			message: "Senior update correctamente",
+			type: "success",
+			values: senior,
+		})
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const deleteSeniorById = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const senior = await prisma.senior.delete({
+			where: { id: req.params.id },
+		})
+		return res.status(200).json({
+			message: "Senior deleted correctamente",
+			type: "success",
+			values: senior,
+		})
+	} catch (error) {
+		next(error)
+	}
+}
