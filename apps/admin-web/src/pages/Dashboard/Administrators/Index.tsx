@@ -18,7 +18,7 @@ const App: React.FC = () => {
 			console.log(response.data.values)
 
 			const transformedData = response.data.values.map((senior: any) => ({
-				key: senior.id,
+				id: senior.id,
 				name: senior.name,
 				email: senior.email,
 				birthDate: senior.birthDate,
@@ -63,7 +63,7 @@ const App: React.FC = () => {
 
 	return (
 		<>
-			<PersonTable data={data} onEdit={(person) => showModal("Edit", person)} onDelete={(person) => showModal("Delete", person)} />
+			<PersonTable data={data} onEdit={(person) => showModal("Edit", person)} />
 			<EditPersonModal visible={isModalOpen} person={selectedPerson} modalType={modalType} onCancel={handleCancel} onOk={handleOk} />
 		</>
 	)

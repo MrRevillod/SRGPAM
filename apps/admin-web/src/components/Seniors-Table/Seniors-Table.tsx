@@ -6,11 +6,15 @@ import type { DataType } from "../../types"
 interface PersonTableProps {
 	data: DataType[]
 	onEdit: (person: DataType) => void
-	onDelete: (person: DataType) => void
 }
 
-const PersonTable: React.FC<PersonTableProps> = ({ data, onEdit, onDelete }) => {
+const PersonTable: React.FC<PersonTableProps> = ({ data, onEdit }) => {
 	const columns: TableProps<DataType>["columns"] = [
+		{
+			title: "Id",
+			dataIndex: "id",
+			key: "id",
+		},
 		{
 			title: "Name",
 			dataIndex: "name",
@@ -27,12 +31,16 @@ const PersonTable: React.FC<PersonTableProps> = ({ data, onEdit, onDelete }) => 
 			key: "address",
 		},
 		{
+			title: "Birthdate",
+			dataIndex: "birthDate",
+			key: "birthDate",
+		},
+		{
 			title: "Action",
 			key: "action",
 			render: (_, record) => (
 				<Space size="middle">
 					<a onClick={() => onEdit(record)}>Edit</a>
-					<a onClick={() => onDelete(record)}>Delete</a>
 				</Space>
 			),
 		},
