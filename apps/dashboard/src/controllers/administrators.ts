@@ -1,7 +1,7 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
+import { AppError } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
-import { AppError, httpRequest } from "@repo/lib"
 
 export const getAdministrators = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -18,7 +18,6 @@ export const getAdministrators = async (req: Request, res: Response, next: NextF
 
 export const getAdministratorById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log("Inicio del middleware")
 		const administratorsById = await prisma.administrator.findUnique({
 			where: {
 				id: req.params.id,
@@ -27,13 +26,11 @@ export const getAdministratorById = async (req: Request, res: Response, next: Ne
 		if (!administratorsById) {
 			throw new AppError(404, "El recurso solicitado no existe")
 		}
-		console.log("Medio del middleware")
 		return res.status(200).json({
 			message: "Administradores obtenidos correctamente por id ",
 			type: "success",
 			values: administratorsById,
 		})
-		
 	} catch (error) {
 		next(error)
 	}

@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { upload, seniorsRegisterMobileImages } from "../config"
+
 import {
 	registerSeniorFromMobile,
 	handleSeniorRequest,
@@ -17,7 +18,7 @@ router.get("/:id", getSeniorById)
 router.patch("/:id", updateSeniorById)
 router.delete("/:id", deleteSeniorById)
 router.get("/new", async (req, res, next) => {})
-router.post("/new-mobile", seniorsRegisterMobileImages, registerSeniorFromMobile)
+router.post("/new-mobile", seniorsRegisterMobileImages,seniorValidation,fileValidation, registerSeniorFromMobile)
 router.post("/pre-checked", createSenior)
 router.patch("/:id/new", handleSeniorRequest)
 router.post("/:id/profile-picture", upload.single("image1"), (req, res) => {})

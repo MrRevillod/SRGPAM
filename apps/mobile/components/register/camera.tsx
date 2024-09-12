@@ -23,7 +23,7 @@ const Camera = ({ navigation }: any) => {
 
 	const takePhoto = async () => {
 		if (cameraRef.current) {
-			const photo = await cameraRef.current.takePictureAsync({ quality: 1 })
+			const photo = await cameraRef.current.takePictureAsync({ quality: 0.01 })
 			if (photo) {
 				const { params } = route as any
 				if (params?.from === "DNI") {

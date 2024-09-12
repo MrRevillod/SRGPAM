@@ -5,24 +5,17 @@ import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
-	const { rut, pin, email } = req.body
+    const { rut, pin, email } = req.body
 	const files = req.files as {
 		[fieldname: string]: Express.Multer.File[]
 	}
 
 	try {
-		await prisma.senior.delete({ where: { id: rut } })
-
-		if (
-			!files["dni-a"] ||
-			files["dni-a"][0] === undefined ||
-			!files["dni-b"] ||
-			files["dni-b"][0] === undefined ||
-			!files["social"] ||
-			files["social"][0] === undefined
-		) {
-			throw new AppError(400, "No se enviaron los archivos requeridos")
-		}
+		await prisma.senior.findUnique({ where: { id: rut } }).then(async (senior) => {
+			if (senior) {
+				await prisma.senior.delete({ where: { id: rut } })
+			}
+		})
 
 		const hashedPin = await hash(pin, 10)
 
@@ -36,6 +29,7 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 				birthDate: new Date(),
 			},
 		})
+
 		const formData = new FormData()
 
 		const dniA = bufferToBlob(files["dni-a"][0].buffer, files["dni-a"][0].mimetype)
@@ -65,6 +59,12 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 	const validated = req.query.validate === "true"
 
 	try {
+		const user = await prisma.senior.findUnique({ where: { id } })
+
+		if (!user) {
+			throw new AppError(404, "Adulto mayor no encontrado")
+		}
+
 		if (validated) {
 			await prisma.senior.update({ where: { id }, data: { validated } })
 		} else {
