@@ -1,17 +1,30 @@
 import { Router } from "express"
 import { upload, seniorsRegisterMobileImages } from "../config"
-import { registerSeniorFromMobile, handleSeniorRequest } from "../controllers/seniors"
+
+import {
+	registerSeniorFromMobile,
+	handleSeniorRequest,
+	getAllSeniors,
+	getSeniorById,
+	createSenior,
+	updateSeniorById,
+	deleteSeniorById,
+} from "../controllers/seniors"
+
+import { fileValidation } from "../middlewares/file"
+import { seniorValidation, userIdValidation } from "../middlewares/validation"
 
 const router: Router = Router()
 
-router.get("", async (req, res, next) => {})
-router.get("/:id", async (req, res, next) => {})
-router.patch("/:id", async (req, res, next) => {})
-router.delete("/:id", async (req, res, next) => {})
+router.get("", getAllSeniors)
+router.get("/:id", userIdValidation("SENIOR"), getSeniorById)
+router.patch("/:id", userIdValidation("SENIOR"), updateSeniorById)
+router.delete("/:id", userIdValidation("SENIOR"), deleteSeniorById)
+router.post("/pre-checked", createSenior) // TODO: Añana la validación de los datos
+router.post("/new-mobile", seniorsRegisterMobileImages, seniorValidation, fileValidation, registerSeniorFromMobile)
+
 router.get("/new", async (req, res, next) => {})
-router.post("/new-mobile", seniorsRegisterMobileImages, registerSeniorFromMobile)
-router.post("/pre-checked", async (req, res, next) => {})
-router.patch("/:id/new", handleSeniorRequest)
+router.patch("/:id/new", userIdValidation("SENIOR"), handleSeniorRequest)
 router.post("/:id/profile-picture", upload.single("image1"), (req, res) => {})
 
 export default router

@@ -1,6 +1,6 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { AppError } from "@repo/lib"
+import { Administrator } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
 
 export const getAdministrators = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,20 +18,10 @@ export const getAdministrators = async (req: Request, res: Response, next: NextF
 
 export const getAdministratorById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log("Inicio del middleware")
-		const administratorsById = await prisma.administrator.findUnique({
-			where: {
-				id: req.params.id,
-			},
-		})
-		if (!administratorsById) {
-			throw new AppError(404, "El recurso solicitado no existe")
-		}
-		console.log("Medio del middleware")
 		return res.status(200).json({
-			message: "Administradores obtenidos correctamente por id ",
+			message: "Administradores obtenidos correctamente por id",
 			type: "success",
-			values: administratorsById,
+			values: req.getExtension("user"),
 		})
 	} catch (error) {
 		next(error)
@@ -43,6 +33,8 @@ export const createAdministrator = async (req: Request, res: Response, next: Nex
 		const { id, name, email } = req.body
 		const defaulAdminPassword = await hash("admin123", 10)
 
+		// TODO! Validar si el usuario ya existe antes de crearlo
+
 		const createAdministrator = await prisma.administrator.create({
 			data: {
 				id,
@@ -51,8 +43,9 @@ export const createAdministrator = async (req: Request, res: Response, next: Nex
 				password: defaulAdminPassword,
 			},
 		})
+
 		return res.status(200).json({
-			message: "Administrador Creado Correctamente ",
+			message: "Administrador Creado Correctamente",
 			type: "success",
 			values: createAdministrator,
 		})
@@ -62,20 +55,24 @@ export const createAdministrator = async (req: Request, res: Response, next: Nex
 }
 
 export const updateAdministrator = async (req: Request, res: Response, next: NextFunction) => {
+	const reqUser = req.getExtension("user") as Administrator
+
 	try {
 		const { name, email, password } = req.body
-		const defaulAdminPassword = await hash(password, 10)
 
-		await prisma.administrator.update({
+		const user = await prisma.administrator.update({
 			where: { id: req.params.id },
-
-			data: { name, email, password: defaulAdminPassword },
+			data: {
+				name,
+				email,
+				password: password ? await hash(password, 10) : reqUser.password,
+			},
 		})
 
 		return res.status(200).json({
-			message: "Administrador Actualizado Correctamente ",
+			message: "Administrador Actualizado Correctamente",
 			type: "success",
-			values: null,
+			values: user,
 		})
 	} catch (error) {
 		next(error)
@@ -87,7 +84,7 @@ export const deleteAdministrator = async (req: Request, res: Response, next: Nex
 		await prisma.administrator.delete({ where: { id: req.params.id } })
 
 		return res.status(200).json({
-			message: "Administradores Eliminado Correctamente ",
+			message: "Administrador Eliminado Correctamente",
 			type: "success",
 			values: null,
 		})

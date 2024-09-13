@@ -53,20 +53,11 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			formData.append("social", socialFile as any)
 		}
 		try {
-			console.log("Enviado documentos")
-
-			console.log(SERVER_URL)
 			const response = await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData)
-
-			console.log(response)
-			console.log("formData", formData)
 
 			if (response.status !== 200) {
 				throw new Error("Error en la solicitud")
 			}
-
-			const result = response.data
-			console.log(result)
 
 			navigation.navigate("Final")
 		} catch (error) {

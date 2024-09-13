@@ -1,13 +1,13 @@
 import { Router } from "express"
-import { userIdValidation } from "../middlewares/validation"
+import { adminValidation, userIdValidation } from "../middlewares/validation"
 import { getAdministrators, getAdministratorById, createAdministrator, updateAdministrator, deleteAdministrator } from "../controllers/administrators"
 
 const router: Router = Router()
 
 router.get("/", getAdministrators)
-router.get("/:id", userIdValidation, getAdministratorById)
-router.post("/", createAdministrator)
-router.patch("/:id", userIdValidation, updateAdministrator)
-router.delete("/:id", userIdValidation, deleteAdministrator)
+router.get("/:id", userIdValidation("ADMIN"), getAdministratorById)
+router.post("/", adminValidation, createAdministrator)
+router.patch("/:id", userIdValidation("ADMIN"), updateAdministrator)
+router.delete("/:id", userIdValidation("ADMIN"), deleteAdministrator)
 
 export default router
