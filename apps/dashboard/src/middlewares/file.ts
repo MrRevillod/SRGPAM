@@ -1,14 +1,13 @@
-import { NextFunction, Request, Response } from "express"
+import { AppError } from "@repo/lib"
 import { fileWhitelist } from "../config"
+import { NextFunction, Request, Response } from "express"
 import { validateBufferMIMEType } from "validate-image-type"
-import { AppError, log } from "@repo/lib"
 
 export const fileValidation = async (req: Request, res: Response, next: NextFunction) => {
 	const files = req.files as {
 		[fieldname: string]: Express.Multer.File[]
 	}
 
-	log(files)
 	try {
 		const filenames = ["dni-a", "dni-b", "social"]
 		filenames.forEach(async (filename) => {
@@ -18,16 +17,15 @@ export const fileValidation = async (req: Request, res: Response, next: NextFunc
 			const isValidate = await validateBufferMIMEType(files[filename][0].buffer, {
 				allowMimeTypes: fileWhitelist,
 			})
-            
+
 			if (!isValidate.ok) {
-                res.status(400).json({
-                    message:"Error de formato"
-                })
-				
+				res.status(400).json({
+					message: "Error de formato",
+				})
 			}
 		})
 		next()
-    } catch (error) {
+	} catch (error) {
 		next(error)
 	}
 }

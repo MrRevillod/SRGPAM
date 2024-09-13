@@ -45,9 +45,10 @@ model Service {
 }
 
 model Professional {
-  id    String @id @db.VarChar(255)
-  name  String @db.Text
-  email String @db.VarChar(255)
+  id       String @id @db.VarChar(255)
+  name     String @db.Text
+  email    String @db.VarChar(255)
+  password String @db.VarChar(255)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

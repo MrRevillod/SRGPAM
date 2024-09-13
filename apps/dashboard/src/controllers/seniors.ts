@@ -5,18 +5,12 @@ import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
-    const { rut, pin, email } = req.body
+	const { rut, pin, email } = req.body
 	const files = req.files as {
 		[fieldname: string]: Express.Multer.File[]
 	}
 
 	try {
-		await prisma.senior.findUnique({ where: { id: rut } }).then(async (senior) => {
-			if (senior) {
-				await prisma.senior.delete({ where: { id: rut } })
-			}
-		})
-
 		const hashedPin = await hash(pin, 10)
 
 		await prisma.senior.create({
@@ -44,7 +38,6 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 
 		if (response.type == "error") {
 			await prisma.senior.delete({ where: { id: rut } })
-
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
@@ -92,15 +85,10 @@ export const getAllSeniors = async (req: Request, res: Response, next: NextFunct
 
 export const getSeniorById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const seniorById = await prisma.senior.findUnique({
-			where: {
-				id: req.params.id,
-			},
-		})
 		return res.status(200).json({
-			message: "Senior for id obtenidos correctamente",
+			message: "Información obtenida correctamente",
 			type: "success",
-			values: seniorById,
+			values: req.getExtension("user"),
 		})
 	} catch (error) {
 		next(error)
@@ -111,6 +99,8 @@ export const createSenior = async (req: Request, res: Response, next: NextFuncti
 	try {
 		const { id, name, email, address, birthDate } = req.body
 		const defaulAdminPassword = await hash("1234", 10)
+
+		// TODO! Validar si el usuario ya existe antes de crearlo
 
 		const senior = await prisma.senior.create({
 			data: {

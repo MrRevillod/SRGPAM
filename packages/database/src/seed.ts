@@ -1,11 +1,18 @@
 const { hash } = require("bcrypt")
 const { PrismaClient } = require("@prisma/client")
 
+require("dotenv").config({ path: "../../../.env" })
+
 const prisma = new PrismaClient()
 
+const DEFAULT_SENIOR_PASSWORD = "1234"
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD ?? "admin"
+const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD ?? "professional"
+
 const seed = async () => {
-	const adminHashedPassword = await hash(".admin!Password2024", 10)
-	const seniorHashedPassword = await hash("2309", 10)
+	const adminHashedPassword = await hash(DEFAULT_ADMIN_PASSWORD, 10)
+	const professionalHashedPassword = await hash(DEFAULT_PROFESSIONAL_PASSWORD, 10)
+	const seniorHashedPassword = await hash(DEFAULT_SENIOR_PASSWORD, 10)
 
 	for (let i = 1; i <= 5; i++) {
 		try {
@@ -53,6 +60,7 @@ const seed = async () => {
 					email: `pro${i}@professionals.com`,
 					name: `Professional N${i}`,
 					serviceId: i,
+					password: professionalHashedPassword,
 				},
 				update: {},
 			})

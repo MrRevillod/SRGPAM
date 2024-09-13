@@ -1,32 +1,44 @@
-import { Request, Response, NextFunction } from "express"
-import { prisma } from "@repo/database"
-import { AppError } from "@repo/lib"
-import { adminSchema, registerSchema } from "./schemas"
 import { z } from "zod"
+import { match } from "ts-pattern"
+import { prisma } from "@repo/database"
+import { AppError, UserKind } from "@repo/lib"
+import { adminSchema, registerSchema } from "./schemas"
+import { Request, Response, NextFunction } from "express"
 
-export const userIdValidation = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		if (!req.params.id) {
-			throw new AppError(400, "El recurso solicitado no existe")
+export const userIdValidation = (userKind: UserKind) => {
+	return async (req: Request, res: Response, next: NextFunction) => {
+		const { id } = req.params
+
+		try {
+			if (!id) throw new AppError(400, "El usuario solicitado no existe")
+
+			const user = await match(userKind)
+				.with("ADMIN", async () => {
+					return await prisma.administrator.findUnique({ where: { id } })
+				})
+				.with("SENIOR", async () => {
+					return await prisma.senior.findUnique({ where: { id } })
+				})
+				.with("PROFESSIONAL", async () => {
+					return await prisma.professional.findUnique({ where: { id } })
+				})
+				.run()
+
+			if (!user) throw new AppError(400, "El usuario solicitado no existe")
+
+			req.setExtension("user", user)
+
+			next()
+		} catch (error) {
+			next(error)
 		}
-
-		const exist = await prisma.administrator.findUnique({
-			where: { id: req.params.id },
-		})
-
-		if (!exist) {
-			throw new AppError(400, "El recurso solicitado no existe")
-		}
-		next()
-	} catch (error) {
-		next(error)
 	}
 }
 
 export const seniorValidation = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		await registerSchema.parseAsync(req.body)
-        next()
+		next()
 	} catch (error) {
 		let err = error
 		if (err instanceof z.ZodError) {
@@ -36,12 +48,12 @@ export const seniorValidation = async (req: Request, res: Response, next: NextFu
 			message: "Argumentos inválidos",
 		})
 	}
-} 
+}
 
 export const adminValidation = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		await adminSchema.parseAsync(req.body)
-        next()
+		next()
 	} catch (error) {
 		let err = error
 		if (err instanceof z.ZodError) {
@@ -51,4 +63,4 @@ export const adminValidation = async (req: Request, res: Response, next: NextFun
 			message: error,
 		})
 	}
-} 
+}
