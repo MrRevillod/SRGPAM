@@ -11,12 +11,10 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 
 	try {
-		await prisma.senior.findUnique({ where: { id: rut } }).then(async (senior) => {
-			if (senior) {
-				await prisma.senior.delete({ where: { id: rut } })
-			}
-		})
-
+		const userExists = await prisma.senior.findUnique({ where: { id: rut } })
+		if (userExists) {
+			throw new AppError(409, "La persona que estas tratando de registrar ya existe")
+		}
 		if (
 			!files["dni-a"] ||
 			files["dni-a"][0] === undefined ||
