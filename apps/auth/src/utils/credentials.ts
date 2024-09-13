@@ -17,6 +17,9 @@ export const checkCredentials = async <T>(userKind: UserKind, credentials: Crede
 		.with("SENIOR", async () => {
 			return await prisma.senior.findFirst({ where: { id: credentials.rut } })
 		})
+		.with("PROFESSIONAL", async () => {
+			return await prisma.professional.findFirst({ where: { email: credentials.email } })
+		})
 		.run()
 
 	if (!user || !(await compare(credentials.password, user.password))) {

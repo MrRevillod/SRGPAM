@@ -11,6 +11,12 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 
 	try {
+
+		const userExists = await prisma.senior.findUnique({ where: { id: rut } })
+		if (userExists) {
+			throw new AppError(409, "La persona que estas tratando de registrar ya existe")
+		}
+
 		const hashedPin = await hash(pin, 10)
 
 		await prisma.senior.create({
