@@ -1,36 +1,16 @@
 import React from "react"
 import { View, Text, Button, StyleSheet } from "react-native"
 import { commonProps } from "@/components/register/types"
+import GeneralView from "@/components/register/generalView"
+import CustomButton from "@/components/button"
 
 const Menu = ({ navigation }: commonProps) => {
 	return (
-		<View style={styles.container}>
-			<Text style={styles.title}>Bienvenido</Text>
-			<View style={styles.buttonContainer}>
-				<Button title="Ir a Registro" onPress={() => navigation.navigate("Register")} />
-			</View>
-			<View style={styles.buttonContainer}>
-				<Button title="Ir a Login" onPress={() => navigation.navigate("Login")} />
-			</View>
-		</View>
+		<GeneralView textCircle="1" textTitle="Eliga una opción" title="Bienvenido">
+			<CustomButton title="Ir a Registro" onPress={() => navigation.navigate("Register")} style={{ marginTop: 20 }} />
+			<CustomButton title="Ir a Login" onPress={() => navigation.navigate("Login")} style={{ marginTop: 20 }} />
+		</GeneralView>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#f5f5f5",
-	},
-	title: {
-		fontSize: 24,
-		marginBottom: 20,
-	},
-	buttonContainer: {
-		marginVertical: 10,
-		width: "80%",
-	},
-})
 
 export default Menu

@@ -4,7 +4,7 @@ import GeneralView from "@/components/register/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/components/register/types"
 
-const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
+const RUT = ({ navigation, control, errors }: commonProps) => {
 	return (
 		<GeneralView
 			title="Datos del Registro"
@@ -14,7 +14,7 @@ const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) 
 		>
 			<View style={styles.container}>
 				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} />
-				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("rut", navigation, "Pin")} />
+				<CustomButton title="Siguiente" onPress={() => navigation.navigate("Pin")} />
 			</View>
 		</GeneralView>
 	)

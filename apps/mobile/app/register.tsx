@@ -63,7 +63,7 @@ const Register = () => {
 		control,
 		handleSubmit,
 		setValue,
-		trigger, // Esto se usará para validar un campo individualmente
+		trigger,
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
