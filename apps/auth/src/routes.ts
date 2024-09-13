@@ -1,12 +1,10 @@
 import { Router } from "express"
-import { administratorsLogin, professionalsLogin } from "./controllers/login"
 import { validateFields } from "./middlewares/validations"
+import { loginController } from "./controllers/login"
 
 const router: Router = Router()
 
-router.post("/administrators/login", validateFields("LOGIN_FIELDS"), administratorsLogin)
-router.post("/professionals/login", validateFields("LOGIN_FIELDS"), professionalsLogin)
-router.post("/seniors/login", validateFields("SENIOR_LOGIN_FIELDS"), (req, res) => {})
+router.post("/login", validateFields("ADMIN_LOGIN_FIELDS"), loginController)
 
 router.post("/validate-auth", (req, res) => {})
 router.post("/validate-role", (req, res) => {})

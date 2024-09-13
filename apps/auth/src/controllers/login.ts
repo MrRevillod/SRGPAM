@@ -1,19 +1,27 @@
-import { Administrator, Professional } from "@prisma/client"
+
 import { checkCredentials } from "../utils/credentials"
+import { Administrator, Professional } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
-import { signJsonwebtoken, AccessTokenOpts, RefreshTokenOpts } from "@repo/lib"
+import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken } from "@repo/lib"
 
-export const administratorsLogin = async (req: Request, res: Response, next: NextFunction) => {
+export const loginController = async (req: Request, res: Response, next: NextFunction) => {
+	const loginKind = req.query.variant
+
+	if (loginKind !== "ADMIN" && loginKind !== "PROFESSIONAL") {
+		throw new AppError(400, "Invalid login kind")
+	}
+
+	const expireDate = new Date()
+	expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
+
+	const refreshDate = new Date()
+	refreshDate.setDate(refreshDate.getDate() + 30)
+
 	try {
-		const expireDate = new Date()
-		expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
-		const refreshDate = new Date()
-		refreshDate.setDate(refreshDate.getDate() + 30)
+		const user: Administrator | Professional = await checkCredentials(loginKind, req.body)
 
-		const user: Administrator = await checkCredentials("ADMIN", req.body)
-
-		const accessToken = signJsonwebtoken({ id: user.id, role: "ADMIN" }, AccessTokenOpts)
-		const refreshToken = signJsonwebtoken({ id: user.id, role: "ADMIN" }, RefreshTokenOpts)
+		const accessToken = signJsonwebtoken({ id: user.id }, AccessTokenOpts)
+		const refreshToken = signJsonwebtoken({ id: user.id }, RefreshTokenOpts)
 
 		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
 		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
@@ -23,25 +31,3 @@ export const administratorsLogin = async (req: Request, res: Response, next: Nex
 		next(err)
 	}
 }
-
-export const professionalsLogin = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const expireDate = new Date()
-		expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
-		const refreshDate = new Date()
-		refreshDate.setDate(refreshDate.getDate() + 30)
-
-		const user: Professional = await checkCredentials("PROFESSIONAL", req.body)
-
-		const accessToken = signJsonwebtoken({ id: user.id, role: "PROFESSIONAL" }, AccessTokenOpts)
-		const refreshToken = signJsonwebtoken({ id: user.id, role: "PROFESSIONAL" }, RefreshTokenOpts)
-
-		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
-		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
-
-		return res.status(200).json({ message: "Logged in ", values: { user }, accessToken, refreshToken })
-	} catch (error) {
-		next(error)
-	}
-}
-export const seniorsLogin = async (req: Request, res: Response, next: NextFunction) => {}
