@@ -9,13 +9,13 @@
 		"generate": "turbo run generate",
 		"build": "turbo run build",
 		"clean": "turbo run clean",
-		"dev": "turbo run dev",
+		"dev": "pnpm install && turbo run dev",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"test": "turbo run test",
 		"typecheck": "turbo run typecheck",
-		"dev:backend": "pnpm run dev --filter=!admin-web  --filter=!mobile-app",
-		"dev:web-apps": "pnpm run dev --filter=admin-web --filter=professional-web",
-		"dev:mobile-app": "pnpm run dev --filter=mobile-app"
+		"dev:backend": "pnpm install && pnpm run dev --filter=!admin-web  --filter=!mobile-app",
+		"dev:web-apps": "pnpm install && pnpm run dev --filter=admin-web --filter=professional-web",
+		"dev:mobile-app": "pnpm install && pnpm run dev --filter=mobile-app"
 	},
 	"devDependencies": {
 		"@types/cookie-parser": "^1.4.7",
