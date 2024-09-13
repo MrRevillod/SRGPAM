@@ -10,6 +10,7 @@ const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD ?? "admin"
 const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD ?? "professional"
 
 const seed = async () => {
+
 	const adminHashedPassword = await hash(DEFAULT_ADMIN_PASSWORD, 10)
 	const professionalHashedPassword = await hash(DEFAULT_PROFESSIONAL_PASSWORD, 10)
 	const seniorHashedPassword = await hash(DEFAULT_SENIOR_PASSWORD, 10)
@@ -58,6 +59,7 @@ const seed = async () => {
 				create: {
 					id: `Professional-${i}`,
 					email: `pro${i}@professionals.com`,
+					password: professionalHashedPassword,
 					name: `Professional N${i}`,
 					serviceId: i,
 					password: professionalHashedPassword,
