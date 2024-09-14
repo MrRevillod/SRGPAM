@@ -1,4 +1,3 @@
-
 import { checkCredentials } from "../utils/credentials"
 import { Administrator, Professional } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
