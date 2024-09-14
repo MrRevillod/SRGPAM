@@ -1,7 +1,7 @@
-import { hash } from "bcrypt"
+import { hash, compare } from "bcrypt"
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
-import { AppError, httpRequest } from "@repo/lib"
+import { AccessTokenOpts, AppError, httpRequest, RefreshTokenOpts, signJsonwebtoken } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,7 +11,6 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 
 	try {
-
 		const userExists = await prisma.senior.findUnique({ where: { id: rut } })
 		if (userExists) {
 			throw new AppError(409, "La persona que estas tratando de registrar ya existe")
@@ -48,6 +47,37 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		}
 
 		return res.status(200).json({ message: "El adulto mayor se a registrado correctamente", type: "success", values: null })
+	} catch (error: unknown) {
+		next(error)
+	}
+}
+
+export const loginSeniorMobile = async (req: Request, res: Response, next: NextFunction) => {
+	const { rut, pin } = req.body
+
+	try {
+		const user = await prisma.senior.findUnique({ where: { id: rut } })
+		console.log(user?.id, user)
+
+		if (!user) {
+			throw new AppError(404, "El rut ingresado no se encuentra registrado")
+		}
+
+		const hash = await compare(pin, user.password)
+
+		if (!hash) {
+			throw new AppError(401, "la contraseña ingresada es incorrecta")
+		}
+
+		if (!user.validated) {
+			throw new AppError(401, "Su cuenta aun no ha sido validada")
+		}
+
+		const payload = { uid: user.id }
+		const accessToken = signJsonwebtoken(payload, AccessTokenOpts)
+		const refreshToken = signJsonwebtoken(payload, RefreshTokenOpts)
+
+		return res.status(200).json({ message: "Inicio de sesión correcto", type: "success", values: { rut, accessToken, refreshToken } })
 	} catch (error: unknown) {
 		next(error)
 	}
