@@ -34,9 +34,9 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			const fileType = mime.lookup(uri) || "image/jpeg"
 
 			return {
-				uri: uri, // URI local del archivo
-				type: fileType, // Tipo MIME (image/jpeg por defecto)
-				name: fileName, // Nombre del archivo
+				uri: uri,
+				type: fileType,
+				name: fileName,
 			}
 		}
 
@@ -53,7 +53,11 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			formData.append("social", socialFile as any)
 		}
 		try {
-			const response = await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData)
+			const response = await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			})
 
 			if (response.status !== 200) {
 				throw new Error("Error en la solicitud")
