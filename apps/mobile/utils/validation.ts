@@ -32,7 +32,12 @@ const registerSchema = z
 		rut: z.string().refine(isValidRut, {
 			message: "El RUT ingresado no es válido",
 		}),
-		email: z.string().email({ message: "Invalid email address" }).optional(),
+		email: z
+			.string()
+			.optional()
+			.refine((email) => email === "" || z.string().email().safeParse(email).success, {
+				message: "Email Invalido",
+			}),
 		pin: z.string().refine((value) => value.length === 4, {
 			message: "El PIN debe tener 4 dígitos",
 		}),
