@@ -9,7 +9,7 @@
 		"generate": "turbo run generate",
 		"build": "turbo run build",
 		"clean": "turbo run clean",
-		"dev": "pnpm install && turbo run dev",
+		"dev": "turbo run dev",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"test": "turbo run test",
 		"typecheck": "turbo run typecheck",

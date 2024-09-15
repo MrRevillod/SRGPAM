@@ -5,11 +5,11 @@ import { Avatar, Dropdown, Navbar } from "flowbite-react"
 
 const Header: React.FC = () => {
 	return (
-		<Navbar fluid rounded className="pt-4">
+		<Navbar fluid rounded className="pt-4 h-16 w-full">
 			<Navbar.Brand>
-				<span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">SRGPAM</span>
+				<img src="/logo.png" alt="logo" width="60" />
 			</Navbar.Brand>
-			<div className="flex md:order-2">
+			<div className="flex md:order-2 -mt-1">
 				<Dropdown
 					arrowIcon={false}
 					inline
@@ -35,9 +35,9 @@ const Header: React.FC = () => {
 				</Dropdown>
 				<Navbar.Toggle />
 			</div>
-			<Navbar.Collapse>
+			<Navbar.Collapse className="-mt-1">
 				<Link to="/dashboard/administradores">
-					<Navbar.Link active>Administradores</Navbar.Link>
+					<Navbar.Link>Administradores</Navbar.Link>
 				</Link>
 
 				<Link to="/dashboard/adultos-mayores">

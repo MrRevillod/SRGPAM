@@ -22,14 +22,14 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 
 	const classes = `border-1 ${error ? "border-red-400" : "border-neutral-500"} rounded-lg 
         p-2 focus:outline-none  focus:ring-blue-500 focus:border-blue-500 w-full 
-        pl-4 placeholder-neutral-400 text-neutral-950
+        pl-4 placeholder-neutral-400 text-neutral-950 mb-1
     `
 
 	const [inputType, setInputType] = useState<InputType>(type)
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
-			<Show when={label === "Password" && type === "password" && (islogin as boolean)}>
+			<Show when={label === "Contraseña" && type === "password" && (islogin as boolean)}>
 				<div className="flex justify-between w-full items-center mt-2">
 					<label htmlFor={name} className="font-semibold text-neutral-950">
 						{label}
@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 				</div>
 			</Show>
 
-			<Show when={label !== "Password" || type !== "password" || !islogin}>
+			<Show when={label !== "Contraseña" || type !== "password" || !islogin}>
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<label className="font-semibold">{label}</label>
 					{error && <div className="text-red-600 text-sm">{error.toString()}</div>}
