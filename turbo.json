@@ -1,6 +1,7 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"tasks": {
+		"install": {},
 		"build": {
 			"inputs": [
 				"$TURBO_DEFAULT$",
@@ -37,8 +38,10 @@
 		},
 		"dev": {
 			"dependsOn": [
+				"^install",
 				"^build",
-				"^generate"
+				"^generate",
+				"^db:seed"
 			],
 			"cache": false,
 			"persistent": true

@@ -3,12 +3,9 @@ import Header from "./components/ui/Header"
 
 const AppLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
 	return (
-		<article>
+		<article className="h-screen w-screen">
 			<Header />
-			<main className="container mx-auto px-4 py-4">{children}</main>
-			<footer className="bg-gray-100 text-center py-4">
-				<p>Dirección de adultos mayores de la municipalidad de Temuco - {new Date().getFullYear()}</p>
-			</footer>
+			<main className="container">{children}</main>
 		</article>
 	)
 }
