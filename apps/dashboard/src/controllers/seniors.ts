@@ -1,7 +1,7 @@
 import { hash, compare } from "bcrypt"
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
-import { AccessTokenOpts, AppError, httpRequest, RefreshTokenOpts, signJsonwebtoken } from "@repo/lib"
+import { AccessTokenOpts, AppError, httpRequest, RefreshTokenOpts, signJsonwebtoken, userWithoutPassword } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
@@ -76,8 +76,9 @@ export const loginSeniorMobile = async (req: Request, res: Response, next: NextF
 		const payload = { uid: user.id }
 		const accessToken = signJsonwebtoken(payload, AccessTokenOpts)
 		const refreshToken = signJsonwebtoken(payload, RefreshTokenOpts)
+		const withoutPassword = userWithoutPassword(user)
 
-		return res.status(200).json({ message: "Inicio de sesión correcto", type: "success", values: { rut, accessToken, refreshToken } })
+		return res.status(200).json({ message: "Inicio de sesión correcto", type: "success", values: { accessToken, refreshToken, withoutPassword } })
 	} catch (error: unknown) {
 		next(error)
 	}

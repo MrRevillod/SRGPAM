@@ -41,3 +41,5 @@ export {
 	CustomTokenOpts,
 	RefreshTokenOpts,
 } from "./authorization/jsonwebtoken"
+
+export { userWithoutPassword } from "./authorization/user"
