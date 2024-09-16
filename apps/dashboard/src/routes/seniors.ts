@@ -9,7 +9,6 @@ import {
 	createSenior,
 	updateSeniorById,
 	deleteSeniorById,
-	loginSeniorMobile,
 } from "../controllers/seniors"
 
 import { fileValidation } from "../middlewares/file"
@@ -23,7 +22,6 @@ router.patch("/:id", userIdValidation("SENIOR"), updateSeniorById)
 router.delete("/:id", userIdValidation("SENIOR"), deleteSeniorById)
 router.post("/pre-checked", createSenior) // TODO: Añana la validación de los datos
 router.post("/new-mobile", seniorsRegisterMobileImages, seniorValidation, fileValidation, registerSeniorFromMobile)
-router.post("/login", loginSeniorMobile)
 
 router.get("/new", async (req, res, next) => {})
 router.patch("/:id/new", userIdValidation("SENIOR"), handleSeniorRequest)

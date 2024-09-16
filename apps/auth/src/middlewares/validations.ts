@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { match } from "ts-pattern"
 import { NextFunction, Request, Response } from "express"
+import { isValidRut } from "@repo/lib"
 
 type ValidationRule = "LOGIN_FIELDS" | "SENIOR_LOGIN_FIELDS"
 
@@ -10,7 +11,9 @@ const LoginFields = z.object({
 })
 
 const SeniorLoginFields = z.object({
-	rut: z.string(),
+	rut: z.string().refine(isValidRut, {
+		message: "El RUT ingresado no es válido",
+	}),
 	password: z.string(),
 })
 

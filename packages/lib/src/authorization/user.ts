@@ -1,28 +1,14 @@
 import { AppError } from ".."
 
-type userProps = {
-	id: string
-	name: string
-	email: string
-	address: string
-	birthDate: string
-}
-
-export const userWithoutPassword = (user: any) => {
+export const toPublicUser = (user: any) => {
 	try {
-		if (!user) {
-			throw new AppError(404, "Usuario no encontrado")
+		if (!user.password) {
+			return user
 		}
 
-		const userWithoutPassword: userProps = {
-			id: user.id || null,
-			name: user.name || null,
-			email: user.email || null,
-			address: user.address || null,
-			birthDate: user.birthDate || null,
-		}
+		const { password, ...userData } = user
 
-		return userWithoutPassword
+		return userData
 	} catch (error) {
 		throw new AppError(404, "Usuario no encontrado")
 	}

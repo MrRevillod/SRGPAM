@@ -23,7 +23,7 @@ const Login = () => {
 	} = useForm({
 		defaultValues: {
 			rut: "",
-			pin: "",
+			password: "",
 		},
 	})
 
