@@ -1,7 +1,7 @@
 import { checkCredentials } from "../utils/credentials"
-import { Administrator, Professional } from "@prisma/client"
+import { Administrator, Professional, Senior } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
-import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken } from "@repo/lib"
+import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken, toPublicUser } from "@repo/lib"
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
 	const loginKind = req.query.variant
@@ -28,5 +28,21 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		return res.status(200).json({ message: "Logged in", values: { user } })
 	} catch (err) {
 		next(err)
+	}
+}
+
+export const loginSeniorMobile = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const user: Senior = await checkCredentials("SENIOR", req.body)
+		if (!user.validated) {
+			throw new AppError(401, "Su cuenta aun no ha sido validada")
+		}
+		const accessToken = signJsonwebtoken({ id: user.id }, AccessTokenOpts)
+		const refreshToken = signJsonwebtoken({ id: user.id }, RefreshTokenOpts)
+		const publicUser = toPublicUser(user)
+
+		return res.status(200).json({ message: "Inicio de sesión correcto", type: "success", values: { accessToken, refreshToken, publicUser } })
+	} catch (error: unknown) {
+		next(error)
 	}
 }

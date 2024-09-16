@@ -33,6 +33,8 @@ export { getServerCookies } from "./authorization/cookies"
 export { services, constants } from "./config"
 export type { JsonResponse, UserKind } from "./types"
 export { AppError, AuthError, errorHandler } from "./errors"
+export { toPublicUser } from "./authorization/user"
+export { isValidRut } from "./authorization/rut"
 
 export {
 	signJsonwebtoken,
@@ -41,5 +43,3 @@ export {
 	CustomTokenOpts,
 	RefreshTokenOpts,
 } from "./authorization/jsonwebtoken"
-
-export { userWithoutPassword } from "./authorization/user"
