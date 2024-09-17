@@ -57,7 +57,7 @@ const registerSchema = z
 		path: ["pinConfirm"],
 	})
 
-const profileSchema = z.object({
+export const profileSchema = z.object({
 	id: z.string().refine(isValidRut, {
 		message: "El RUT ingresado no es válido",
 	}),
