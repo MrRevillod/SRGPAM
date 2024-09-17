@@ -167,3 +167,21 @@ export const deleteSeniorById = async (req: Request, res: Response, next: NextFu
 		next(error)
 	}
 }
+
+export const newSeniors = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const seniors = await prisma.senior.findMany({
+			where: {
+				validated: false,
+			},
+		})
+
+		return res.status(200).json({
+			message: "Seniors encontrados correctamente",
+			type: "success",
+			values: { seniors, len: seniors.length },
+		})
+	} catch (error) {
+		next(error)
+	}
+}

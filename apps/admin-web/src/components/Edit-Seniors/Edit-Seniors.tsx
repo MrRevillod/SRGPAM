@@ -93,19 +93,39 @@ const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, moda
 					}}
 					autoComplete="off"
 				>
-					<Form.Item<FieldType> label="Name" name="name" rules={[{ required: true, message: "Please input your name!" }]}>
+					<Form.Item<FieldType>
+						label="Name"
+						name="name"
+						rules={[{ required: true, message: "Please input your name!" }]}
+					>
 						<Input />
 					</Form.Item>
-					<Form.Item<FieldType> label="Email" name="email" rules={[{ type: "email", message: "Please input a valid email!" }]}>
+					<Form.Item<FieldType>
+						label="Email"
+						name="email"
+						rules={[{ type: "email", message: "Please input a valid email!" }]}
+					>
 						<Input />
 					</Form.Item>
-					<Form.Item<FieldType> label="Address" name="address" rules={[{ required: true, message: "Please input your address!" }]}>
+					<Form.Item<FieldType>
+						label="Address"
+						name="address"
+						rules={[{ required: true, message: "Please input your address!" }]}
+					>
 						<Input />
 					</Form.Item>
-					<Form.Item<FieldType> label="BirthDate" name="birthDate" rules={[{ required: true, message: "Please input your birth date!" }]}>
+					<Form.Item<FieldType>
+						label="BirthDate"
+						name="birthDate"
+						rules={[{ required: true, message: "Please input your birth date!" }]}
+					>
 						<Input />
 					</Form.Item>
-					<Form.Item<FieldType> label="Password" name="password" rules={[{ required: true, message: "Please input a password!" }]}>
+					<Form.Item<FieldType>
+						label="Password"
+						name="password"
+						rules={[{ required: true, message: "Please input a password!" }]}
+					>
 						<Input.Password />
 					</Form.Item>
 				</Form>
