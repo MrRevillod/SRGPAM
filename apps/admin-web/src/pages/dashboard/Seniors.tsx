@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
-import PersonTable from "../../../components/Seniors-Table/Seniors-Table"
-import EditPersonModal from "../../../components/Edit-Seniors/Edit-Seniors"
-import type { DataType } from "../../../types"
+import PersonTable from "../../components/Seniors-Table/Seniors-Table"
+import EditPersonModal from "../../components/Edit-Seniors/Edit-Seniors"
+import type { DataType } from "../../lib/types"
 
-const App: React.FC = () => {
+import "../../index.css"
+import PageLayout from "../../layouts/PageLayout"
+
+const SeniorsPage: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [modalType, setModalType] = useState("")
 	const [selectedPerson, setSelectedPerson] = useState<DataType | null>(null)
@@ -62,17 +65,19 @@ const App: React.FC = () => {
 	}
 
 	return (
-		<>
-			<PersonTable data={data} onEdit={(person) => showModal("Edit", person)} />
-			<EditPersonModal
-				visible={isModalOpen}
-				person={selectedPerson}
-				modalType={modalType}
-				onCancel={handleCancel}
-				onOk={handleOk}
-			/>
-		</>
+		<PageLayout pageTitle="Adultos mayores" addFunction={() => {}} setData={() => {}}>
+			<>
+				<PersonTable data={data} onEdit={(person) => showModal("Edit", person)} />
+				<EditPersonModal
+					visible={isModalOpen}
+					person={selectedPerson}
+					modalType={modalType}
+					onCancel={handleCancel}
+					onOk={handleOk}
+				/>
+			</>
+		</PageLayout>
 	)
 }
 
-export default App
+export default SeniorsPage

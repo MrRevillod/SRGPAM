@@ -1,7 +1,7 @@
 import React from "react"
 import { Table, Space } from "antd"
 import type { TableProps } from "antd"
-import type { DataType } from "../../types"
+import type { DataType } from "../../lib/types"
 
 interface PersonTableProps {
 	data: DataType[]

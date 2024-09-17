@@ -1,7 +1,7 @@
 import React from "react"
 import { Modal, Form, Input, message, Button } from "antd"
 import axios from "axios"
-import type { DataType, FieldType } from "../../types"
+import type { DataType, FieldType } from "../../lib/types"
 
 interface EditPersonModalProps {
 	visible: boolean

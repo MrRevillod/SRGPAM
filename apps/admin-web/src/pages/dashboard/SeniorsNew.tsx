@@ -11,7 +11,7 @@ interface Senior {
 	validated: boolean
 }
 
-const SeniorsPage: React.FC = () => {
+const NewSeniorsPage: React.FC = () => {
 	const [data, setData] = useState<Senior[]>([]) // Estado para los datos de seniors
 	const [loading, setLoading] = useState(true) // Estado de carga
 	const [error, setError] = useState<string | null>(null) // Estado para el error
@@ -59,8 +59,8 @@ const SeniorsPage: React.FC = () => {
 
 				setData((prevData) =>
 					prevData.map((senior) =>
-						senior.id === selectedSenior.id ? { ...senior, validated: true } : senior
-					)
+						senior.id === selectedSenior.id ? { ...senior, validated: true } : senior,
+					),
 				)
 				handleCloseModal()
 			} catch (error) {
@@ -168,4 +168,4 @@ const SeniorsPage: React.FC = () => {
 	)
 }
 
-export default SeniorsPage
+export default NewSeniorsPage

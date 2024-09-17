@@ -1,15 +1,21 @@
 import React from "react"
-
-import { Link } from "react-router-dom"
+import { Link, redirect } from "react-router-dom"
 import { Avatar, Dropdown, Navbar } from "flowbite-react"
 
 const Header: React.FC = () => {
+	const logout = () => {
+		console.log("logout")
+		return redirect("/")
+	}
+
+	const linkClasses = `text-neutral-200 font-base hover:text-neutral-50`
+
 	return (
-		<Navbar fluid rounded className="pt-4 h-16 w-full">
-			<Navbar.Brand>
+		<Navbar fluid className="pt-5 h-20 w-full bg-green-700 rounded-none">
+			<Navbar.Brand className="ml-14">
 				<img src="/logo.png" alt="logo" width="60" />
 			</Navbar.Brand>
-			<div className="flex md:order-2 -mt-1">
+			<div className="flex md:order-2 mr-14">
 				<Dropdown
 					arrowIcon={false}
 					inline
@@ -25,31 +31,39 @@ const Header: React.FC = () => {
 						<span className="block text-sm">Bonnie Green</span>
 						<span className="block truncate text-sm font-medium">name@flowbite.com</span>
 					</Dropdown.Header>
-
 					<Link to="/dashboard/perfil">
 						<Dropdown.Item>Mi perfíl</Dropdown.Item>
 					</Link>
-
 					<Dropdown.Divider />
-					<Dropdown.Item>Sign out</Dropdown.Item>
+					<Dropdown.Item onClick={() => logout()}>Cerrar sesión</Dropdown.Item>
 				</Dropdown>
 				<Navbar.Toggle />
 			</div>
-			<Navbar.Collapse className="-mt-1">
-				<Link to="/dashboard/administradores">
-					<Navbar.Link>Administradores</Navbar.Link>
+			<Navbar.Collapse>
+				<Link to="/dashboard/administradores" className={linkClasses}>
+					Administradores
 				</Link>
 
-				<Link to="/dashboard/adultos-mayores">
-					<Navbar.Link>Adultos mayores</Navbar.Link>
+				<Dropdown
+					label=""
+					dismissOnClick={false}
+					renderTrigger={() => <span className={`${linkClasses} cursor-pointer`}>Aultos Mayores</span>}
+				>
+					<Link to="/dashboard/adultos-mayores">
+						<Dropdown.Item>Todos</Dropdown.Item>
+					</Link>
+
+					<Link to="/dashboard/adultos-mayores/nuevos">
+						<Dropdown.Item>Solicitudes de registro</Dropdown.Item>
+					</Link>
+				</Dropdown>
+
+				<Link to="/dashboard/eventos" className={linkClasses}>
+					Eventos
 				</Link>
 
-				<Link to="/dashboard/eventos">
-					<Navbar.Link>Eventos</Navbar.Link>
-				</Link>
-
-				<Link to="/dashboard/estadisticas">
-					<Navbar.Link>Estadisticas</Navbar.Link>
+				<Link to="/dashboard/estadisticas" className={linkClasses}>
+					Estadisticas
 				</Link>
 			</Navbar.Collapse>
 		</Navbar>
