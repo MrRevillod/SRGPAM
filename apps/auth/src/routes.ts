@@ -9,7 +9,7 @@ router.post("/login", validateFields("LOGIN_FIELDS"), loginController)
 router.post("/login-senior", validateFields("SENIOR_LOGIN_FIELDS"), loginSeniorMobile)
 router.post("/validate-auth", sessionMiddleware, (req, res) => {
 	console.log(req.getExtension("userId"))
-	return res.status(200)
+	return res.status(200).send()
 })
 router.post("/validate-role", (req, res) => {})
 export default router

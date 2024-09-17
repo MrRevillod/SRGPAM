@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 
 export const storeTokens = async (accessToken: string, refreshToken: string) => {
 	try {
@@ -21,28 +20,12 @@ export const getAccessToken = async (): Promise<string | null> => {
 	}
 }
 
-export const makeAuthenticatedRequest = async (url: string, options: AxiosRequestConfig = {}): Promise<AxiosResponse | null> => {
+export const getRefreshToken = async (): Promise<string | null> => {
 	try {
-		const token = await getAccessToken()
-
-		if (!token) {
-			throw new Error("Token no disponible, el usuario necesita autenticarse de nuevo")
-		}
-
-		const headers = {
-			...options.headers,
-			Authorization: `Bearer ${token}`,
-		}
-
-		const response = await axios({
-			url: url,
-			...options,
-			headers: headers,
-		})
-
-		return response
+		const token = await AsyncStorage.getItem("refreshToken")
+		return token || null
 	} catch (error) {
-		console.error("Error en la solicitud autenticada", error)
+		console.error("Error al obtener el refresh token", error)
 		return null
 	}
 }
