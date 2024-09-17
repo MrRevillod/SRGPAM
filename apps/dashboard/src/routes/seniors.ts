@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { upload, seniorsRegisterMobileImages } from "../config"
+import { upload, seniorsRegisterMobileImages, seniorsProfileImage } from "../config"
 
 import {
 	registerSeniorFromMobile,
@@ -25,6 +25,10 @@ router.post("/new-mobile", seniorsRegisterMobileImages, seniorValidation, fileVa
 
 router.get("/new", async (req, res, next) => {})
 router.patch("/:id/new", userIdValidation("SENIOR"), handleSeniorRequest)
-router.post("/:id/profile-picture", upload.single("image1"), (req, res) => {})
+router.post("/:id/profile", seniorsProfileImage, (req, res) => {
+	res.status(200).json({
+		message: "Imagen recibida",
+	})
+})
 
 export default router
