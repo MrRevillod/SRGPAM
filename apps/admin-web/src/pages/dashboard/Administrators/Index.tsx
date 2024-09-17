@@ -14,7 +14,7 @@ const App: React.FC = () => {
 
 	const fetchSeniors = async () => {
 		try {
-			const response = await axios.get("http://localhost:5000/api/dashboard/seniors")
+			const response = await axios.get("http://localhost/api/dashboard/seniors")
 			console.log(response.data.values)
 
 			const transformedData = response.data.values.map((senior: any) => ({
@@ -64,7 +64,13 @@ const App: React.FC = () => {
 	return (
 		<>
 			<PersonTable data={data} onEdit={(person) => showModal("Edit", person)} />
-			<EditPersonModal visible={isModalOpen} person={selectedPerson} modalType={modalType} onCancel={handleCancel} onOk={handleOk} />
+			<EditPersonModal
+				visible={isModalOpen}
+				person={selectedPerson}
+				modalType={modalType}
+				onCancel={handleCancel}
+				onOk={handleOk}
+			/>
 		</>
 	)
 }
