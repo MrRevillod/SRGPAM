@@ -7,8 +7,15 @@ import { commonProps } from "@/components/register/types"
 import axios from "axios"
 import { SERVER_URL } from "@/constants/colors"
 import { storeTokens, storeUser } from "@/utils/storage"
+import { useEffect } from "react"
 
-const Pin = ({ navigation, control, errors, handleSubmit }: commonProps) => {
+const Pin = ({ navigation, control, errors, setValue, handleSubmit, rutSenior }: commonProps) => {
+	useEffect(() => {
+		if (rutSenior) {
+			setValue("rut", rutSenior)
+		}
+	}, [rutSenior])
+
 	const onSubmit = async (data: any) => {
 		try {
 			const response = await axios.post(`${SERVER_URL}/api/auth/login-senior`, data)
