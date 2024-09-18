@@ -7,6 +7,7 @@ const router: Router = Router()
 router.get("/", getAdministrators)
 router.get("/:id", userIdValidation("ADMIN"), getAdministratorById)
 router.post("/", adminValidation, createAdministrator)
+
 router.patch("/:id", userIdValidation("ADMIN"), updateAdministrator)
 router.delete("/:id", userIdValidation("ADMIN"), deleteAdministrator)
 
