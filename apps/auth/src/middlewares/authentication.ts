@@ -1,4 +1,5 @@
-import { AppError, verifyJsonwebtoken, AccessTokenOpts } from "@repo/lib"
+import { prisma } from "@repo/database"
+import { AppError, verifyJsonwebtoken, AccessTokenOpts, UserKind } from "@repo/lib"
 import { NextFunction, Request, Response } from "express"
 
 export const sessionMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,6 +20,21 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
 
 		req.setExtension("userId", payload.id)
+
+		const [admin, professional, senior] = await Promise.all([
+			prisma.administrator.findUnique({ where: { id: payload.id } }),
+			prisma.professional.findUnique({ where: { id: payload.id } }),
+			prisma.senior.findUnique({ where: { id: payload.id } }),
+		])
+
+		if (!admin && !professional && !senior) {
+			throw new AppError(401, "No tienes autorización para acceder a este recurso")
+		}
+
+		const role: UserKind = admin ? "ADMIN" : professional ? "PROFESSIONAL" : "SENIOR"
+
+		req.setExtension("user", admin || professional || senior)
+		req.setExtension("role", role)
 
 		next()
 	} catch (error) {

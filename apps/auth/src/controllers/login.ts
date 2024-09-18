@@ -25,7 +25,11 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
 		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
 
-		return res.status(200).json({ message: "Logged in", values: { user } })
+		return res.status(200).json({
+			message: "Has iniciado sesión correctamente",
+			type: "success",
+			values: { user: toPublicUser(user) },
+		})
 	} catch (err) {
 		next(err)
 	}
