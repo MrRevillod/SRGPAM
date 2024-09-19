@@ -2,6 +2,7 @@ import { ZodError } from "zod"
 import { log } from "."
 import { JsonResponse } from "./types"
 import { NextFunction, Request, Response } from "express"
+import { JsonWebTokenError } from "jsonwebtoken"
 
 export class AppError extends Error {
 	public code: number
@@ -26,7 +27,14 @@ export const errorHandler = (err: unknown, req: Request, res: Response, next: Ne
 	if (err instanceof ZodError) {
 		return res.status(400).json({ message: "Invalid fields", type: "error" })
 	}
-
+	if (err instanceof JsonWebTokenError) {
+		return res.status(401).json({
+			status: 401,
+			message: "No autorizado",
+			type: "error",
+			values: null,
+		})
+	}
 	if (!(err instanceof AppError)) {
 		return res.status(500).json({ message: "Internal Server Error", type: "error" })
 	}

@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { validateFields } from "./middlewares/validations"
 import { loginController, loginSeniorMobile } from "./controllers/login"
-import { sessionMiddleware } from "./middlewares/authentication"
+import { sessionMiddleware, authenticationByRole } from "./middlewares/authentication"
 
 const router: Router = Router()
 
@@ -11,5 +11,9 @@ router.post("/validate-auth", sessionMiddleware, (req, res) => {
 	console.log(req.getExtension("userId"))
 	return res.status(200).send()
 })
-router.post("/validate-role", (req, res) => {})
+router.post("/validate-role", sessionMiddleware, authenticationByRole("ADMIN"), (req, res) => {
+	console.log(req.getExtension("role"))
+	console.log(req.getExtension("user"))
+	return res.status(200).send()
+})
 export default router
