@@ -5,23 +5,17 @@ export const api = axios.create({
 	withCredentials: true,
 })
 
-// api.interceptors.request.use(
-// 	(response) => response,
-// 	async (err) => {
-// 		const { setAuth } = useAuth()
-// 		const { data, useRequest } = useRequestStore()
+api.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		if (error.response?.status === 401) {
+			try {
+				await api.get("/auth/refresh")
+			} catch (error) {
+				return Promise.reject(error)
+			}
+		}
 
-// 		if (err.response?.status === 401) {
-// 			console.log("Refreshing session")
-
-// 			try {
-// 				await useRequest(refreshSessionOpts, false)
-// 				setAuth(true, data?.values.user)
-// 			} catch (error) {
-// 				setAuth(false, null)
-// 			}
-// 		}
-
-// 		return Promise.reject(err)
-// 	}
-// )
+		return Promise.reject(error)
+	}
+)
