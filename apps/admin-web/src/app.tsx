@@ -1,6 +1,7 @@
 import React from "react"
 import AppLayout from "./layouts/AppLayout"
 import LoginPage from "./pages/auth/Login"
+import ProfilePage from "./pages/Profile"
 import SeniorsPage from "./pages/dashboard/Seniors"
 import AdministratorPage from "./pages/dashboard/Administrators"
 
@@ -13,6 +14,7 @@ export default function App() {
 			<AppLayout>
 				<Routes>
 					<Route path="/" element={<LoginPage />} />
+					<Route path="/profile" element={<ProfilePage />} />
 					<Route path="/dashboard/adultos-mayores" element={<SeniorsPage />} />
 					<Route path="/dashboard/adultos-mayores/nuevos" element={<NewSeniorsPage />} />
 					<Route path="/dashboard/administradores" element={<AdministratorPage />} />
