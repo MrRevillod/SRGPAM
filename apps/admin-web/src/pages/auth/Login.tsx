@@ -1,10 +1,8 @@
 import React from "react"
 import { Input } from "../../components/ui/Input"
 import { useAuth } from "../../context/AuthContext"
-import { loginOpts } from "../../lib/requests"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoginFormData } from "../../lib/types"
-import { useRequestStore } from "../../context/RequestStore"
 import { LoginFormSchema } from "../../lib/schemas"
 import { SubmitHandler, useForm } from "react-hook-form"
 
@@ -18,19 +16,9 @@ const LoginPage: React.FC = () => {
 		resolver: zodResolver(LoginFormSchema),
 	})
 
-	const { setAuth, resetAuth } = useAuth()
-	const { status, data, useRequest, reset } = useRequestStore()
-
+	const { login } = useAuth()
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
-		await useRequest(loginOpts(formData))
-		if (status === "success") {
-			setAuth(true, data?.values.user)
-			localStorage.setItem("SELECTED_ROLE", getValues("role"))
-		}
-
-		if (status === "error") resetAuth()
-
-		reset()
+		login(formData)
 	}
 
 	return (
@@ -46,6 +34,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Correo electrónico"
 							type="email"
+							value={"admin1@admins.com"}
 							{...register("email")}
 							placeholder="example@gmail.com"
 							error={errors.email ? errors.email.message?.toString() : ""}
@@ -54,6 +43,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Contraseña"
 							type="password"
+							value={"!Admin2024Password"}
 							{...register("password")}
 							placeholder="●●●●●●●●●●"
 							error={errors.password ? errors.password.message?.toString() : ""}

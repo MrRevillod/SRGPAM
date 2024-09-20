@@ -17,8 +17,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, setData
 	useEffect(() => {
 		const pagePath = window.location.pathname
 		setBreadcrumbItems(pagePath.split("/").filter((item) => item !== ""))
-
-		console.log("breadcrumbItems", breadcrumbItems)
 	}, [])
 
 	const navigateTo = (itemIndex: string) => {

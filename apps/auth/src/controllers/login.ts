@@ -7,7 +7,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 	const loginKind = req.query.variant
 
 	if (loginKind !== "ADMIN" && loginKind !== "PROFESSIONAL") {
-		throw new AppError(400, "Invalid login kind")
+		throw new AppError(400, "Inicio de sesión inválido")
 	}
 
 	const expireDate = new Date()
@@ -30,8 +30,8 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 			type: "success",
 			values: { user: toPublicUser(user) },
 		})
-	} catch (err) {
-		next(err)
+	} catch (error) {
+		next(error)
 	}
 }
 

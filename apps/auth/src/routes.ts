@@ -1,24 +1,18 @@
 import { Router } from "express"
 import { validateFields } from "./middlewares/validations"
-import { loginController, loginSeniorMobile } from "./controllers/login"
+import { logoutController } from "./controllers/logout"
 import { sessionMiddleware } from "./middlewares/authentication"
-import { JsonResponse } from "@repo/lib"
+import { refreshController, validateSession } from "./controllers/validate"
+import { loginController, loginSeniorMobile } from "./controllers/login"
 
 const router: Router = Router()
 
 router.post("/login", validateFields("LOGIN_FIELDS"), loginController)
 router.post("/login-senior", validateFields("SENIOR_LOGIN_FIELDS"), loginSeniorMobile)
-router.get("/validate-auth", sessionMiddleware, (req, res) => {
-	const user = req.getExtension("user")
 
-	const response: JsonResponse<any> = {
-		type: "success",
-		values: { user },
-		message: "Usuario autenticado",
-		status: 200,
-	}
-
-	return res.status(200).json(response)
-})
+router.get("/validate-auth", sessionMiddleware, validateSession)
 router.post("/validate-role", (req, res) => {})
+router.get("/refresh", refreshController)
+router.post("/logout", sessionMiddleware, logoutController)
+
 export default router

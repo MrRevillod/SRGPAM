@@ -5,11 +5,11 @@ import { useAuth } from "../../context/AuthContext"
 import { Show } from "./Show"
 
 const Header: React.FC = () => {
-	const { isAuthenticated, user } = useAuth()
+	const { isAuthenticated, user, logout } = useAuth()
 
-	const logout = () => {
-		console.log("logout")
-		return redirect("/")
+	const logoutHandler = async () => {
+		await logout()
+		return redirect("/auth/login")
 	}
 
 	const linkClasses = `text-neutral-200 font-base hover:text-neutral-50`
@@ -41,7 +41,7 @@ const Header: React.FC = () => {
 							<Dropdown.Item>Mi perfíl</Dropdown.Item>
 						</Link>
 						<Dropdown.Divider />
-						<Dropdown.Item onClick={() => logout()}>Cerrar sesión</Dropdown.Item>
+						<Dropdown.Item onClick={() => logoutHandler()}>Cerrar sesión</Dropdown.Item>
 					</Dropdown>
 					<Navbar.Toggle />
 				</div>

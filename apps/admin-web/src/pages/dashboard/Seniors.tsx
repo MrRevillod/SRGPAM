@@ -4,7 +4,7 @@ import PersonTable from "../../components/Seniors-Table/Seniors-Table"
 import EditPersonModal from "../../components/Edit-Seniors/Edit-Seniors"
 import type { DataType } from "../../lib/types"
 
-import "../../index.css"
+import "../../main.css"
 import PageLayout from "../../layouts/PageLayout"
 
 const SeniorsPage: React.FC = () => {
