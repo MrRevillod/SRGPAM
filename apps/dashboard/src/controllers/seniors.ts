@@ -51,6 +51,32 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		next(error)
 	}
 }
+export const uploadProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
+	const { rut } = req.body
+	const file = req.file as Express.Multer.File
+
+	try {
+		const userExists = await prisma.senior.findUnique({ where: { id: rut } })
+		if (!userExists) {
+			throw new AppError(409, "La persona no existe")
+		}
+
+		const formData = new FormData()
+
+		const profile = bufferToBlob(file.buffer, file.mimetype)
+		formData.append("profile", profile, file.originalname)
+
+		const response = await httpRequest<null>("STORAGE", `/seniors/profile/${rut}`, "POST", "MULTIPART", formData)
+
+		if (response.type == "error") {
+			throw new AppError(response.status ?? 500, response.message)
+		}
+
+		return res.status(200).json({ message: "La imagen de perfil se a registrado correctamente", type: "success", values: null })
+	} catch (error: unknown) {
+		next(error)
+	}
+}
 
 export const handleSeniorRequest = async (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params

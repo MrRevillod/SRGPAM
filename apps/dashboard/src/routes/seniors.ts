@@ -10,9 +10,10 @@ import {
 	updateSeniorById,
 	deleteSeniorById,
 	newSeniors,
+    uploadProfilePicture,
 } from "../controllers/seniors"
 
-import { fileValidation } from "../middlewares/file"
+import { filesValidation, fileValidation } from "../middlewares/file"
 import { seniorValidation, userIdValidation } from "../middlewares/validation"
 
 const router: Router = Router()
@@ -23,13 +24,9 @@ router.get("/:id", userIdValidation("SENIOR"), getSeniorById)
 router.patch("/:id", userIdValidation("SENIOR"), updateSeniorById)
 router.delete("/:id", userIdValidation("SENIOR"), deleteSeniorById)
 router.post("/pre-checked", createSenior) // TODO: Añana la validación de los datos
-router.post("/new-mobile", seniorsRegisterMobileImages, seniorValidation, fileValidation, registerSeniorFromMobile)
+router.post("/new-mobile", seniorsRegisterMobileImages, seniorValidation, filesValidation, registerSeniorFromMobile)
 
 router.patch("/:id/new", userIdValidation("SENIOR"), handleSeniorRequest)
-router.post("/:id/profile", seniorsProfileImage, (req, res) => {
-	res.status(200).json({
-		message: "Imagen recibida",
-	})
-})
+router.post("/profile", seniorsProfileImage, fileValidation, uploadProfilePicture)
 
 export default router
