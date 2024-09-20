@@ -32,9 +32,32 @@ export const arrayController: RequestHandler = (req, res, next) => {
 	}
 }
 
+export const profileController: RequestHandler = (req, res, next) => {
+	try {
+		const file = req.file as Express.Multer.File
+
+		const directory = `public/${req.params["id"]}`
+
+		if (!existsSync(directory)) {
+			throw new AppError(409, "El directorio de archivos no existe")
+		}
+
+        const extension = file.originalname.split(".")[1]
+        const fileName = `${file.fieldname}.${extension}`
+        writeFileSync(`${directory}/${fileName}`, file.buffer)
+
+		const response = { message: "Upload success", type: "success", values: null }
+
+		return res.status(200).json(response)
+	} catch (error) {
+		console.error("Error in arrayController", error)
+		next(error)
+	}
+}
+
 export const deleteController: RequestHandler = (req, res, next) => {
 	const dir = `public/${req.params["id"]}`
-	const fileNames = ["dni-a", "dni-b", "social"]
+	const fileNames = ["dni-a", "dni-b", "social", "profile"]
 
 	if (existsSync(dir)) {
 		const dirFiles = readdirSync(dir)
