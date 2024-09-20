@@ -5,7 +5,7 @@ import { SERVER_URL } from "@/constants/colors"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { profileSchema } from "@/utils/validation"
 
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 
@@ -32,7 +32,6 @@ const NewProfile = ({ navigation, route }: any) => {
 	}, [route.params?.photoUri])
 
 	const pickImage = async () => {
-		// No permissions request is necessary for launching the image library
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.All,
 			allowsEditing: true,

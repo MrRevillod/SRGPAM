@@ -1,16 +1,16 @@
 import { View, StyleSheet } from "react-native"
 import Input from "@/components/input"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "@/components/register/types"
+import { commonProps } from "@/components/types"
 
-const Pin = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
+const ConfirmPin = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (
-		<GeneralView title="Datos del Registro" textCircle="3/7" textTitle="Ingresa tu Pin de 4 dígitos.">
+		<GeneralView title="Datos del Registro" textCircle="4/7" textTitle="Vuelve a ingresar tu Pin.">
 			<View style={styles.container}>
-				<Input name="pin" placeholder="Ingresa tu pin" control={control} errors={errors} secureTextEntry />
-				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("pin", navigation, "ConfirmPin")} />
+				<Input name="pinConfirm" placeholder="Confirma tu PIN" control={control} errors={errors} secureTextEntry />
+				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("pinConfirm", navigation, "DNI")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
 					textStyle={styles.customButtonText}
@@ -22,7 +22,7 @@ const Pin = ({ navigation, control, errors, validateAndNavigate }: commonProps) 
 	)
 }
 
-export default Pin
+export default ConfirmPin
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import RUT from "@/components/login/rut"
-import Pin from "@/components/login/pin"
+import RUT from "@/screens/login/rut"
+import Pin from "@/screens/login/pin"
 import { useForm } from "react-hook-form"
 import React, { useEffect, useState } from "react"
 import { getStorageRUT } from "@/utils/storage"
@@ -14,9 +14,16 @@ const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: a
 
 	useEffect(() => {
 		const getRUT = async () => {
-			const id = await getStorageRUT()
-			setRUT(id)
-			setLoading(false)
+			try {
+				const id = await getStorageRUT()
+				if (!id) {
+					console.error("No se pudo obtener el RUT")
+				}
+				setRUT(id)
+				setLoading(false)
+			} catch (error) {
+				console.error("Error al obtener el RUT", error)
+			}
 		}
 		getRUT()
 	}, [])

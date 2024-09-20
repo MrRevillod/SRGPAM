@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TextInput } from "react-native"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "../types"
+import { commonProps } from "../../components/types"
 import { Controller, useForm } from "react-hook-form"
 
 const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {

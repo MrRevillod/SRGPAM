@@ -1,13 +1,13 @@
 import React from "react"
-import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform } from "react-native"
+import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform, Image } from "react-native"
 import Colors from "@/components/colors"
 const { width, height } = Dimensions.get("window")
 
 type GeneralViewProps = {
 	title: string
 	children: React.ReactNode
-	textCircle: string
-	textTitle: string
+	textCircle?: string
+	textTitle?: string
 	textDescription?: string
 }
 
@@ -23,10 +23,15 @@ const GeneralView = ({ title, children, textCircle, textTitle, textDescription }
 			</View>
 			<View style={styles.whiteContainer}>
 				<View style={styles.description}>
-					<View style={styles.circle}>
-						<Text style={styles.circleText}>{textCircle}</Text>
-					</View>
-					<Text style={{ fontSize: 18, fontWeight: "500", flex: 1, alignSelf: "center" }}>{textTitle}</Text>
+					{textCircle && textTitle && (
+						<>
+							<View style={styles.circle}>
+								<Text style={styles.circleText}>{textCircle}</Text>
+							</View>
+							<Text style={{ fontSize: 18, fontWeight: "500", flex: 1, alignSelf: "center" }}>{textTitle}</Text>
+						</>
+					)}
+					{!textCircle && textTitle && <Text style={{ fontSize: 20, fontWeight: "500", flex: 1, textAlign: "center" }}>{textTitle}</Text>}
 				</View>
 				{textDescription && <Text style={{ fontSize: 16, marginTop: 10, color: Colors.gray, textAlign: "justify" }}>{textDescription}</Text>}
 				{children}
