@@ -7,7 +7,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 	const loginKind = req.query.variant
 
 	if (loginKind !== "ADMIN" && loginKind !== "PROFESSIONAL") {
-		throw new AppError(400, "Invalid login kind")
+		throw new AppError(400, "Inicio de sesión inválido")
 	}
 
 	const expireDate = new Date()
@@ -25,9 +25,13 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
 		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
 
-		return res.status(200).json({ message: "Logged in", values: { user } })
-	} catch (err) {
-		next(err)
+		return res.status(200).json({
+			message: "Has iniciado sesión correctamente",
+			type: "success",
+			values: { user: toPublicUser(user) },
+		})
+	} catch (error) {
+		next(error)
 	}
 }
 

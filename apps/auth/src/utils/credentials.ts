@@ -23,7 +23,7 @@ export const checkCredentials = async <T>(userKind: UserKind, credentials: Crede
 		.run()
 
 	if (!user || !(await compare(credentials.password, user.password))) {
-		throw new AuthError(401, "Invalid credentials")
+		throw new AuthError(401, "Credenciales inválidas")
 	}
 
 	return user as T

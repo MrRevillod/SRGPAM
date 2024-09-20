@@ -16,3 +16,37 @@ export type FieldType = {
 	address?: string // Dirección, opcional
 	birthDate?: string // Fecha de nacimiento, opcional
 }
+
+export type LoginVariant = "ADMIN" | "PROFESSIONAL"
+
+export type LoginFormData = {
+	email: string
+	password: string
+	role: LoginVariant
+	rememberMe: boolean
+}
+
+interface IUser {
+	id: string
+	email: string
+	name: string
+	createdAt: string
+	updatedAt: string
+}
+
+export interface Administrator extends IUser {}
+export interface Professional extends IUser {}
+
+export interface Senior extends IUser {
+	address: string
+	birthDate: string
+}
+
+export type User = Administrator | Professional | Senior
+
+export type ApiResponse = {
+	status?: number
+	message: string
+	type: "success" | "error"
+	values: any
+}

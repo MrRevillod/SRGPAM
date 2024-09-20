@@ -15,7 +15,7 @@ export const createServer = (): express.Express => {
 	app.use(cookieParser())
 	app.use(express.urlencoded({ extended: true }))
 	app.use(express.json())
-	app.use(cors())
+	app.use(cors({ origin: "*" }))
 
 	app.use(extensions)
 	app.use("/api/auth", router)
