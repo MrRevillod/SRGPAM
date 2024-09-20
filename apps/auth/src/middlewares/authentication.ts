@@ -41,3 +41,16 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 		next(error)
 	}
 }
+
+export const authenticationByRole = (requiredRole: UserKind) => {
+	return async (req: Request, res: Response, next: NextFunction) => {
+		const user = req.getExtension("user")
+		const role = req.getExtension("role")
+
+		if (role !== requiredRole) {
+			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+		}
+
+		next()
+	}
+}

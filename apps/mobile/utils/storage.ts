@@ -30,10 +30,27 @@ export const getRefreshToken = async (): Promise<string | null> => {
 	}
 }
 
-export const storeUser = async (user: any) => {
+export const storeUser = async (user: object) => {
 	try {
+		if (!user) {
+			throw new Error("El usuario no existe")
+		}
 		await AsyncStorage.setItem("user", JSON.stringify(user))
 	} catch (error) {
 		console.error("No se pudo almacenar el usuario", error)
+	}
+}
+
+export const getStorageRUT = async (): Promise<string | null> => {
+	try {
+		const user = await AsyncStorage.getItem("user")
+		if (user) {
+			const parsedUser = JSON.parse(user)
+			return parsedUser?.id ?? null
+		}
+		return null
+	} catch (error) {
+		console.error("Error al obtener el ID del usuario", error)
+		return null
 	}
 }

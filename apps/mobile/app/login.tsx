@@ -2,14 +2,47 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import RUT from "@/components/login/rut"
 import Pin from "@/components/login/pin"
 import { useForm } from "react-hook-form"
+import React, { useEffect, useState } from "react"
+import { getStorageRUT } from "@/utils/storage"
+import { View, ActivityIndicator } from "react-native"
 
 const Stack = createNativeStackNavigator()
 
-const FormNavigator = ({ control, handleSubmit, errors }: { control: any; handleSubmit: any; errors: any; setValue: any }) => {
+const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: any; handleSubmit: any; errors: any; setValue: any }) => {
+	const [rut, setRUT] = useState<string | null>(null)
+	const [loading, setLoading] = useState(true)
+
+	useEffect(() => {
+		const getRUT = async () => {
+			const id = await getStorageRUT()
+			setRUT(id)
+			setLoading(false)
+		}
+		getRUT()
+	}, [])
+
+	if (loading) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" color="#0000ff" />
+			</View>
+		)
+	}
+
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
-			<Stack.Screen name="RUT">{(props) => <RUT {...props} control={control} errors={errors} />}</Stack.Screen>
-			<Stack.Screen name="Pin">{(props) => <Pin {...props} control={control} errors={errors} handleSubmit={handleSubmit} />}</Stack.Screen>
+			{rut !== null ? (
+				<Stack.Screen name="Pin">
+					{(props) => <Pin {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} rutSenior={rut} />}
+				</Stack.Screen>
+			) : (
+				<>
+					<Stack.Screen name="RUT">{(props) => <RUT {...props} control={control} errors={errors} />}</Stack.Screen>
+					<Stack.Screen name="Pin">
+						{(props) => <Pin {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
+					</Stack.Screen>
+				</>
+			)}
 		</Stack.Navigator>
 	)
 }

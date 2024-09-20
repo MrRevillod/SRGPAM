@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { View, StyleSheet, Text, Alert } from "react-native"
 import GeneralView from "@/components/register/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "@/components/register/types"
-import { Controller, useForm } from "react-hook-form"
+import { Controller } from "react-hook-form"
 import * as mime from "react-native-mime-types"
 import axios from "axios"
 

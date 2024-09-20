@@ -18,4 +18,5 @@ export interface commonProps {
 	setValue?: any
 	trigger?: any
 	validateAndNavigate?: any
+	rutSenior?: string | null
 }
