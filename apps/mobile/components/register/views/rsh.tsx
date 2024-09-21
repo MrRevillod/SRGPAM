@@ -64,8 +64,7 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			}
 
 			navigation.navigate("Final")
-		} catch (error) {
-			console.error(error)
+		} catch (error: any) {
 			Alert.alert("Error", "Hubo un problema al enviar los datos. Intenta nuevamente.")
 		}
 	}

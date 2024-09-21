@@ -36,10 +36,14 @@ export const userIdValidation = (userKind: UserKind) => {
 }
 
 export const seniorValidation = async (req: Request, res: Response, next: NextFunction) => {
+	console.log(req.body)
+
 	try {
 		await registerSchema.parseAsync(req.body)
 		next()
 	} catch (error) {
+		console.log(error)
+
 		let err = error
 		if (err instanceof z.ZodError) {
 			err = err.issues.map((e) => ({ path: e.path[0], message: e.message }))

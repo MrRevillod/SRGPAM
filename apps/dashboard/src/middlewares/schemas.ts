@@ -27,11 +27,15 @@ export const isValidRut = (rut: string): boolean => {
 	return verifier === expectedVerifier
 }
 
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
 export const registerSchema = z.object({
 	rut: z.string().refine(isValidRut, {
 		message: "El RUT ingresado no es válido",
 	}),
-	email: z.string().email({ message: "Invalid email address" }).optional(),
+	email: z.string().refine((value) => value === "" || emailRegex.test(value), {
+		message: "El email ingresado no es válido",
+	}),
 	pin: z.string().refine((value) => value.length === 4, {
 		message: "El PIN debe tener 4 dígitos",
 	}),
