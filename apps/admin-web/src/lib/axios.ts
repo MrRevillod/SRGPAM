@@ -5,17 +5,17 @@ export const api = axios.create({
 	withCredentials: true,
 })
 
-api.interceptors.response.use(
-	(response) => response,
-	async (error) => {
-		if (error.response?.status === 401) {
-			try {
-				await api.get("/auth/refresh")
-			} catch (error) {
-				return Promise.reject(error)
-			}
-		}
+// api.interceptors.response.use(
+// 	(response) => response,
+// 	async (error) => {
+// 		if (error.response?.status === 401) {
+// 			try {
+// 				await api.get("/auth/refresh")
+// 			} catch (error) {
+// 				return Promise.reject(error)
+// 			}
+// 		}
 
-		return Promise.reject(error)
-	}
-)
+// 		return Promise.reject(error)
+// 	}
+// )

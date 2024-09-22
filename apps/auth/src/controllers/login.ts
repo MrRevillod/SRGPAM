@@ -1,7 +1,7 @@
-import { checkCredentials } from "../utils/credentials"
-import { Administrator, Professional, Senior } from "@prisma/client"
+import { Senior } from "@prisma/client"
+import { compare } from "bcrypt"
 import { Request, Response, NextFunction } from "express"
-import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken, toPublicUser } from "@repo/lib"
+import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken, toPublicUser, findUser } from "@repo/lib"
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
 	const loginKind = req.query.variant
@@ -10,20 +10,26 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		throw new AppError(400, "Inicio de sesión inválido")
 	}
 
-	const expireDate = new Date()
+	const expireDate = new Date() // Token de acceso expira en 15 minutos
 	expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
 
-	const refreshDate = new Date()
+	const refreshDate = new Date() // Token de refresco expira en 30 días
 	refreshDate.setDate(refreshDate.getDate() + 30)
 
 	try {
-		const user: Administrator | Professional = await checkCredentials(loginKind, req.body)
+		const user = await findUser({ email: req.body.email }, loginKind)
 
-		const accessToken = signJsonwebtoken({ id: user.id }, AccessTokenOpts)
-		const refreshToken = signJsonwebtoken({ id: user.id }, RefreshTokenOpts)
+		if (!user || !(await compare(req.body.password, user.password))) {
+			throw new AppError(401, "Credenciales inválidas")
+		}
 
-		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
-		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
+		const payload = { id: user.id, role: loginKind }
+
+		const accessToken = signJsonwebtoken(payload, AccessTokenOpts)
+		const refreshToken = signJsonwebtoken(payload, RefreshTokenOpts)
+
+		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/", domain: "localhost", sameSite: "none" })
+		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/", domain: "localhost", sameSite: "none" })
 
 		return res.status(200).json({
 			message: "Has iniciado sesión correctamente",
@@ -37,15 +43,24 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 
 export const loginSeniorMobile = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const user: Senior = await checkCredentials("SENIOR", req.body)
+		const user = (await findUser({ email: req.body.email }, "SENIOR")) as Senior
+
+		if (!user || !(await compare(req.body.password, user.password))) {
+			throw new AppError(401, "Credenciales inválidas")
+		}
+
 		if (!user.validated) {
 			throw new AppError(401, "Su cuenta aun no ha sido validada")
 		}
-		const accessToken = signJsonwebtoken({ id: user.id }, AccessTokenOpts)
-		const refreshToken = signJsonwebtoken({ id: user.id }, RefreshTokenOpts)
+		const accessToken = signJsonwebtoken({ id: user.id, role: "SENIOR" }, AccessTokenOpts)
+		const refreshToken = signJsonwebtoken({ id: user.id, role: "SENIOR" }, RefreshTokenOpts)
 		const publicUser = toPublicUser(user)
 
-		return res.status(200).json({ message: "Inicio de sesión correcto", type: "success", values: { accessToken, refreshToken, publicUser } })
+		return res.status(200).json({
+			message: "Inicio de sesión correcto",
+			type: "success",
+			values: { accessToken, refreshToken, publicUser },
+		})
 	} catch (error: unknown) {
 		next(error)
 	}

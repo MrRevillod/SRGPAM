@@ -1,56 +1,60 @@
-import { prisma } from "@repo/database"
-import { AppError, verifyJsonwebtoken, AccessTokenOpts, UserKind } from "@repo/lib"
 import { NextFunction, Request, Response } from "express"
+import { AppError, findUser, isValidUserRole } from "@repo/lib"
+import { verifyJsonwebtoken, AccessTokenOpts, getServerTokens } from "@repo/lib"
 
+// Middleware que se encarga de verificar y validar una sesión
+// de usuario mediante su token de acceso JWT
 export const sessionMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const accessCookie = req.cookies["ACCESS_TOKEN"]
+		// Obtener los tokens de la petición (cookies o headers)
+		const tokens = getServerTokens(req.headers, req.cookies)
+		if (!tokens?.access) throw new AppError(401, "No tienes autorización para acceder a este recurso")
 
-		const authHeader = req.headers.authorization
-		let accessHeaderToken = null
+		const payload = verifyJsonwebtoken(tokens.access, AccessTokenOpts)
 
-		if (authHeader && authHeader.startsWith("Bearer ")) {
-			accessHeaderToken = authHeader.split("Bearer ")[1].split(",")[0].trim()
-		}
-
-		const accessToken = accessCookie || accessHeaderToken
-
-		if (!accessToken) throw new AppError(401, "No tienes autorización para acceder a este recurso")
-
-		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
-
-		req.setExtension("userId", payload.id)
-
-		const [admin, professional, senior] = await Promise.all([
-			prisma.administrator.findUnique({ where: { id: payload.id } }),
-			prisma.professional.findUnique({ where: { id: payload.id } }),
-			prisma.senior.findUnique({ where: { id: payload.id } }),
-		])
-
-		if (!admin && !professional && !senior) {
+		if (!payload.id || !payload.role) {
 			throw new AppError(401, "No tienes autorización para acceder a este recurso")
 		}
 
-		const role: UserKind = admin ? "ADMIN" : professional ? "PROFESSIONAL" : "SENIOR"
+		// Se busca al usuario que está realizando la petición actual
+		const user = await findUser({ id: payload.id }, payload.role)
+		if (!user) throw new AppError(401, "No tienes autorización para acceder a este recurso")
 
-		req.setExtension("user", admin || professional || senior)
-		req.setExtension("role", role)
+		// Se añade la información del usuario a la petición
+
+		req.setExtension("user", user)
+		req.setExtension("role", payload.role)
+		req.setExtension("userId", payload.id)
 
 		next()
+
+		console.log("pasó la sesión")
 	} catch (error) {
 		next(error)
 	}
 }
 
-export const authenticationByRole = (requiredRole: UserKind) => {
-	return async (req: Request, res: Response, next: NextFunction) => {
-		const user = req.getExtension("user")
-		const role = req.getExtension("role")
+// Middleware que se encarga de verificar si el usuario que está
+// realizando la petición tiene el rol necesario para acceder a un recurso específico
+export const authenticationByRole = async (req: Request, res: Response, next: NextFunction) => {
+	// Se obtiene el rol requerido para acceder al recurso
+	// desde la URL de la petición "/validate-role/ADMIN
+	const requiredRole = req.params.role
 
-		if (role !== requiredRole) {
-			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+	try {
+		if (!isValidUserRole(requiredRole)) {
+			throw new AppError(401, "No tienes permisos para acceder a este recurso")
+		}
+
+		// Se obtiene el rol del usuario que está realizando la petición
+		const currentUserRole = req.getExtension("role")
+
+		if (currentUserRole !== requiredRole) {
+			throw new AppError(401, "No tienes permisos para acceder a este recurso")
 		}
 
 		next()
+	} catch (error) {
+		next(error)
 	}
 }

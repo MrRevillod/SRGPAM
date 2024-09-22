@@ -1,19 +1,33 @@
 import { Router } from "express"
 import { validateFields } from "./middlewares/validations"
 import { logoutController } from "./controllers/logout"
-import { authenticationByRole, sessionMiddleware } from "./middlewares/authentication"
 import { refreshController, validateSession } from "./controllers/validate"
 import { loginController, loginSeniorMobile } from "./controllers/login"
+import { authenticationByRole, sessionMiddleware } from "./middlewares/authentication"
 
 const router: Router = Router()
 
+// -- Rutas de autenticación
+
+// Iniciar sesión (Variantes ADMIN y PROFESSIONAL)
+// Uso: POST /auth/login?variant=ADMIN | PROFESSIONAL
 router.post("/login", validateFields("LOGIN_FIELDS"), loginController)
+
+// Iniciar sesión (Variante SENIOR)
 router.post("/login-senior", validateFields("SENIOR_LOGIN_FIELDS"), loginSeniorMobile)
 
-router.get("/validate-auth", sessionMiddleware, validateSession)
-router.post("/validate-role", authenticationByRole("ADMIN"), validateSession)
+// Refrescar token de acceso
 router.get("/refresh", refreshController)
+
+// Cerrar sesión
 router.post("/logout", sessionMiddleware, logoutController)
 
-export default router
+// -- Rutas de validación de sesión
 
+// Validar sesión -> Retorna OK si la sesión es válida
+router.get("/validate-auth", sessionMiddleware, validateSession)
+
+// Validar rol de usuario (ADMIN, PROFESSIONAL, SENIOR)
+router.get("/validate-role/:role", sessionMiddleware, authenticationByRole, validateSession)
+
+export default router

@@ -3,7 +3,6 @@ import { RequestHandler } from "express"
 import { rmSync, existsSync, readdirSync, mkdirSync, writeFileSync } from "node:fs"
 
 export const arrayController: RequestHandler = (req, res, next) => {
-
 	try {
 		const files = req.files as {
 			[fieldname: string]: Express.Multer.File[]
@@ -12,7 +11,7 @@ export const arrayController: RequestHandler = (req, res, next) => {
 		const directory = `public/${req.params["id"]}`
 
 		if (existsSync(directory)) {
-			throw new AppError(409, "El directorio de archivos ya existe")
+			throw new AppError(409, "La información de usuario ya existe")
 		}
 
 		mkdirSync(directory)
@@ -27,7 +26,6 @@ export const arrayController: RequestHandler = (req, res, next) => {
 
 		return res.status(200).json(response)
 	} catch (error) {
-		console.error("Error in arrayController", error)
 		next(error)
 	}
 }
@@ -42,9 +40,9 @@ export const profileController: RequestHandler = (req, res, next) => {
 			throw new AppError(409, "El directorio de archivos no existe")
 		}
 
-        const extension = file.originalname.split(".")[1]
-        const fileName = `${file.fieldname}.${extension}`
-        writeFileSync(`${directory}/${fileName}`, file.buffer)
+		const extension = file.originalname.split(".")[1]
+		const fileName = `${file.fieldname}.${extension}`
+		writeFileSync(`${directory}/${fileName}`, file.buffer)
 
 		const response = { message: "Upload success", type: "success", values: null }
 

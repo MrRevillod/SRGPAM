@@ -2,6 +2,7 @@ import cors from "cors"
 import helmet from "helmet"
 import morgan from "morgan"
 import express from "express"
+import cookieParser from "cookie-parser"
 
 import administrarorsRouter from "./routes/administrators"
 import professionalsRouter from "./routes/professionals"
@@ -17,6 +18,7 @@ export const createServer = (): express.Express => {
 	app.use(express.urlencoded({ extended: true }))
 	app.use(express.json())
 	app.use(cors())
+	app.use(cookieParser())
 
 	app.use(extensions)
 	app.use("/api/dashboard/professionals", professionalsRouter)

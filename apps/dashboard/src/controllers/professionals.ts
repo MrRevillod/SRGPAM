@@ -1,14 +1,14 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { Administrator } from "@prisma/client"
 import { constants, findUser } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
+import { Professional } from "@prisma/client"
 
-// Controlador para obtener todos los administradores de la base de datos
+// Controlador para obtener todos los profesionales de la base de datos
 // se excluye el campo password de la respuesta
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const administrators = await prisma.administrator.findMany({
+		const professionals = await prisma.professional.findMany({
 			select: {
 				id: true,
 				name: true,
@@ -18,11 +18,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 		})
 
 		return res.status(200).json({
-			message: "Administradores obtenidos correctamente",
+			message: "Profesionales obtenidos correctamente",
 			type: "success",
 			values: {
-				administrators,
-				len: administrators.length,
+				professionals,
+				len: professionals.length,
 			},
 		})
 	} catch (error) {
@@ -30,32 +30,27 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 	}
 }
 
-// Controlador para crear un nuevo administrador
+// Controlador para crear un nuevo profesional
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id, name, email } = req.body
-		const defaulAdminPassword = await hash(constants.DEFAULT_ADMIN_PASSWORD, 10)
+		const defaulAdminPassword = await hash(constants.DEFAULT_PROFESSIONAL_PASSWORD, 10)
 
-		// Verificamos si el administrador ya existe
+		// Verificamos si el profesional ya existe
 
-		const userExists = await findUser({ id, email }, "ADMIN")
+		const userExists = await findUser({ id, email }, "PROFESSIONAL")
 		if (userExists) {
 			const conflicts = []
 
-			// Si el admin ya existe se verificará que campo está en conflicto
+			// Si el profesional ya existe se verificará que campo está en conflicto
 
-			if (userExists?.id === id) {
-				conflicts.push("id")
-			}
-
-			if (userExists?.email === email) {
-				conflicts.push("email")
-			}
+			if (userExists?.id === id) conflicts.push("id")
+			if (userExists?.email === email) conflicts.push("email")
 
 			// Y se retornará un arreglo con los campos en conflicto
 
 			return res.status(409).json({
-				message: "El administrador ya existe",
+				message: "El profesional ya existe",
 				type: "error",
 				values: conflicts,
 			})
@@ -80,14 +75,14 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 	}
 }
 
-// Controlador para Actualizar un administrador por su id
+// Controlador para Actualizar un profesional por su id
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
-	const reqUser = req.getExtension("user") as Administrator
+	const reqUser = req.getExtension("user") as Professional
 
 	try {
 		const { name, email, password } = req.body
 
-		const user = await prisma.administrator.update({
+		const user = await prisma.professional.update({
 			where: { id: req.params.id },
 			data: {
 				name,
@@ -111,10 +106,10 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 	}
 }
 
-// Controlador para eliminar un administrador por su id
+// Controlador para eliminar un profesional por su id
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await prisma.administrator.delete({ where: { id: req.params.id } })
+		await prisma.professional.delete({ where: { id: req.params.id } })
 
 		return res.status(200).json({
 			message: "Eliminación exitosa",
