@@ -28,8 +28,8 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		const accessToken = signJsonwebtoken(payload, AccessTokenOpts)
 		const refreshToken = signJsonwebtoken(payload, RefreshTokenOpts)
 
-		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/", sameSite: "none" })
-		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/", sameSite: "none" })
+		res.cookie("ACCESS_TOKEN", accessToken, { expires: expireDate, httpOnly: true, path: "/" })
+		res.cookie("REFRESH_TOKEN", refreshToken, { expires: refreshDate, httpOnly: true, path: "/" })
 
 		return res.status(200).json({
 			message: "Has iniciado sesión correctamente",
