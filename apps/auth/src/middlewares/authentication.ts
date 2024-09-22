@@ -6,19 +6,33 @@ import { verifyJsonwebtoken, AccessTokenOpts, getServerTokens } from "@repo/lib"
 // de usuario mediante su token de acceso JWT
 export const sessionMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		// Obtener los tokens de la petición (cookies o headers)
-		const tokens = getServerTokens(req.headers, req.cookies)
-		if (!tokens?.access) throw new AppError(401, "No tienes autorización para acceder a este recurso")
+		// // Obtener los tokens de la petición (cookies o headers)
 
-		const payload = verifyJsonwebtoken(tokens.access, AccessTokenOpts)
+		const accessCookie = req.cookies["ACCESS_TOKEN"]
+
+		console.log("accessCookie", accessCookie)
+
+		const authHeader = req.headers.authorization
+		let accessHeaderToken = null
+		if (authHeader && authHeader.startsWith("Bearer ")) {
+			accessHeaderToken = authHeader.split("Bearer ")[1].split(",")[0].trim()
+		}
+		const accessToken = accessCookie || accessHeaderToken
+		if (!accessToken) throw new AppError(401, "No tienes autorización para acceder a este recurso")
+
+		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
 
 		if (!payload.id || !payload.role) {
 			throw new AppError(401, "No tienes autorización para acceder a este recurso")
 		}
 
+		console.log("payload", payload)
+
 		// Se busca al usuario que está realizando la petición actual
 		const user = await findUser({ id: payload.id }, payload.role)
 		if (!user) throw new AppError(401, "No tienes autorización para acceder a este recurso")
+
+		console.log("user", user)
 
 		// Se añade la información del usuario a la petición
 

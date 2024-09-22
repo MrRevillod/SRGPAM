@@ -10,11 +10,9 @@ export const arrayController: RequestHandler = (req, res, next) => {
 
 		const directory = `public/${req.params["id"]}`
 
-		if (existsSync(directory)) {
-			throw new AppError(409, "La información de usuario ya existe")
+		if (!existsSync(directory)) {
+			mkdirSync(directory)
 		}
-
-		mkdirSync(directory)
 
 		Object.keys(files).forEach((key) => {
 			const extension = files[key][0].originalname.split(".")[1]

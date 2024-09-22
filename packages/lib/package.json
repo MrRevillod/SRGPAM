@@ -12,7 +12,6 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@repo/database": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
 		"@types/bcrypt": "^5.0.2",
 		"@types/dotenv": "^8.2.0",
@@ -25,6 +24,7 @@
 	},
 	"dependencies": {
 		"@prisma/client": "^5.10.2",
+		"@repo/database": "workspace:*",
 		"bcrypt": "^5.1.1",
 		"dotenv": "^16.4.5",
 		"express": "^4.18.3",

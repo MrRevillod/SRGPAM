@@ -56,6 +56,7 @@ export const registerFromMobile = async (req: Request, res: Response, next: Next
 		})
 
 		if (response.type == "error") {
+			console.log("Error in registerFromMobile", response)
 			await prisma.senior.delete({ where: { id: rut } })
 			throw new AppError(response.status ?? 500, response.message)
 		}
@@ -254,6 +255,18 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		const senior = await prisma.senior.delete({
 			where: { id: req.params.id },
 		})
+
+		const storageResponse = await httpRequest({
+			service: "STORAGE",
+			endpoint: `/seniors/${req.params.id}`,
+			method: "DELETE",
+		})
+
+		if (storageResponse.type === "error") {
+			await prisma.senior.create({ data: senior })
+			throw new AppError(storageResponse.status || 500, storageResponse.message)
+		}
+
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
