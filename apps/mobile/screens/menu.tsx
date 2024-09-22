@@ -1,6 +1,6 @@
 import React from "react"
-import { StyleSheet } from "react-native"
-import { commonProps } from "@/components/types"
+import { StyleSheet, Image } from "react-native"
+import { commonProps } from "@/utils/types"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
@@ -18,6 +18,11 @@ const Menu = ({ navigation }: commonProps) => {
 			<CustomButton
 				title="Mi Perfil"
 				onPress={() => navigation.navigate("Profile")}
+				style={{ marginTop: 20, width: "85%", alignSelf: "center" }}
+			/>
+			<CustomButton
+				title="Nueva Foto de Perfil"
+				onPress={() => navigation.navigate("NewProfile")}
 				style={{ marginTop: 20, width: "85%", alignSelf: "center" }}
 			/>
 		</GeneralView>

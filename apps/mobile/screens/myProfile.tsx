@@ -1,13 +1,26 @@
-import GeneralView from "@/components/generalView"
-import { parse } from "@babel/core"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { useState, useEffect } from "react"
-import { View, Text, ActivityIndicator } from "react-native"
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions, TouchableOpacity, Image } from "react-native"
+import { Colors } from "@/components/colors"
+import DataDisplayer from "@/components/dataDisplayer"
+import { formatDate, calculateAge, formatRUT } from "@/utils/formatter"
+import MenuBar from "@/components/menuBar"
+import { SERVER_URL } from "@/constants/colors"
+import axios from "axios"
 
-const Profile = (navigation: any) => {
+const rutImg = require("@/assets/images/profile/rut.png")
+const emailImg = require("@/assets/images/profile/email.png")
+const birthImg = require("@/assets/images/profile/birth.png")
+const ccImg = require("@/assets/images/profile/cc.png")
+const keyImg = require("@/assets/images/profile/key.png")
+
+const { width } = Dimensions.get("window")
+
+const Profile = ({ navigation }: any) => {
 	const [user, setUser] = useState<any>(null)
 	const [loading, setLoading] = useState(true)
+	const [profileUri, setProfileUri] = useState<string | null>(null)
 
 	useEffect(() => {
 		const getUser = async () => {
@@ -18,13 +31,34 @@ const Profile = (navigation: any) => {
 				}
 				const parsedUser = JSON.parse(user)
 				setUser(parsedUser)
-				setLoading(false)
 			} catch (error) {
 				console.error("Error al obtener el usuario", error)
 			}
 		}
 		getUser()
 	}, [])
+
+	useEffect(() => {
+		if (user) {
+			const checkProfilePhoto = async () => {
+				try {
+					await axios.get(`${SERVER_URL}/api/storage/${user.id}/profile.jpg`, {
+						headers: { "x-storage-key": "STORAGE_KEY_SECRET" },
+					})
+					setProfileUri(`${SERVER_URL}/api/storage/${user.id}/profile.jpg`)
+				} catch (error) {
+					await axios.get(`${SERVER_URL}/api/storage/default-profile.jpg`, {
+						headers: { "x-storage-key": "STORAGE_KEY_SECRET" },
+					})
+					setProfileUri(`${SERVER_URL}/api/storage/default-profile.jpg`)
+					console.error("Error verificando la foto de perfil", error)
+					setProfileUri(null)
+				}
+			}
+			checkProfilePhoto()
+			setLoading(false)
+		}
+	}, [user])
 
 	if (loading) {
 		return (
@@ -34,21 +68,83 @@ const Profile = (navigation: any) => {
 		)
 	}
 
-	const { id, name, email, address, birthDate, validated, createdAt, updatedAt } = user
+	const { id, name, email, birthDate } = user
+	const formattedRUT = formatRUT(id)
+	const age = calculateAge(birthDate)
 
 	return (
-		<GeneralView title="Mi Perfil" textTitle="Información personal">
-			<View>
-				<Text>{id}</Text>
-				<Text>{name}</Text>
-				<Text>{email}</Text>
-				<Text>{address}</Text>
-				<Text>{birthDate}</Text>
-				<Text>{validated}</Text>
-				<Text>{createdAt}</Text>
-				<Text>{updatedAt}</Text>
+		<>
+			<View style={styles.greenContainer}>
+				<>
+					<TouchableOpacity style={styles.circle} onPress={() => navigation.navigate("NewProfile")}>
+						{profileUri && (
+							<Image source={{ uri: profileUri }} style={{ width: width * 0.25, height: width * 0.25, borderRadius: 100 }} />
+						)}
+					</TouchableOpacity>
+					<Text style={{ color: Colors.white, fontSize: 18, fontWeight: "500" }}>{name}</Text>
+				</>
 			</View>
-		</GeneralView>
+			<View style={styles.dataContainer}>
+				<View>
+					<DataDisplayer imgPath={rutImg} titleField="RUT" descriptionField={formattedRUT} />
+					{email ? (
+						<DataDisplayer imgPath={emailImg} titleField="Correo Eléctronico" descriptionField={email} actionButton="Cambiar" />
+					) : (
+						<DataDisplayer imgPath={emailImg} titleField="Aún no ingresa su Correo Eléctronico" actionButton="Ingresar" />
+					)}
+					<DataDisplayer
+						imgPath={ccImg}
+						titleField="Centro Comunitario Preferido"
+						descriptionField="CC Pedro de Valdivia"
+						actionButton="Cambiar"
+					/>
+					<DataDisplayer imgPath={birthImg} titleField="Edad" descriptionField={`${age} Años`} />
+					<DataDisplayer imgPath={keyImg} titleField="Cambiar Contraseña" actionButton="Cambiar" />
+				</View>
+			</View>
+			<MenuBar
+				onPress={() => {
+					navigation.navigate("Menu")
+				}}
+			/>
+		</>
 	)
 }
+
 export default Profile
+
+const styles = StyleSheet.create({
+	greenContainer: {
+		backgroundColor: Colors.green,
+		height: "30%",
+		alignItems: "center",
+		justifyContent: "center",
+		borderBottomLeftRadius: 20,
+		borderBottomRightRadius: 20,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 5,
+		},
+		shadowOpacity: 0.2,
+		shadowRadius: 10,
+		elevation: 50,
+	},
+	circle: {
+		margin: 20,
+		width: width * 0.25,
+		height: width * 0.25,
+		borderRadius: 100,
+		borderColor: Colors.white,
+		borderWidth: 2,
+		backgroundColor: Colors.gray,
+	},
+
+	dataContainer: {
+		height: "61.53%",
+		margin: 0,
+		alignItems: "center",
+		alignContent: "center",
+		justifyContent: "center",
+	},
+})

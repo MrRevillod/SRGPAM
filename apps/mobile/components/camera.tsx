@@ -28,8 +28,8 @@ const Camera = ({ navigation }: any) => {
 				const { params } = route as any
 				if (params?.from === "DNI") {
 					navigation.navigate("DNI", { photoUri: photo.uri })
-				} else if (params?.from === "RSH") {
-					navigation.navigate("RSH", { photoUri: photo.uri })
+				} else if (params?.from === "Social") {
+					navigation.navigate("Social", { photoUri: photo.uri })
 				}
 			}
 		}

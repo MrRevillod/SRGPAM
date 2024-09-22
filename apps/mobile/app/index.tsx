@@ -4,6 +4,8 @@ import Register from "./register"
 import Login from "./login"
 import Menu from "../screens/menu"
 import Profile from "../screens/myProfile"
+import NewProfile from "@/screens/newProfile"
+import Camera from "@/components/camera"
 
 const Stack = createNativeStackNavigator()
 
@@ -14,6 +16,8 @@ const App = () => {
 			<Stack.Screen name="Register" component={Register} />
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Profile" component={Profile} />
+			<Stack.Screen name="NewProfile" component={NewProfile} />
+			<Stack.Screen name="Camera" component={Camera} options={{ headerShown: true }} />
 		</Stack.Navigator>
 	)
 }

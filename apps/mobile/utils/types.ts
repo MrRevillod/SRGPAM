@@ -1,15 +1,6 @@
 import { Control, FieldErrors, FieldValues } from "react-hook-form"
 
-export interface registerFormData {
-	username: string
-	email: string
-	password: string
-	dni_a: string
-	dni_b: string
-	rshPhoto: string
-}
-
-export interface commonProps {
+export type commonProps = {
 	route: any
 	navigation: any
 	control?: Control<FieldValues>

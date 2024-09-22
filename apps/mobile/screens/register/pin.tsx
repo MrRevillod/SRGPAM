@@ -3,7 +3,7 @@ import Input from "@/components/input"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "@/components/types"
+import { commonProps } from "@/utils/types"
 
 const Pin = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (

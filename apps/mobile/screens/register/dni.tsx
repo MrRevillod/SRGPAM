@@ -3,22 +3,18 @@ import { View, Text, StyleSheet, TextInput } from "react-native"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "../../components/types"
+import { commonProps } from "../../utils/types"
 import { Controller, useForm } from "react-hook-form"
 
 const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
-	const [frontPhoto, setFrontPhoto] = useState<string | null>(null)
-	const [backPhoto, setBackPhoto] = useState<string | null>(null)
 	const [isCapturingFront, setIsCapturingFront] = useState<boolean>(true)
 
 	useEffect(() => {
 		if (route.params?.photoUri) {
 			if (isCapturingFront) {
-				setFrontPhoto(route.params.photoUri)
 				console.log("Front photo set:", route.params.photoUri)
 				setValue("dni_a", route.params.photoUri)
 			} else {
-				setBackPhoto(route.params.photoUri)
 				console.log("Back photo set:", route.params.photoUri)
 				setValue("dni_b", route.params.photoUri)
 			}
@@ -76,7 +72,7 @@ const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
 				<CustomButton
 					textStyle={styles.customButtonText}
 					title="Siguiente"
-					onPress={() => navigation.navigate("RSH")}
+					onPress={() => navigation.navigate("Social")}
 					style={{ backgroundColor: Colors.white }}
 				/>
 
