@@ -20,6 +20,15 @@ export type FieldType = {
 	birthDate?: string // Fecha de nacimiento, opcional
 }
 
+export interface newSenior {
+	id: string
+	name: string
+	email: string
+	birthDate: string
+	address: string
+	validated: boolean
+}
+
 export type LoginVariant = "ADMIN" | "PROFESSIONAL"
 
 export type LoginFormData = {
