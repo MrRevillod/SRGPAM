@@ -1,7 +1,23 @@
 import React from "react"
+import Router from "./pages/router"
 import ReactDOM from "react-dom/client"
+import AppLayout from "./layouts/AppLayout"
 
-import "./index.css"
-import App from "./app"
+import { Toaster } from "sonner"
 
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />)
+import "./main.css"
+import { BrowserRouter } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContext"
+
+const root = ReactDOM.createRoot(document.getElementById("root")!)
+
+root.render(
+	<AuthProvider>
+		<BrowserRouter>
+			<AppLayout>
+				<Router />
+				<Toaster position="top-right" />
+			</AppLayout>
+		</BrowserRouter>
+	</AuthProvider>
+)

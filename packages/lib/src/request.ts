@@ -2,39 +2,34 @@ import { AppError } from "."
 import { constants, services } from "./config"
 import { JsonResponse, ContentTypeVariant, ServiceName, AllowedHttpMethod } from "./types"
 
+interface HttpRequestProps {
+	service: ServiceName
+	endpoint: string
+	method?: AllowedHttpMethod
+	variant?: ContentTypeVariant
+	headers?: Record<string, string>
+	body?: any
+}
+
 /**
- * httpRequest is a function that sends a request to a service
- * @param service - the service to send the request to
- * @param endpoint - the endpoint to send the request to
- * @param method - the http method to use for the request
- * @param body - the body of the request
- * @param variant - the content type variant of the request
- * @returns a JsonResponse object
  *
- * @throws {Error} - if the service is not found in the services object
- * @throws {Error} - if the method is GET and the body is not undefined
- * @throws {Error} - if the variant is MULTIPART and the body is not an instance of FormData
- * @throws {Error} - if the response is not ok
- * @throws {Error} - if an unknown error occurs
- *
- * @example
- *
- * const response = await httpRequest<User[]>("DASHBOARD", "/provide-users", "GET", "JSON")
- *
- * response.values.forEach((user) => {
- * 	console.log(user)
- * })
- *
- * return res.status(200).json(response)
+ * @param service Indica el servicio al que se hará la petición
+ * @param endpoint Indica el endpoint (ruta HTTP) al que se hará la petición
+ * @param method  Indica el método HTTP de la petición (POST, GET, PUT, DELETE, PATCH)
+ * @param variant Indica el tipo de contenido de la petición (JSON, MULTIPART)
+ * @param headers Indica los headers HTTP de la petición
+ * @param body  Indica el cuerpo de la petición
+ * @returns Promise<JsonResponse<T>>
  */
 
-export const httpRequest = async <T>(
-	service: ServiceName,
-	endpoint: string,
-	method: AllowedHttpMethod,
-	variant: ContentTypeVariant,
-	body?: any,
-): Promise<JsonResponse<T>> => {
+export const httpRequest = async <T>({
+	service,
+	endpoint,
+	method,
+	variant,
+	headers,
+	body,
+}: HttpRequestProps): Promise<JsonResponse<T>> => {
 	if (!services[service]) {
 		throw new Error(`Service ${service} not found in services`)
 	}
@@ -48,20 +43,26 @@ export const httpRequest = async <T>(
 	}
 
 	const url = `${services[service].url}${endpoint}`
-	const headers = new Headers()
+	const reqheaders = new Headers()
 
-	if (variant === "JSON") {
-		headers.append("Content-Type", "application/json")
+	if (!variant || variant === "JSON") {
+		reqheaders.append("Content-Type", "application/json")
 	}
 
 	if (service === "STORAGE") {
-		headers.append("X-storage-key", constants.STORAGE_KEY)
+		reqheaders.append("X-storage-key", constants.STORAGE_KEY)
+	}
+
+	if (headers) {
+		Object.entries(headers).forEach(([key, value]) => {
+			reqheaders.append(key, value)
+		})
 	}
 
 	try {
 		const response = await fetch(url, {
-			method,
-			headers,
+			method: method || "GET",
+			headers: reqheaders,
 			body: variant === "JSON" ? JSON.stringify(body) : body,
 		})
 

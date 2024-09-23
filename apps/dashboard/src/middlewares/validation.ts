@@ -1,66 +1,47 @@
-import { z } from "zod"
 import { match } from "ts-pattern"
-import { prisma } from "@repo/database"
-import { AppError, UserKind } from "@repo/lib"
-import { adminSchema, registerSchema } from "./schemas"
+import { AppError, findUser, UserRole } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
+import { SeniorSchemas, AdministratorSchemas, ProfessionalSchemas, SchemasKeys } from "@repo/lib"
 
-export const userIdValidation = (userKind: UserKind) => {
+// Middleware de validación de ID de usuario
+// Valida si el ID de usuario en la URL de la petición es válido (existe en la base de datos)
+export const validateUserId = (role: UserRole) => async (req: Request, res: Response, next: NextFunction) => {
+	if (!req.params.id) throw new AppError(400, "Petición inválida")
+
+	try {
+		const user = await findUser({ id: req.params.id }, role)
+		if (!user) throw new AppError(400, "El usuario solicitado no existe")
+
+		req.setExtension("user", user)
+
+		next()
+	} catch (error) {
+		next(error)
+	}
+}
+
+// Middleware de validación de campos en formularios
+// Valida si los campos en el cuerpo de la petición son válidos
+// según el rol del usuario y el tipo de formulario (fichero lib/schemas.ts)
+export const fieldsValidation = (role: UserRole, variant: SchemasKeys) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
-		const { id } = req.params
-
 		try {
-			if (!id) throw new AppError(400, "El usuario solicitado no existe")
-
-			const user = await match(userKind)
-				.with("ADMIN", async () => {
-					return await prisma.administrator.findUnique({ where: { id } })
+			match(role)
+				.with("SENIOR", () => {
+					SeniorSchemas[variant as keyof typeof SeniorSchemas].parse(req.body)
 				})
-				.with("SENIOR", async () => {
-					return await prisma.senior.findUnique({ where: { id } })
+				.with("ADMIN", () => {
+					AdministratorSchemas[variant as keyof typeof AdministratorSchemas].parse(req.body)
 				})
-				.with("PROFESSIONAL", async () => {
-					return await prisma.professional.findUnique({ where: { id } })
+				.with("PROFESSIONAL", () => {
+					ProfessionalSchemas[variant as keyof typeof ProfessionalSchemas].parse(req.body)
 				})
 				.run()
 
-			if (!user) throw new AppError(400, "El usuario solicitado no existe")
-
-			req.setExtension("user", user)
-
 			next()
-		} catch (error) {
-			next(error)
+		} catch (error: any) {
+			console.log(error.message)
+			next(new AppError(400, "Error de validación de campos en el formulario"))
 		}
-	}
-}
-
-export const seniorValidation = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		await registerSchema.parseAsync(req.body)
-		next()
-	} catch (error) {
-		let err = error
-		if (err instanceof z.ZodError) {
-			err = err.issues.map((e) => ({ path: e.path[0], message: e.message }))
-		}
-		return res.status(409).json({
-			message: "Argumentos inválidos",
-		})
-	}
-}
-
-export const adminValidation = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		await adminSchema.parseAsync(req.body)
-		next()
-	} catch (error) {
-		let err = error
-		if (err instanceof z.ZodError) {
-			err = err.issues.map((e) => ({ path: e.path[0], message: e.message }))
-		}
-		return res.status(409).json({
-			message: error,
-		})
 	}
 }

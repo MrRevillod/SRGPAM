@@ -1,6 +1,7 @@
 import multer from "multer"
+
+import { AppError } from "@repo/lib"
 import { RequestHandler } from "express"
-import { AppError} from "@repo/lib"
 
 export const fileWhitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
 
@@ -8,7 +9,7 @@ const storage = multer.memoryStorage()
 
 export const upload = multer({
 	storage: storage,
-	limits: { fileSize: 5* 1048576 },
+	limits: { fileSize: 5 * 1048576 },
 	fileFilter: (req, file, cb) => {
 		if (!fileWhitelist.includes(file.mimetype)) {
 			return cb(new AppError(400, "Este tipo de archivo no esta permitido"))

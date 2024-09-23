@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Modal, Form, Input, message, Button } from "antd"
 import axios from "axios"
 import type { DataType, FieldType } from "../../lib/types"
+import { SetStateAction, Dispatch } from "react"
 
 interface EditPersonModalProps {
 	visible: boolean
@@ -9,17 +10,44 @@ interface EditPersonModalProps {
 	modalType: string
 	onCancel: () => void
 	onOk: () => void
+	data: any[]
+	setData: Dispatch<SetStateAction<DataType[]>>
 }
 
-const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, modalType, onCancel, onOk }) => {
+const EditPersonModal: React.FC<EditPersonModalProps> = ({
+	visible,
+	person,
+	modalType,
+	onCancel,
+	onOk,
+	data,
+	setData,
+}) => {
 	const [form] = Form.useForm()
+
+	// Este useEffect se ejecutará cuando `person` cambie
+	useEffect(() => {
+		if (person) {
+			// Si hay una persona seleccionada, establece los valores del formulario
+			form.setFieldsValue({
+				name: person.name,
+				email: person.email,
+				address: person.address,
+				birthDate: person.birthDate,
+				password: "", // Si prefieres no mostrar la contraseña anterior
+			})
+		} else {
+			// Si no hay persona seleccionada, resetea el formulario
+			form.resetFields()
+		}
+	}, [person, form])
 
 	const handleSubmit = async () => {
 		try {
 			const values = await form.validateFields()
 
 			if (modalType === "Edit" && person?.id) {
-				await axios.patch(`http://localhost:5000/api/dashboard/seniors/${person.id}`, {
+				await axios.patch(`http://localhost/api/dashboard/seniors/${person.id}`, {
 					name: values.name,
 					email: values.email,
 					password: values.password,
@@ -30,6 +58,21 @@ const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, moda
 			} else {
 				message.error("No se pudo encontrar el ID de la persona")
 			}
+
+			const userUpdate = {
+				id: person?.id,
+				name: values.name,
+				email: values.email,
+				password: values.password,
+				address: values.address,
+				birthDate: values.birthDate,
+				createdAt: new Date().toUTCString(),
+				updatedAt: new Date().toUTCString(),
+			}
+
+			// Actualiza la lista de usuarios
+			const updatedData = data.map((item) => (item.id === person?.id ? { ...item, ...userUpdate } : item))
+			setData(updatedData)
 
 			form.resetFields()
 			onOk()
@@ -42,8 +85,14 @@ const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, moda
 	const handleDelete = async () => {
 		try {
 			if (person?.id) {
-				await axios.delete(`http://localhost:5000/api/dashboard/seniors/${person.id}`)
+				await axios.delete(`http://localhost/api/dashboard/seniors/${person.id}`)
+
 				message.success("Persona eliminada correctamente")
+
+				// Elimina el usuario de la lista
+				const updatedData = data.filter((item) => item.id !== person.id)
+				setData(updatedData)
+
 				form.resetFields()
 				onOk()
 			} else {
@@ -57,7 +106,7 @@ const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, moda
 
 	return (
 		<Modal
-			title={`${modalType} ${person?.name || "New Person"}`}
+			title={`Administrar`}
 			open={visible}
 			onOk={handleSubmit}
 			onCancel={() => {
@@ -73,58 +122,50 @@ const EditPersonModal: React.FC<EditPersonModalProps> = ({ visible, person, moda
 						Eliminar
 					</Button>
 				),
-				<Button key="submit" type="primary" onClick={handleSubmit}>
+				<Button
+					style={{ backgroundColor: "#16a34a", borderColor: "#16a34a" }}
+					key="submit"
+					type="primary"
+					onClick={handleSubmit}
+				>
 					Guardar
 				</Button>,
 			]}
 		>
 			{person && (
-				<Form
-					form={form}
-					name="basic"
-					labelCol={{ span: 8 }}
-					wrapperCol={{ span: 16 }}
-					initialValues={{
-						name: person.name,
-						email: person.email,
-						address: person.address,
-						birthDate: person.birthDate,
-						password: "",
-					}}
-					autoComplete="off"
-				>
+				<Form form={form} name="basic" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} autoComplete="off">
 					<Form.Item<FieldType>
-						label="Name"
+						label="Nombre"
 						name="name"
 						rules={[{ required: true, message: "Please input your name!" }]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item<FieldType>
-						label="Email"
+						label="Correo Electrónico"
 						name="email"
 						rules={[{ type: "email", message: "Please input a valid email!" }]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item<FieldType>
-						label="Address"
+						label="Dirección"
 						name="address"
 						rules={[{ required: true, message: "Please input your address!" }]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item<FieldType>
-						label="BirthDate"
+						label="Fecha de nacimiento"
 						name="birthDate"
 						rules={[{ required: true, message: "Please input your birth date!" }]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item<FieldType>
-						label="Password"
+						label="Contraseña"
 						name="password"
-						rules={[{ required: true, message: "Please input a password!" }]}
+						rules={[{ message: "Please input a password!" }]}
 					>
 						<Input.Password />
 					</Form.Item>
