@@ -1,9 +1,10 @@
 import { View, StyleSheet, Alert } from "react-native"
 import Input from "@/components/input"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "@/components/register/types"
+import { commonProps } from "@/utils/types"
+
 import axios from "axios"
 import { SERVER_URL } from "@/constants/colors"
 import { storeTokens, storeUser } from "@/utils/storage"

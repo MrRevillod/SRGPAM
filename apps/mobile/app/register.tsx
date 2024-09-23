@@ -2,14 +2,14 @@ import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import Camera from "@/components/register/camera"
-import RUT from "@/components/register/views/rut"
-import Email from "@/components/register/views/email"
-import Pin from "@/components/register/views/pin"
-import ConfirmPin from "@/components/register/views/confirmPin"
-import DNI from "@/components/register/views/dni"
-import RSH from "@/components/register/views/rsh"
-import Final from "@/components/register/views/final"
+import Camera from "@/components/camera"
+import RUT from "@/screens/register/rut"
+import Email from "@/screens/register/email"
+import Pin from "@/screens/register/pin"
+import ConfirmPin from "@/screens/register/confirmPin"
+import DNI from "@/screens/register/dni"
+import Social from "@/screens/register/social"
+import Final from "@/screens/register/final"
 import registerSchema from "@/utils/validation"
 
 const Stack = createNativeStackNavigator()
@@ -49,8 +49,8 @@ const FormNavigator = ({
 				{(props) => <ConfirmPin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
 			</Stack.Screen>
 			<Stack.Screen name="DNI">{(props) => <DNI {...props} control={control} errors={errors} setValue={setValue} />}</Stack.Screen>
-			<Stack.Screen name="RSH">
-				{(props) => <RSH {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
+			<Stack.Screen name="Social">
+				{(props) => <Social {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
 			</Stack.Screen>
 			<Stack.Screen name="Final">{(props) => <Final {...props} />}</Stack.Screen>
 			<Stack.Screen name="Camera" component={Camera} options={{ headerShown: true }} />

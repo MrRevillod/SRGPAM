@@ -10,6 +10,7 @@ import { validateCors } from "./middlewares"
 export const createServer = (): express.Express => {
 	const app = express()
 
+	app.use(express.static("public"))
 	app.use(helmet())
 	app.use(morgan("dev"))
 	app.use(express.urlencoded({ extended: true }))

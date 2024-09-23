@@ -1,10 +1,12 @@
 import { View, StyleSheet } from "react-native"
 import Input from "@/components/input"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
-import { commonProps } from "@/components/register/types"
+import { commonProps } from "@/utils/types"
+import { useNavigation } from "@react-navigation/native"
 
-const RUT = ({ navigation, control, errors }: commonProps) => {
+const RUT = ({ control, errors }: commonProps) => {
+	const navigation = useNavigation()
 	return (
 		<GeneralView
 			title="Datos del Registro"

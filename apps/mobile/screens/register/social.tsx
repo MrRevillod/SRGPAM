@@ -1,16 +1,16 @@
 import { useEffect } from "react"
 import { View, StyleSheet, Text, Alert } from "react-native"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
-import { commonProps } from "@/components/register/types"
+import { commonProps } from "@/utils/types"
 import { Controller } from "react-hook-form"
 import * as mime from "react-native-mime-types"
 import axios from "axios"
 
 import { SERVER_URL } from "@/constants/colors"
 
-const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps) => {
+const Social = ({ navigation, route, control, setValue, handleSubmit }: commonProps) => {
 	useEffect(() => {
 		if (route.params?.photoUri) {
 			console.log("RSH photo URI:", route.params.photoUri)
@@ -19,7 +19,7 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 	}, [route.params?.photoUri])
 
 	const openCamera = () => {
-		navigation.navigate("Camera", { from: "RSH" })
+		navigation.navigate("Camera", { from: "Social" })
 	}
 
 	const onSubmit = async (data: any) => {
@@ -107,7 +107,7 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 	)
 }
 
-export default RSH
+export default Social
 
 const styles = StyleSheet.create({
 	customButtonText: {

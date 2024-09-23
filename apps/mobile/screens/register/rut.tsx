@@ -1,8 +1,8 @@
 import { View, StyleSheet } from "react-native"
 import Input from "@/components/input"
-import GeneralView from "@/components/register/generalView"
+import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
-import { commonProps } from "@/components/register/types"
+import { commonProps } from "@/utils/types"
 
 const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (
