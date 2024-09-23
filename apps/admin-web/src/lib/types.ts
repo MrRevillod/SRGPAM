@@ -3,8 +3,11 @@ export interface DataType {
 	id: string // Identificador único, puede ser el 'id' del senior
 	name: string // Nombre del senior
 	email: string // Correo electrónico
-	address: string // Dirección física
+	address: string // Dirección del senior
 	birthDate: string // Fecha de nacimiento en formato de string (ISO 8601)
+	validated: boolean // Indica si el senior ha sido validado
+	createdAt: string // Fecha de creación en formato de string (ISO 8601)
+	updatedAt: string // Fecha de actualización en formato de string (ISO 8601)
 }
 
 // Opciones para los campos editables en un formulario de seniors

@@ -40,6 +40,7 @@ export const fieldsValidation = (role: UserRole, variant: SchemasKeys) => {
 
 			next()
 		} catch (error: any) {
+			console.log(error.message)
 			next(new AppError(400, "Error de validación de campos en el formulario"))
 		}
 	}

@@ -3,7 +3,7 @@ import { AppError, getServerTokens, httpRequest, UserRole } from "@repo/lib"
 
 export const validateRole = (role: UserRole) => async (req: Request, res: Response, next: NextFunction) => {
 	const tokens = getServerTokens(req.headers, req.cookies)
-
+	console.log("ROL TOKENS ---->", tokens)
 	try {
 		const response = await httpRequest({
 			service: "AUTH",
