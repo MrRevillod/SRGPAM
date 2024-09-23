@@ -3,6 +3,7 @@ import Loading from "../components/Loading"
 import HomePage from "./Home"
 import LoginPage from "./auth/Login"
 import SeniorsPage from "./dashboard/Seniors"
+import ProfilePage from "./dashboard/Profile"
 import NotFoundPage from "./NotFound"
 import NewSeniorsPage from "./dashboard/SeniorsNew"
 import AdministratorPage from "./dashboard/Administrators"
@@ -36,6 +37,7 @@ const Router: React.FC = () => {
 			</Route>
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
+				<Route path="/profile" element={<ProfilePage />} />
 				<Route path="/dashboard" element={<HomePage />} />
 				<Route path="/dashboard/adultos-mayores" element={<SeniorsPage />} />
 				<Route path="/dashboard/adultos-mayores/nuevos" element={<NewSeniorsPage />} />
