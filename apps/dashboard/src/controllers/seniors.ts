@@ -1,10 +1,12 @@
-import { hash, compare } from "bcrypt"
+import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
-import { AppError, httpRequest } from "@repo/lib"
+import { Prisma, Senior } from "@prisma/client"
+import { AppError, findUser, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
-export const registerSeniorFromMobile = async (req: Request, res: Response, next: NextFunction) => {
+/// Controlador para manejar el registro de adultos mayores desde la aplicación móvil
+export const registerFromMobile = async (req: Request, res: Response, next: NextFunction) => {
 	const { rut, pin, email } = req.body
 	const files = req.files as {
 		[fieldname: string]: Express.Multer.File[]
@@ -16,18 +18,22 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 			throw new AppError(409, "La persona que estas tratando de registrar ya existe")
 		}
 
-		const hashedPin = await hash(pin, 10)
+		// Si el adulto mayor no existe, se crea
 
 		await prisma.senior.create({
 			data: {
 				id: rut,
 				name: "",
 				email: email ?? null,
-				password: hashedPin,
+				password: await hash(pin, 10),
 				address: "",
 				birthDate: new Date(),
 			},
 		})
+
+		// Se envían los archivos a la API de almacenamiento (storage)
+		// Para ello se deben convertir los buffers de la librería MULTER a blobs
+		// compatibles con la API de FETCH
 
 		const formData = new FormData()
 
@@ -39,9 +45,18 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 		formData.append("dni-b", dniB, files["dni-b"][0].originalname)
 		formData.append("social", social, files["social"][0].originalname)
 
-		const response = await httpRequest<null>("STORAGE", `/seniors/${rut}`, "POST", "MULTIPART", formData)
+		// Se envían los archivos a la API de almacenamiento (storage)
+
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/seniors/${rut}`,
+			method: "POST",
+			variant: "MULTIPART",
+			body: formData,
+		})
 
 		if (response.type == "error") {
+			console.log("Error in registerFromMobile", response)
 			await prisma.senior.delete({ where: { id: rut } })
 			throw new AppError(response.status ?? 500, response.message)
 		}
@@ -52,62 +67,134 @@ export const registerSeniorFromMobile = async (req: Request, res: Response, next
 	}
 }
 
-export const handleSeniorRequest = async (req: Request, res: Response, next: NextFunction) => {
-	const { id } = req.params
-	const validated = req.query.validate === "true"
-
+export const uploadProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const user = await prisma.senior.findUnique({ where: { id } })
-
-		if (!user) {
-			throw new AppError(404, "Adulto mayor no encontrado")
+		const userExists = await prisma.senior.findUnique({ where: { id: req.body.rut } })
+		if (!userExists) {
+			throw new AppError(404, "La persona no existe")
 		}
 
-		if (validated) {
-			await prisma.senior.update({ where: { id }, data: { validated } })
-		} else {
-			await prisma.senior.delete({ where: { id } })
+		const formData = new FormData()
+
+		const file = req.file as Express.Multer.File
+		const profile = bufferToBlob(file.buffer, file.mimetype)
+		formData.append("profile", profile, file.originalname)
+
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/seniors/profile/${req.body.rut}`,
+			method: "POST",
+			variant: "MULTIPART",
+			body: formData,
+		})
+
+		if (response.type == "error") {
+			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(200).json({ message: "Adulto mayor con ID ", type: "success" })
+		return res.status(200).json({ message: "La imagen de perfil se a registrado correctamente", type: "success", values: null })
 	} catch (error: unknown) {
 		next(error)
 	}
 }
 
-export const getAllSeniors = async (req: Request, res: Response, next: NextFunction) => {
+// Controlador para manejar las solicitudes de registro de adultos mayores
+// Se puede aceptar o rechazar una solicitud de registro
+// Esto de pende de la query validate=true | false
+
+export const handleSeniorRequest = async (req: Request, res: Response, next: NextFunction) => {
+	const id = req.params.id
+	const validated = req.query.validate === "true"
+
 	try {
-		const senior = await prisma.senior.findMany()
+		// Se verifica si el adulto mayor existe
+		if (!(await prisma.senior.findUnique({ where: { id } }))) {
+			throw new AppError(400, "Adulto mayor no encontrado")
+		}
+
+		// Si la solicitud es aceptada, se actualiza el campo validated a true
+		// Esto significa que el adulto mayor ya puede acceder a la aplicación
+
+		if (validated) {
+			await prisma.senior.update({ where: { id }, data: { validated } })
+			return res.status(200).json({ message: "La solicitud ha sido aceptada", type: "success", values: null })
+		} else {
+			// Si la solicitud es rechazada, se eliminan los archivos enviados
+			// y se elimina el adulto mayor de la base de datos
+
+			const storageResponse = await httpRequest({
+				service: "STORAGE",
+				endpoint: `/seniors/${id}`,
+				method: "DELETE",
+			})
+
+			if (storageResponse.type === "error") {
+				throw new AppError(storageResponse.status || 500, storageResponse.message)
+			}
+
+			await prisma.senior.delete({ where: { id } })
+			return res.status(200).json({ message: "La solicitud ha sido denegada", type: "success", values: null })
+		}
+	} catch (error: unknown) {
+		next(error)
+	}
+}
+
+// Controladores CRUD para los adultos mayores
+
+export const getAll = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const seniors = await prisma.senior.findMany({
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				address: true,
+				birthDate: true,
+				validated: true,
+				password: false,
+			},
+		})
+
 		return res.status(200).json({
 			message: "Seniors obtenidos correctamente",
 			type: "success",
-			values: senior,
+			values: {
+				seniors,
+				len: seniors.length,
+			},
 		})
 	} catch (error) {
 		next(error)
 	}
 }
 
-export const getSeniorById = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		return res.status(200).json({
-			message: "Información obtenida correctamente",
-			type: "success",
-			values: req.getExtension("user"),
-		})
-	} catch (error) {
-		next(error)
-	}
-}
-
-export const createSenior = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id, name, email, address, birthDate } = req.body
 		const defaulAdminPassword = await hash("1234", 10)
 
-		// TODO! Validar si el usuario ya existe antes de crearlo
+		const filter: Prisma.SeniorWhereInput = {
+			id,
+			OR: [{ id }, { email }],
+		}
 
-		const senior = await prisma.senior.create({
+		const userExists = await findUser(filter, "SENIOR")
+
+		if (userExists) {
+			const conflicts = []
+
+			if (userExists?.id === id) conflicts.push("id")
+			if (userExists?.email === email) conflicts.push("email")
+
+			return res.status(409).json({
+				message: "El adulto mayor ya existe",
+				type: "error",
+				values: { conflicts },
+			})
+		}
+
+		await prisma.senior.create({
 			data: {
 				id,
 				name,
@@ -119,32 +206,42 @@ export const createSenior = async (req: Request, res: Response, next: NextFuncti
 			},
 		})
 		return res.status(200).json({
-			message: "Senior created correctamente",
+			message: "Creación exitosa",
 			type: "success",
-			values: senior,
+			values: null,
 		})
 	} catch (error) {
 		next(error)
 	}
 }
 
-export const updateSeniorById = async (req: Request, res: Response, next: NextFunction) => {
+export const updateById = async (req: Request, res: Response, next: NextFunction) => {
+	const reqUser = req.getExtension("user") as Senior
 	try {
 		const { name, email, password, address, birthDate } = req.body
-		const updatePassword = await hash(password, 10)
 
 		const senior = await prisma.senior.update({
 			where: { id: req.params.id },
 			data: {
 				name,
 				email,
-				password: updatePassword,
+				password: password ? await hash(password, 10) : reqUser.password,
 				address,
 				birthDate: new Date(birthDate),
 			},
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				address: true,
+				birthDate: true,
+				validated: true,
+				password: false,
+			},
 		})
+
 		return res.status(200).json({
-			message: "Senior update correctamente",
+			message: "Actualización exitosa",
 			type: "success",
 			values: senior,
 		})
@@ -153,13 +250,25 @@ export const updateSeniorById = async (req: Request, res: Response, next: NextFu
 	}
 }
 
-export const deleteSeniorById = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const senior = await prisma.senior.delete({
 			where: { id: req.params.id },
 		})
+
+		const storageResponse = await httpRequest({
+			service: "STORAGE",
+			endpoint: `/seniors/${req.params.id}`,
+			method: "DELETE",
+		})
+
+		if (storageResponse.type === "error") {
+			await prisma.senior.create({ data: senior })
+			throw new AppError(storageResponse.status || 500, storageResponse.message)
+		}
+
 		return res.status(200).json({
-			message: "Senior deleted correctamente",
+			message: "Eliminación exitosa",
 			type: "success",
 			values: senior,
 		})

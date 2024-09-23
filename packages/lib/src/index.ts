@@ -29,12 +29,18 @@ export const extensions = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export { httpRequest } from "./request"
-export { getServerCookies } from "./authorization/cookies"
 export { services, constants } from "./config"
-export type { JsonResponse, UserKind } from "./types"
+export type { JsonResponse, UserRole, User } from "./types"
 export { AppError, AuthError, errorHandler } from "./errors"
-export { toPublicUser } from "./authorization/user"
+export { toPublicUser, findUser, isValidUserRole } from "./authorization/user"
 export { isValidRut } from "./authorization/rut"
+
+export {
+	SeniorSchemas,
+	type SchemasKeys,
+	AdministratorSchemas,
+	ProfessionalSchemas,
+} from "./schemas"
 
 export {
 	signJsonwebtoken,
@@ -42,4 +48,6 @@ export {
 	AccessTokenOpts,
 	CustomTokenOpts,
 	RefreshTokenOpts,
+	getServerTokens,
+	type ServerTokens,
 } from "./authorization/jsonwebtoken"

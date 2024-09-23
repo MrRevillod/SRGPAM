@@ -13,7 +13,9 @@ dist-ssr
 */dist
 **/dist
 .markdown/preguntas.md
+.markdown/tareas.md
 **/*-lock.*
 **/pnpm-lock.yaml
 **/yarn.lock
 **/package-lock.json
+tareas/

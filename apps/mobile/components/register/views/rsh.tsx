@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { View, StyleSheet, Text, Alert } from "react-native"
 import GeneralView from "@/components/register/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "@/components/register/types"
-import { Controller, useForm } from "react-hook-form"
+import { Controller } from "react-hook-form"
 import * as mime from "react-native-mime-types"
 import axios from "axios"
 
@@ -64,8 +64,7 @@ const RSH = ({ navigation, route, control, setValue, handleSubmit }: commonProps
 			}
 
 			navigation.navigate("Final")
-		} catch (error) {
-			console.error(error)
+		} catch (error: any) {
 			Alert.alert("Error", "Hubo un problema al enviar los datos. Intenta nuevamente.")
 		}
 	}

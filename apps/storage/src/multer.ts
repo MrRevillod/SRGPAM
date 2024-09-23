@@ -10,3 +10,5 @@ export const uploadFields: RequestHandler = upload.fields([
 	{ name: "dni-b", maxCount: 1 },
 	{ name: "social", maxCount: 1 },
 ])
+
+export const uploadProfile: RequestHandler = upload.single("profile")

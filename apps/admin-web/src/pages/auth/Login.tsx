@@ -1,46 +1,29 @@
 import React from "react"
-import axios from "axios"
-
-import { z } from "zod"
 import { Input } from "../../components/ui/Input"
+import { useAuth } from "../../context/AuthContext"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LoginFormData } from "../../lib/types"
+import { LoginFormSchema } from "../../lib/schemas"
 import { SubmitHandler, useForm } from "react-hook-form"
 
 const LoginPage: React.FC = () => {
-	type FormData = {
-		email: string
-		password: string
-		role: "ADMIN" | "PROFESSIONAL"
-		rememberMe: boolean
-	}
-
-	const schema = z.object({
-		email: z.string().email().min(1, "El correo electrónico es requerido"),
-		password: z.string().min(1, "La contraseña es requerida"),
-		role: z.enum(["ADMIN", "PROFESSIONAL"]),
-	})
-
 	const {
+		getValues,
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm({
-		resolver: zodResolver(schema),
+		resolver: zodResolver(LoginFormSchema),
 	})
 
-	const onSubmit: SubmitHandler<FormData> = async (data) => {
-		try {
-			const response = await axios.post(`http://localhost/api/auth/login?variant=${data.role}`, data)
-
-			localStorage.setItem("SELECTED_ROLE", data.role)
-		} catch (error) {
-			console.error(error)
-		}
+	const { login } = useAuth()
+	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
+		login(formData)
 	}
 
 	return (
 		<div className="flex w-full login-container items-center justify-center absolute">
-			<div className="bg-white flex flex-col justify-center items-center px-12 w-11/12 md:w-1/2 lg:w-1/3 xl:w-5/12 2xl:w-1/4 rounded-lg h-3/4">
+			<div className="bg-white flex flex-col justify-center items-center px-12 w-11/12 md:w-1/2 lg:w-1/3 xl:w-5/12 2xl:w-1/4 rounded-lg h-4/6 login-form-container">
 				<div className="w-full max-w-md">
 					<h2 className="text-4xl font-bold text-gray-900 text-center mb-4">¡Hola!</h2>
 					<p className="text-center text-gray-600 mb-6">
@@ -51,6 +34,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Correo electrónico"
 							type="email"
+							value={"admin1@admins.com"}
 							{...register("email")}
 							placeholder="example@gmail.com"
 							error={errors.email ? errors.email.message?.toString() : ""}
@@ -59,6 +43,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Contraseña"
 							type="password"
+							value={"!Admin2024Password"}
 							{...register("password")}
 							placeholder="●●●●●●●●●●"
 							error={errors.password ? errors.password.message?.toString() : ""}

@@ -1,14 +1,22 @@
+import * as administrators from "../controllers/administrators"
+
 import { Router } from "express"
-import { adminValidation, userIdValidation } from "../middlewares/validation"
-import { getAdministrators, getAdministratorById, createAdministrator, updateAdministrator, deleteAdministrator } from "../controllers/administrators"
+import { fieldsValidation, validateUserId } from "../middlewares/validation"
 
 const router: Router = Router()
 
-router.get("/", getAdministrators)
-router.get("/:id", userIdValidation("ADMIN"), getAdministratorById)
-router.post("/", adminValidation, createAdministrator)
+// -- Endpoints CRUD
 
-router.patch("/:id", userIdValidation("ADMIN"), updateAdministrator)
-router.delete("/:id", userIdValidation("ADMIN"), deleteAdministrator)
+// Obtener todos los administradores
+router.get("/", administrators.getAll)
+
+// Crear un administrador
+router.post("/", fieldsValidation("ADMIN", "Create"), administrators.create)
+
+// Actualizar un administrador por id -- !TODO: Requiere middleware de pertenencia
+router.patch("/:id", validateUserId("ADMIN"), fieldsValidation("ADMIN", "Update"), administrators.updateById)
+
+// Eliminar un administrador por id -- !TODO: Requiere middleware de pertenencia
+router.delete("/:id", validateUserId("ADMIN"), administrators.deleteById)
 
 export default router

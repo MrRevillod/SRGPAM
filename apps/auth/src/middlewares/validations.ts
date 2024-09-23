@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { match } from "ts-pattern"
-import { NextFunction, Request, Response } from "express"
 import { isValidRut } from "@repo/lib"
+import { NextFunction, Request, Response } from "express"
 
 type ValidationRule = "LOGIN_FIELDS" | "SENIOR_LOGIN_FIELDS"
 

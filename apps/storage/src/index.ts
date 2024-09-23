@@ -14,11 +14,11 @@ export const createServer = (): express.Express => {
 	app.use(morgan("dev"))
 	app.use(express.urlencoded({ extended: true }))
 	app.use(cors())
-    app.use(extensions)
-    app.use(validateCors)
+	app.use(extensions)
+	app.use(validateCors)
 	app.use("/api/storage/seniors", router)
-    app.use(errorHandler)
-    
+	app.use(errorHandler)
+
 	return app
 }
 

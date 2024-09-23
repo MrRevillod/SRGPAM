@@ -15,8 +15,8 @@
 		"preset": "@repo/jest-presets/node"
 	},
 	"dependencies": {
-		"@repo/database": "workspace:*",
 		"@repo/lib": "workspace:*",
+		"@repo/database": "workspace:*",
 		"cors": "^2.8.5",
 		"express": "^4.18.3",
 		"helmet": "^7.1.0",

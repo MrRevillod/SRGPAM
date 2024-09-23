@@ -1,3 +1,5 @@
+import { Administrator, Professional, Senior } from "@prisma/client"
+
 export type ContentTypeVariant = "JSON" | "MULTIPART"
 export type AllowedHttpMethod = "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
 export type ServiceName = "AUTH" | "DASHBOARD" | "STORAGE" | "ADMIN_WEB" | "PRO_WEB"
@@ -14,4 +16,5 @@ export type JsonResponse<T> = {
 	values: T
 }
 
-export type UserKind = "ADMIN" | "PROFESSIONAL" | "SENIOR"
+export type User = Administrator | Senior | Professional
+export type UserRole = "ADMIN" | "PROFESSIONAL" | "SENIOR"
