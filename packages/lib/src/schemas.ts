@@ -15,6 +15,10 @@ const pinSchema = z.string().refine((value) => value.length === 4, {
 	message: "El PIN debe tener 4 dígitos",
 })
 
+const optionalPinSchema = z.string().refine((value) => value === "" || value.length === 4, {
+	message: "Debe ser una cadena vacía o de exactamente 4 dígitos",
+})
+
 const passwordSchema = z
 	.string()
 	.min(8, "La contraseña debe tener al menos 8 caracteres")
@@ -60,10 +64,10 @@ export const SeniorSchemas = {
 			name: nameSchema,
 			address: addressSchema,
 			birthDate: birthDateSchema,
-			pin: pinSchema,
-			confirmPin: pinSchema,
+			password: optionalPinSchema,
+			confirmPassword: optionalPinSchema,
 		})
-		.refine((data) => data.pin === data.confirmPin, {
+		.refine((data) => data.password === data.confirmPassword, {
 			message: "Los PIN ingresados no coinciden",
 		}),
 }

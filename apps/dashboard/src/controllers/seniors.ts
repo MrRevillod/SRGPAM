@@ -153,9 +153,10 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				birthDate: true,
 				validated: true,
 				password: false,
+				createdAt: true,
+				updatedAt: true,
 			},
 		})
-
 		return res.status(200).json({
 			message: "Seniors obtenidos correctamente",
 			type: "success",
@@ -175,11 +176,10 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const defaulAdminPassword = await hash("1234", 10)
 
 		const filter: Prisma.SeniorWhereInput = {
-			id,
 			OR: [{ id }, { email }],
 		}
 
-		const userExists = await findUser(filter, "SENIOR")
+		const userExists = await prisma.senior.findFirst({ where: filter })
 
 		if (userExists) {
 			const conflicts = []
