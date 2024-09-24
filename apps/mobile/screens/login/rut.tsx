@@ -3,10 +3,8 @@ import Input from "@/components/input"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
-import { useNavigation } from "@react-navigation/native"
 
-const RUT = ({ control, errors }: commonProps) => {
-	const navigation = useNavigation()
+const RUT = ({ navigation, control, errors }: commonProps) => {
 	return (
 		<GeneralView
 			title="Datos del Registro"

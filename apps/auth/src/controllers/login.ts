@@ -2,6 +2,7 @@ import { Senior } from "@prisma/client"
 import { compare } from "bcrypt"
 import { Request, Response, NextFunction } from "express"
 import { AccessTokenOpts, AppError, RefreshTokenOpts, signJsonwebtoken, toPublicUser, findUser } from "@repo/lib"
+import { prisma } from "@repo/database"
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
 	const loginKind = req.query.variant
@@ -43,7 +44,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 
 export const loginSeniorMobile = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const user = (await findUser({ email: req.body.email }, "SENIOR")) as Senior
+		const user = await prisma.senior.findUnique({ where: { id: req.body.rut } })
 
 		if (!user || !(await compare(req.body.password, user.password))) {
 			throw new AppError(401, "Credenciales inválidas")

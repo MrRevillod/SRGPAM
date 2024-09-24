@@ -53,7 +53,7 @@ const Header: React.FC = () => {
 					<Dropdown
 						label=""
 						dismissOnClick={false}
-						renderTrigger={() => <span className={`${linkClasses} cursor-pointer`}>Aultos Mayores</span>}
+						renderTrigger={() => <span className={`${linkClasses} cursor-pointer`}>Adultos Mayores</span>}
 					>
 						<Link to="/dashboard/adultos-mayores">
 							<Dropdown.Item>Todos</Dropdown.Item>

@@ -16,14 +16,10 @@ const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: a
 		const getRUT = async () => {
 			try {
 				const id = await getStorageRUT()
-				if (!id) {
-					console.error("No se pudo obtener el RUT")
-				}
+
 				setRUT(id)
 				setLoading(false)
-			} catch (error) {
-				console.error("Error al obtener el RUT", error)
-			}
+			} catch (error) {}
 		}
 		getRUT()
 	}, [])
