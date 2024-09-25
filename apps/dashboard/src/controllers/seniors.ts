@@ -294,3 +294,23 @@ export const newSeniors = async (req: Request, res: Response, next: NextFunction
 		next(error)
 	}
 }
+
+// TODO: MANEJO DE ERRORES
+export const uniqueCheck = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { rut, email } = req.body
+		if (!rut && !email) {
+			Error
+		}
+		const field = rut ? rut : email
+		const senior = await prisma.senior.findFirst({
+			where: {
+				OR: [{ id: field }, { email: field }],
+			},
+		})
+		if (senior) {
+			return res.status(409)
+		}
+		return res.status(200)
+	} catch (error) {}
+}

@@ -36,4 +36,7 @@ router.patch("/:id/new", controllers.handleSeniorRequest)
 // Subir imagen de perfil de adulto mayor !TODO: Cambiar a req.params
 router.post("/profile", seniorsProfileImage, fileValidation, controllers.uploadProfilePicture)
 
+// Verificar si el RUT o email ya existe en la base de datos
+router.post("/unique-check", controllers.uniqueCheck)
+
 export default router

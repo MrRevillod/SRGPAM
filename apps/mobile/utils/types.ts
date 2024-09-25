@@ -7,7 +7,9 @@ export type commonProps = {
 	errors?: FieldErrors<FieldValues>
 	handleSubmit?: any
 	setValue?: any
+	getValues?: any
 	trigger?: any
+	setError?: any
 	validateAndNavigate?: any
 	rutSenior?: string | null
 }

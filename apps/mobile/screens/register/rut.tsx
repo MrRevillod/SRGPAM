@@ -4,7 +4,14 @@ import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
 
-const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
+const RUT = ({ navigation, control, errors, getValues, setError, validateAndNavigate }: commonProps) => {
+	const onSubmit = async () => {
+		const rutValue = getValues("rut")
+		// TODO: INGRESAR ENDPOINT CREADO, RESPONSE ? NAVIGATE : ERROR
+		// FIXME: NO SE DEBE USAR EL validateAndNavigate, en cambio se tiene
+		// que usar solo el trigger para verificacion manual del field (segun lo que pense ahora, sujeto a cambios)
+	}
+
 	return (
 		<GeneralView
 			title="Datos del Registro"

@@ -19,13 +19,17 @@ const FormNavigator = ({
 	handleSubmit,
 	errors,
 	setValue,
+	getValues,
 	trigger,
+	setError,
 }: {
 	control: any
 	handleSubmit: any
 	errors: any
 	setValue: any
 	trigger: any
+	setError: any
+	getValues: any
 }) => {
 	const validateAndNavigate = async (field: string, navigation: any, nextScreen: string) => {
 		const isValid = await trigger(field)
@@ -37,10 +41,19 @@ const FormNavigator = ({
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="RUT">
-				{(props) => <RUT {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+				{(props) => (
+					<RUT
+						{...props}
+						control={control}
+						errors={errors}
+						getValues={getValues}
+						validateAndNavigate={validateAndNavigate}
+						setError={setError}
+					/>
+				)}
 			</Stack.Screen>
 			<Stack.Screen name="Email">
-				{(props) => <Email {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
+				{(props) => <Email {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} setError={setError} />}
 			</Stack.Screen>
 			<Stack.Screen name="Pin">
 				{(props) => <Pin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
@@ -63,7 +76,9 @@ const Register = () => {
 		control,
 		handleSubmit,
 		setValue,
+		getValues,
 		trigger,
+		setError,
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
@@ -78,7 +93,17 @@ const Register = () => {
 		resolver: zodResolver(registerSchema),
 	})
 
-	return <FormNavigator control={control} handleSubmit={handleSubmit} errors={errors} setValue={setValue} trigger={trigger} />
+	return (
+		<FormNavigator
+			control={control}
+			handleSubmit={handleSubmit}
+			errors={errors}
+			setValue={setValue}
+			getValues={getValues}
+			trigger={trigger}
+			setError={setError}
+		/>
+	)
 }
 
 export default Register
