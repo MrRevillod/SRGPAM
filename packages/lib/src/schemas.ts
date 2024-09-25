@@ -39,10 +39,17 @@ const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), 
 	message: "La fecha de nacimiento ingresada no es válida",
 })
 
-export type SchemasKeys =
-	| keyof typeof SeniorSchemas
-	| keyof typeof AdministratorSchemas
-	| keyof typeof ProfessionalSchemas
+const nameServiceSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
+
+const titleServiceSchema = z
+	.string()
+	.min(2, "El título debe tener al menos 2 caracteres")
+	.max(50, "El título no debe tener más de 50 caracteres")
+	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El título solo puede contener letras y espacios")
 
 export const SeniorSchemas = {
 	MobileRegister: z.object({
@@ -70,6 +77,17 @@ export const SeniorSchemas = {
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Los PIN ingresados no coinciden",
 		}),
+}
+
+export const ServiceSchemas = {
+	Create: z.object({
+		name: nameServiceSchema,
+		title: titleServiceSchema,
+	}),
+	Update: z.object({
+		name: nameServiceSchema,
+		title: titleServiceSchema,
+	}),
 }
 
 export const AdministratorSchemas = {
