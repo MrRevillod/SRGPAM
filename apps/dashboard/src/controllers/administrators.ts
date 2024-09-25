@@ -1,6 +1,6 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { Administrator } from "@prisma/client"
+import { Administrator, Prisma } from "@prisma/client"
 import { constants, findUser } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
@@ -38,7 +38,11 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 		// Verificamos si el administrador ya existe
 
-		const userExists = await findUser({ id, email }, "ADMIN")
+		const filter: Prisma.AdministratorWhereInput = {
+			OR: [{ id }, { email }],
+		}
+
+		const userExists = await prisma.administrator.findFirst({ where: filter })
 		if (userExists) {
 			const conflicts = []
 

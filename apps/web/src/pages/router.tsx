@@ -2,11 +2,15 @@ import React from "react"
 import Loading from "../components/Loading"
 import HomePage from "./Home"
 import LoginPage from "./auth/Login"
+import EventsPage from "./dashboard/Events"
+import CentersPage from "./dashboard/Centers"
 import SeniorsPage from "./dashboard/Seniors"
 import ProfilePage from "./Profile"
+import ServicesPage from "./dashboard/Services"
 import NotFoundPage from "./NotFound"
 import NewSeniorsPage from "./dashboard/SeniorsNew"
 import AdministratorPage from "./dashboard/Administrators"
+import ProfessionalsPage from "./dashboard/Professionals"
 
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
@@ -31,17 +35,25 @@ const Router: React.FC = () => {
 
 			<Route
 				path="/auth/login"
-				element={<RouteProtector condition={user !== null && isAuthenticated} redirectTo="/dashboard" />}
+				element={
+					<RouteProtector
+						condition={user !== null && isAuthenticated}
+						redirectTo="/dashboard/administradores"
+					/>
+				}
 			>
 				<Route path="" element={<LoginPage />} />
 			</Route>
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
 				<Route path="/profile" element={<ProfilePage />} />
-				<Route path="/dashboard" element={<HomePage />} />
+				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
+				<Route path="/dashboard/profesionales" element={<ProfessionalsPage />} />
 				<Route path="/dashboard/adultos-mayores" element={<SeniorsPage />} />
 				<Route path="/dashboard/adultos-mayores/nuevos" element={<NewSeniorsPage />} />
-				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
+				<Route path="/dashboard/eventos" element={<EventsPage />} />
+				<Route path="/dashboard/servicios" element={<ServicesPage />} />
+				<Route path="/dashboard/centros-de-atencion" element={<CentersPage />} />
 			</Route>
 
 			<Route path="*" element={<NotFoundPage />} />

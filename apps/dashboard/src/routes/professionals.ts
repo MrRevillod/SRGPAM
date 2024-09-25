@@ -2,7 +2,10 @@ import * as professionals from "../controllers/professionals"
 
 import { Router } from "express"
 import { validateRole } from "../middlewares/authentication"
-import { fieldsValidation, validateUserId } from "../middlewares/validation"
+import { validateSchema, validateUserId } from "../middlewares/validation"
+
+import { ProfessionalSchemas } from "@repo/lib"
+const { Create, Update } = ProfessionalSchemas
 
 const router: Router = Router()
 
@@ -12,10 +15,10 @@ const router: Router = Router()
 router.get("/", validateRole("ADMIN"), professionals.getAll)
 
 // Crear un profesional, requiere validación de rol ADMIN.
-router.post("/", fieldsValidation("PROFESSIONAL", "Create"), validateRole("ADMIN"), professionals.create)
+router.post("/", validateSchema(Create), validateRole("ADMIN"), professionals.create)
 
 // Actualizar un profesional por id -- !TODO: Requiere middleware de pertenencia
-router.patch("/:id", validateUserId("PROFESSIONAL"), fieldsValidation("PROFESSIONAL", "Update"), professionals.updateById)
+router.patch("/:id", validateUserId("PROFESSIONAL"), validateSchema(Update), professionals.updateById)
 
 // Eliminar un profesional por id -- !TODO: Requiere middleware de pertenencia
 router.delete("/:id", validateUserId("PROFESSIONAL"), professionals.deleteById)

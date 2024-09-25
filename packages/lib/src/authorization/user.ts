@@ -20,13 +20,13 @@ export const isValidUserRole = (role: string): role is UserRole => {
 export const findUser = async (filter: any, role: UserRole) => {
 	return await match(role)
 		.with("ADMIN", async () => {
-			return await prisma.administrator.findUnique({ where: filter })
+			return await prisma.administrator.findFirst({ where: filter })
 		})
 		.with("SENIOR", async () => {
-			return await prisma.senior.findUnique({ where: filter })
+			return await prisma.senior.findFirst({ where: filter })
 		})
 		.with("PROFESSIONAL", async () => {
-			return await prisma.professional.findUnique({ where: filter })
+			return await prisma.professional.findFirst({ where: filter })
 		})
 		.run()
 }

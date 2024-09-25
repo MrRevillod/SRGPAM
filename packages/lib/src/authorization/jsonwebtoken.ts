@@ -54,8 +54,6 @@ export const getServerTokens = (headers: IncomingHttpHeaders, cookies: any) => {
 		cookies &&
 		(cookies["ACCESS_TOKEN"] !== undefined || cookies["REFRESH_TOKEN"] !== undefined)
 	) {
-		console.log("cookies", cookies)
-
 		tokens.access = cookies["ACCESS_TOKEN"] || null
 		tokens.refresh = cookies["REFRESH_TOKEN"] || null
 		return tokens

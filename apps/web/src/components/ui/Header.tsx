@@ -45,9 +45,13 @@ const Header: React.FC = () => {
 					</Dropdown>
 					<Navbar.Toggle />
 				</div>
-				<Navbar.Collapse>
+				<Navbar.Collapse className="-ml-4">
 					<Link to="/dashboard/administradores" className={linkClasses}>
 						Administradores
+					</Link>
+
+					<Link to="/dashboard/profesionales" className={linkClasses}>
+						Profesionales
 					</Link>
 
 					<Dropdown
@@ -66,6 +70,14 @@ const Header: React.FC = () => {
 
 					<Link to="/dashboard/eventos" className={linkClasses}>
 						Eventos
+					</Link>
+
+					<Link to="/dashboard/servicios" className={linkClasses}>
+						Servicios
+					</Link>
+
+					<Link to="/dashboard/centros-de-atencion" className={linkClasses}>
+						Centros de atención
 					</Link>
 
 					<Link to="/dashboard/estadisticas" className={linkClasses}>

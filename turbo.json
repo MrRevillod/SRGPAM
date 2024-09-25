@@ -12,10 +12,8 @@
 			],
 			"outputs": [
 				"build/**",
-				".vercel/**",
 				"dist/**",
-				".next/**",
-				"!.next/cache/**"
+				"node_modules/**"
 			]
 		},
 		"db:migrate:deploy": {},
@@ -38,6 +36,7 @@
 		},
 		"dev": {
 			"dependsOn": [
+				"^clean",
 				"^install",
 				"^build",
 				"^generate",

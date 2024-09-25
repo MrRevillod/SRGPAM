@@ -3,8 +3,11 @@ import * as controllers from "../controllers/seniors"
 import { Router } from "express"
 import { validateRole } from "../middlewares/authentication"
 import { filesValidation, fileValidation } from "../middlewares/file"
-import { fieldsValidation, validateUserId } from "../middlewares/validation"
+import { validateSchema, validateUserId } from "../middlewares/validation"
 import { seniorsRegisterMobileImages, seniorsProfileImage } from "../config"
+
+import { SeniorSchemas } from "@repo/lib"
+const { DashboardRegister, MobileRegister, Update } = SeniorSchemas
 
 const router: Router = Router()
 
@@ -14,10 +17,10 @@ const router: Router = Router()
 router.get("/", validateRole("ADMIN"), controllers.getAll)
 
 // Crear un adulto mayor prechequeado
-router.post("/pre-checked", validateRole("ADMIN"), fieldsValidation("SENIOR", "DashboardRegister"), controllers.create)
+router.post("/pre-checked", validateRole("ADMIN"), validateSchema(DashboardRegister), controllers.create)
 
 // Actualizar un adulto mayor por id -- !TODO: Requiere middleware de pertenencia
-router.patch("/:id", validateUserId("SENIOR"), fieldsValidation("SENIOR", "Update"), controllers.updateById)
+router.patch("/:id", validateUserId("SENIOR"), validateSchema(Update), controllers.updateById)
 
 // Eliminar un adulto mayor por id -- !TODO: Requiere middleware de pertenencia
 router.delete("/:id", validateUserId("SENIOR"), controllers.deleteById)
@@ -28,7 +31,7 @@ router.delete("/:id", validateUserId("SENIOR"), controllers.deleteById)
 router.get("/new", validateRole("ADMIN"), controllers.newSeniors)
 
 // Registrar un adulto mayor desde la app móvil
-router.post("/new-mobile", seniorsRegisterMobileImages, fieldsValidation("SENIOR", "MobileRegister"), filesValidation, controllers.registerFromMobile)
+router.post("/new-mobile", seniorsRegisterMobileImages, validateSchema(MobileRegister), filesValidation, controllers.registerFromMobile)
 
 // Actualizar una solicitud registro de adulto mayor (denegar o aceptar)
 router.patch("/:id/new", controllers.handleSeniorRequest)

@@ -22,7 +22,10 @@
     "**/node_modules": true,
     "**/build": true,
     "**/dist": true,
-    "**/.turbo": true
+    "**/.turbo": true,
+    "**/__tests__": true,
+    "**/migrations": true,
+    "config": true,
   },
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,

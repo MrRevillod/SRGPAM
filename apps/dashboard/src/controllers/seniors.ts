@@ -56,7 +56,6 @@ export const registerFromMobile = async (req: Request, res: Response, next: Next
 		})
 
 		if (response.type == "error") {
-			console.log("Error in registerFromMobile", response)
 			await prisma.senior.delete({ where: { id: rut } })
 			throw new AppError(response.status ?? 500, response.message)
 		}

@@ -2,7 +2,7 @@ import { Administrator, Professional, Senior } from "@prisma/client"
 
 export type ContentTypeVariant = "JSON" | "MULTIPART"
 export type AllowedHttpMethod = "POST" | "PUT" | "DELETE" | "GET" | "PATCH"
-export type ServiceName = "AUTH" | "DASHBOARD" | "STORAGE" | "ADMIN_WEB" | "PRO_WEB"
+export type ServiceName = "AUTH" | "DASHBOARD" | "STORAGE" | "WEB_APP"
 
 export type ServiceInfo = {
 	url: string

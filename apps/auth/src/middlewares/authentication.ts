@@ -10,8 +10,6 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 
 		const accessCookie = req.cookies["ACCESS_TOKEN"]
 
-		console.log("accessCookie", accessCookie)
-
 		const authHeader = req.headers.authorization
 		let accessHeaderToken = null
 		if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -26,13 +24,9 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 			throw new AppError(401, "No tienes autorización para acceder a este recurso")
 		}
 
-		console.log("payload", payload)
-
 		// Se busca al usuario que está realizando la petición actual
 		const user = await findUser({ id: payload.id }, payload.role)
 		if (!user) throw new AppError(401, "No tienes autorización para acceder a este recurso")
-
-		console.log("user", user)
 
 		// Se añade la información del usuario a la petición
 
@@ -41,8 +35,6 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 		req.setExtension("userId", payload.id)
 
 		next()
-
-		console.log("pasó la sesión")
 	} catch (error) {
 		next(error)
 	}

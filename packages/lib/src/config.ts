@@ -20,15 +20,11 @@ export const services: Record<ServiceName, ServiceInfo> = {
 		url: (process.env.DASHBOARD_SERVICE_URL ?? "http://localhost") as string,
 		port: envPortAsInt("DASHBOARD_SERVICE_PORT", 5000),
 	},
-	ADMIN_WEB: {
-		url: (process.env.ADMIN_WEB_SERVICE_URL ?? "http://localhost") as string,
-		port: envPortAsInt("ADMIN_WEB_SERVICE_PORT", 8000),
+	WEB_APP: {
+		url: (process.env.WEB_APP_URL ?? "http://localhost") as string,
+		port: envPortAsInt("WEB_APP_PORT", 8000),
 	},
-	PRO_WEB: {
-		url: (process.env.PRO_WEB_SERVICE_URL ?? "http://localhost") as string,
-		port: envPortAsInt("PRO_WEB_SERVICE_PORT", 9000),
-	},
-}
+} as const
 
 export const constants = {
 	JWT_SECRET: process.env.JWT_SECRET ?? "secret",
@@ -38,6 +34,11 @@ export const constants = {
 
 	DEFAULT_ADMIN_PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD ?? "admin",
 	DEFAULT_PROFESSIONAL_PASSWORD: process.env.DEFAULT_PROFESSIONAL_PASSWORD ?? "professional",
-}
+
+	PROJECT_EMAIL_ADDRESS: process.env.PROJECT_EMAIL_ADDRESS ?? "",
+	PROJECT_EMAIL_PASSWORD: process.env.PROJECT_EMAIL_PASSWORD ?? "",
+	PROJECT_EMAIL_HOST: process.env.PROJECT_EMAIL_HOST ?? "",
+	PROJECT_EMAIL_PORT: process.env.PROJECT_EMAIL_PORT ?? "",
+} as const
 
 console.table(services)

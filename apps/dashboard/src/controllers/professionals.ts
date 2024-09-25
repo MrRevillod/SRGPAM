@@ -2,7 +2,7 @@ import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
 import { constants, findUser } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
-import { Professional } from "@prisma/client"
+import { Prisma, Professional } from "@prisma/client"
 
 // Controlador para obtener todos los profesionales de la base de datos
 // se excluye el campo password de la respuesta
@@ -38,7 +38,12 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 		// Verificamos si el profesional ya existe
 
-		const userExists = await findUser({ id, email }, "PROFESSIONAL")
+		const filter: Prisma.ProfessionalWhereInput = {
+			OR: [{ id }, { email }],
+		}
+
+		const userExists = await prisma.professional.findFirst({ where: filter })
+
 		if (userExists) {
 			const conflicts = []
 
