@@ -62,3 +62,8 @@ export type ApiResponse = {
 	type: "success" | "error"
 	values: any
 }
+
+export type PasswordFields = {
+	password: string
+	confirmPassword: string
+}

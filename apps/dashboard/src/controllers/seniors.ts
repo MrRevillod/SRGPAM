@@ -193,7 +193,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 		}
 
-		await prisma.senior.create({
+		const { password, ...senior } = await prisma.senior.create({
 			data: {
 				id,
 				name,
@@ -204,11 +204,8 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				validated: true,
 			},
 		})
-		return res.status(200).json({
-			message: "Creación exitosa",
-			type: "success",
-			values: null,
-		})
+
+		return res.status(200).json({ message: "Creación exitosa", type: "success", values: { senior } })
 	} catch (error) {
 		next(error)
 	}
@@ -236,13 +233,15 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 				birthDate: true,
 				validated: true,
 				password: false,
+				createdAt: true,
+				updatedAt: true,
 			},
 		})
 
 		return res.status(200).json({
 			message: "Actualización exitosa",
 			type: "success",
-			values: senior,
+			values: { senior },
 		})
 	} catch (error) {
 		next(error)

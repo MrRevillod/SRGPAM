@@ -6,7 +6,7 @@ import { HiPencil } from "react-icons/hi"
 interface PersonTableProps {
 	data: DataType[]
 	columnsConfig: Array<{ title: string; dataIndex: keyof DataType; key: string }>
-	onEdit?: (person: DataType) => void // Ahora es opcional
+	onEdit?: (person: DataType) => void
 }
 
 const isDateString = (value: any) => {
@@ -15,32 +15,29 @@ const isDateString = (value: any) => {
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString)
-	return date.toLocaleDateString() // Puedes personalizar el formato aquí
+	return date.toLocaleDateString()
 }
 
 const renderBoolean = (value: boolean) => {
-	return value ? "Si" : "No" // Puedes cambiar este texto o usar íconos
+	return value ? "Si" : "No"
 }
 
 const PersonTable: React.FC<PersonTableProps> = ({ data, columnsConfig, onEdit }) => {
 	const dateKeys = ["birthDate", "updatedAt", "createdAt"]
 	return (
-		<Table dataSource={data}>
+		<Table dataSource={data} rowKey={(record) => record.id}>
 			{columnsConfig.map((col) => (
 				<Table.Column
 					key={col.key}
 					title={col.title}
 					dataIndex={col.dataIndex}
 					render={(value: any) => {
-						// Si la columna es updatedAt o createdAt, aplica formato de fecha
 						if (dateKeys.includes(col.key) && isDateString(value)) {
 							return formatDate(value)
 						}
-						// Si la columna es validate, renderiza el booleano como texto
 						if (col.key === "validated") {
 							return renderBoolean(value)
 						}
-						// Para el resto de los casos, renderiza el valor tal cual
 						return value
 					}}
 				/>
