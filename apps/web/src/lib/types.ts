@@ -29,6 +29,10 @@ export interface newSenior {
 	validated: boolean
 }
 
+export type BaseDataType = {
+	id: string
+}
+
 export type LoginVariant = "ADMIN" | "PROFESSIONAL"
 
 export type LoginFormData = {
@@ -52,8 +56,10 @@ export interface Professional extends IUser {}
 export interface Senior extends IUser {
 	address: string
 	birthDate: string
+	validated: boolean
 }
 
+export type UnvalidatedSenior = Omit<Senior, "name" & "address" & "birthDate">
 export type User = Administrator | Professional | Senior
 
 export type ApiResponse = {
@@ -67,3 +73,5 @@ export type PasswordFields = {
 	password: string
 	confirmPassword: string
 }
+
+export type TableColumnType<T> = Array<{ title: string; dataIndex: keyof T; key: string }>

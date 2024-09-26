@@ -1,11 +1,18 @@
 import React from "react"
 import { api } from "../../lib/axios"
 import { Input } from "../ui/Input"
-import { InputDate } from "../ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SeniorSchemas } from "../../lib/schemas"
 import { Modal, message } from "antd"
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import { FieldValues, SubmitHandler, useForm, Controller } from "react-hook-form"
+
+import { es } from "date-fns/locale/es"
+import { registerLocale } from "react-datepicker"
+import ReactDatePicker from "react-datepicker"
+
+registerLocale("es", es)
+
+import "react-datepicker/dist/react-datepicker.css"
 
 interface CreateSeniorsProps {
 	visible: boolean
@@ -31,12 +38,12 @@ const CreateSeniors: React.FC<CreateSeniorsProps> = ({ visible, onCancel, onOk, 
 		formState: { errors },
 		reset,
 		clearErrors,
+		control,
 	} = useForm({
 		resolver: zodResolver(SeniorSchemas.DashboardRegister),
 	})
 
 	const handleCancel = () => {
-		clearErrors()
 		reset()
 		onCancel()
 	}
@@ -109,17 +116,34 @@ const CreateSeniors: React.FC<CreateSeniorsProps> = ({ visible, onCancel, onOk, 
 					error={errors.address ? errors.address.message?.toString() : ""}
 				/>
 
-				<InputDate
-					label="Fecha de Nacimiento"
-					{...register("birthDate")}
-					error={errors.birthDate ? errors.birthDate.message?.toString() : ""}
-				/>
+				<div className="flex flex-col gap-3 w-full">
+					<div className="flex flex-row gap-2 items-center justify-between">
+						<label className="font-semibold">Fecha de Nacimiento</label>
+						{errors.birthDate && (
+							<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
+						)}
+					</div>
+					<Controller
+						control={control}
+						name="birthDate"
+						render={({ field: { onChange, value } }) => (
+							<ReactDatePicker
+								className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
+								placeholderText="Fecha de Nacimiento"
+								onChange={onChange}
+								selected={value}
+								maxDate={new Date()}
+								locale="es"
+							/>
+						)}
+					/>
+				</div>
 
 				<div className="flex flex-row gap-4 w-full justify-end -mb-6">
 					<button
 						key="back"
 						onClick={() => handleCancel()}
-						className="bg-red-700 text-neutral-100 font-semibold px-6 py-2 rounded-lg"
+						className="border-1 border-red-700 text-red-700 font-semibold px-6 py-2 rounded-lg"
 					>
 						Cancelar
 					</button>

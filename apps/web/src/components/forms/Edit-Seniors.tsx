@@ -1,13 +1,20 @@
 import React, { useEffect } from "react"
 import { api } from "../../lib/axios"
 import { Input } from "../ui/Input"
-import { InputDate } from "../ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SeniorSchemas } from "../../lib/schemas"
 import { Modal, message } from "antd"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import type { DataType, PasswordFields, Senior } from "../../lib/types"
 import { SetStateAction, Dispatch } from "react"
+
+import { es } from "date-fns/locale/es"
+import { registerLocale } from "react-datepicker"
+import ReactDatePicker from "react-datepicker"
+
+registerLocale("es", es)
+
+import "react-datepicker/dist/react-datepicker.css"
 
 interface ModalProps {
 	visible: boolean
@@ -29,6 +36,7 @@ const EditPersonModal: React.FC<ModalProps> = ({ visible, person, onCancel, onOk
 		formState: { errors },
 		reset,
 		clearErrors,
+		control,
 	} = useForm({
 		resolver: zodResolver(SeniorSchemas.Update),
 	})
@@ -50,25 +58,6 @@ const EditPersonModal: React.FC<ModalProps> = ({ visible, person, onCancel, onOk
 		reset()
 		clearErrors()
 		onCancel()
-	}
-
-	const handleDelete = async () => {
-		try {
-			if (person?.id) {
-				await api.delete(`/dashboard/seniors/${person.id}`)
-				message.success("Persona eliminada correctamente")
-
-				const updatedData = data.filter((item) => item.id !== person.id)
-				setData(updatedData)
-
-				onOk()
-			} else {
-				message.error("No se pudo encontrar el ID de la persona")
-			}
-		} catch (error) {
-			message.error("Error al eliminar la persona")
-			console.error("Error en el delete:", error)
-		}
 	}
 
 	const onSubmit: SubmitHandler<FormValues> = async (form) => {
@@ -140,12 +129,30 @@ const EditPersonModal: React.FC<ModalProps> = ({ visible, person, onCancel, onOk
 					defaultValue={person?.address}
 					{...register("address")}
 				/>
-				<InputDate
-					label="Fecha de Nacimiento"
-					value={person?.birthDate}
-					{...register("birthDate")}
-					error={errors.birthDate ? errors.birthDate.message?.toString() : ""}
-				/>
+
+				<div className="flex flex-col gap-3 w-full">
+					<div className="flex flex-row gap-2 items-center justify-between">
+						<label className="font-semibold">Fecha de Nacimiento</label>
+						{errors.birthDate && (
+							<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
+						)}
+					</div>
+					<Controller
+						control={control}
+						name="birthDate"
+						render={({ field: { onChange, value } }) => (
+							<ReactDatePicker
+								className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
+								placeholderText="Fecha de Nacimiento"
+								onChange={onChange}
+								selected={value}
+								maxDate={new Date()}
+								locale="es"
+							/>
+						)}
+					/>
+				</div>
+
 				<Input
 					label="PIN"
 					type="password"
@@ -167,16 +174,9 @@ const EditPersonModal: React.FC<ModalProps> = ({ visible, person, onCancel, onOk
 					<button
 						key="back"
 						onClick={() => handleCancel()}
-						className="text-red-700 border-red-700 border-1 font-semibold px-6 py-2 rounded-lg"
+						className="text-red-700 border-1 border-red-700 font-semibold px-6 py-2 rounded-lg"
 					>
 						Cancelar
-					</button>
-					<button
-						key="delete"
-						onClick={handleDelete}
-						className="bg-red-700 text-neutral-100 font-semibold px-6 py-2 rounded-lg"
-					>
-						Eliminar
 					</button>
 					<button
 						key="submit"

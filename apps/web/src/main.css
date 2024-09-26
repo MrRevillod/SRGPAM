@@ -46,3 +46,8 @@ body {
     width: 100%;
     padding: 2rem;
 }
+
+.ant-table-cell {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+}

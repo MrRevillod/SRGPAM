@@ -1,23 +1,25 @@
-import axios from "axios"
 import React, { useState, useEffect } from "react"
-import PageLayout from "../../layouts/PageLayout"
 import Modals from "../../components/Modal"
-import PersonTable from "../../components/Table"
-import { DataType } from "../../lib/types"
+import DataTable from "../../components/Table"
+import PageLayout from "../../layouts/PageLayout"
+
+import { api } from "../../lib/axios"
 import { Button } from "antd"
-import { columnsConfig } from "../../lib/table-columns"
+import { Senior, UnvalidatedSenior } from "../../lib/types"
+import { UnvalidatedSeniorsColumns } from "../../lib/columns"
 
 const NewSeniorsPage: React.FC = () => {
-	const [data, setData] = useState<DataType[]>([])
+	const [data, setData] = useState<Senior[]>([])
 	const [loading, setLoading] = useState(true)
-	const [selectedSenior, setSelectedSenior] = useState<DataType | null>(null)
+	const [selectedSenior, setSelectedSenior] = useState<Partial<Senior> | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const fetchSeniors = async () => {
 		try {
-			const response = await axios.get("http://localhost/api/dashboard/seniors/new")
+			const response = await api.get("/dashboard/seniors/new")
 			setData(response.data.values.seniors)
 		} catch (err) {
+			console.log(err)
 			console.error("Error al obtener los datos de seniors")
 		} finally {
 			setLoading(false)
@@ -31,8 +33,8 @@ const NewSeniorsPage: React.FC = () => {
 	const handleValidate = async (validate: boolean) => {
 		if (selectedSenior && selectedSenior.id) {
 			try {
-				const url = `http://localhost/api/dashboard/seniors/${selectedSenior.id}/new?validate=${validate}`
-				await axios.patch(url)
+				const url = `/dashboard/seniors/${selectedSenior.id}/new?validate=${validate}`
+				await api.patch(url)
 
 				setData((prevData) =>
 					prevData.map((senior) =>
@@ -47,25 +49,18 @@ const NewSeniorsPage: React.FC = () => {
 		}
 	}
 
-	const handleOpenModal = (senior: DataType) => {
-		setSelectedSenior(senior)
-		setIsModalOpen(true)
-	}
-
 	const handleCloseModal = () => {
 		setIsModalOpen(false)
 		setSelectedSenior(null)
 	}
 
-	return (
-		<PageLayout pageTitle="Solicitudes de registro nuevo adultos mayores">
-			<PersonTable
-				data={data}
-				columnsConfig={columnsConfig} // Usa el columnsConfig importado
-				onEdit={handleOpenModal}
-			/>
+	// Añadir Onvalidate a las props de la tabla, y ahí renderizar el enlace
+	// a la página de validación singular por cada senior !TODO
 
-			{/* Modal personalizado para editar los detalles del senior */}
+	return (
+		<PageLayout pageTitle="Solicitudes de registro nuevos adultos mayores">
+			<DataTable<UnvalidatedSenior> data={data} columnsConfig={UnvalidatedSeniorsColumns} />
+
 			<Modals
 				title="Edit Senior Details"
 				isVisible={isModalOpen}
@@ -96,7 +91,7 @@ const NewSeniorsPage: React.FC = () => {
 						</p>
 						<p>
 							<strong>Fecha de Nacimiento: </strong>
-							{new Date(selectedSenior.birthDate).toLocaleDateString()}
+							{new Date(selectedSenior.birthDate as string).toLocaleDateString()}
 						</p>
 						<p>
 							<strong>Verificado: </strong>

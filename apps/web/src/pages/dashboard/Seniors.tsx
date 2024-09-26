@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from "react"
-import axios from "axios"
-import PersonTable from "../../components/Table"
-import EditPersonModal from "../../components/forms/Edit-Seniors"
-import CreateSeniors from "../../components/forms/Create-Seniors"
-import type { DataType } from "../../lib/types"
-import { columnsConfig } from "../../lib/table-columns"
-import "../../main.css"
+import React, { useState, useEffect, Fragment } from "react"
+import { api } from "../../lib/axios"
+import { Senior } from "../../lib/types"
+import { SeniorsColumns } from "../../lib/columns"
+
+import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
+import CreateSeniors from "../../components/forms/Create-Seniors"
+import ConfirmDelete from "../../components/ConfirmDelete"
+import EditPersonModal from "../../components/forms/Edit-Seniors"
 
 const SeniorsPage: React.FC = () => {
 	const [modalType, setModalType] = useState("")
-	const [selectedPerson, setSelectedPerson] = useState<DataType | null>(null)
+	const [selectedPerson, setSelectedPerson] = useState<Senior | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [data, setData] = useState<DataType[]>([])
+	const [data, setData] = useState<Senior[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const fetchSeniors = async () => {
 		try {
-			const response = await axios.get("http://localhost/api/dashboard/seniors")
+			const response = await api.get("/dashboard/seniors")
 			setData(response.data.values.seniors)
 		} catch (err) {
 			setError("Error al obtener los datos de seniors")
@@ -31,9 +32,18 @@ const SeniorsPage: React.FC = () => {
 		fetchSeniors()
 	}, [])
 
-	const showModal = (type: string, person: DataType | null) => {
+	const handleDelete = async (element: any) => {
+		try {
+			const response = await api.delete(`/dashboard/seniors/${element.id}`)
+			return response
+		} catch (error) {
+			console.error("Error en el delete:", error)
+		}
+	}
+
+	const showModal = (type: string, element: Senior | null) => {
 		setModalType(type)
-		setSelectedPerson(person)
+		setSelectedPerson(element)
 		setIsModalOpen(true)
 	}
 
@@ -49,8 +59,13 @@ const SeniorsPage: React.FC = () => {
 
 	return (
 		<PageLayout pageTitle="Adultos mayores" addFunction={() => showModal("Create", null)} setData={() => {}}>
-			<>
-				<PersonTable data={data} columnsConfig={columnsConfig} onEdit={(person) => showModal("Edit", person)} />
+			<Fragment>
+				<DataTable<Senior>
+					data={data}
+					columnsConfig={SeniorsColumns}
+					onEdit={(person) => showModal("Edit", person)}
+					onDelete={(person) => showModal("Delete", person)}
+				/>
 				<EditPersonModal
 					visible={isModalOpen && modalType === "Edit"}
 					person={selectedPerson}
@@ -67,7 +82,18 @@ const SeniorsPage: React.FC = () => {
 					setData={setData}
 					data={data}
 				/>
-			</>
+				<ConfirmDelete
+					executeAction={(element) => handleDelete(element)}
+					modalType={modalType}
+					text="Adulto mayor"
+					visible={isModalOpen && modalType === "Delete"}
+					onCancel={handleCancel}
+					onOk={handleOk}
+					data={data}
+					setData={setData}
+					selectedElement={selectedPerson}
+				/>
+			</Fragment>
 		</PageLayout>
 	)
 }

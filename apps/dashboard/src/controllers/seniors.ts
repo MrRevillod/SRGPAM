@@ -268,7 +268,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
-			values: senior,
+			values: { deletedId: req.params.id },
 		})
 	} catch (error) {
 		next(error)
