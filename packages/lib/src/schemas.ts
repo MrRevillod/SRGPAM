@@ -51,6 +51,20 @@ const titleServiceSchema = z
 	.max(50, "El título no debe tener más de 50 caracteres")
 	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El título solo puede contener letras y espacios")
 
+const nameCenterSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
+
+const addressCenterSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
+
+const phoneSchema = z
+	.string()
+	.regex(/^[0-9]+$/, "El teléfono solo puede contener números")
+	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
+	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
+
 export const SeniorSchemas = {
 	MobileRegister: z.object({
 		rut: rutSchema,
@@ -90,6 +104,18 @@ export const ServiceSchemas = {
 	}),
 }
 
+export const CentersSchemas = {
+	Create: z.object({
+		name: nameCenterSchema,
+		address: addressCenterSchema,
+		phone: phoneSchema,
+	}),
+	Update: z.object({
+		name: nameCenterSchema,
+		address: addressCenterSchema,
+		phone: phoneSchema,
+	}),
+}
 export const AdministratorSchemas = {
 	Create: z.object({
 		id: rutSchema,

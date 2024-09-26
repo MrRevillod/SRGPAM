@@ -27,9 +27,6 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, title } = req.body
-		//const filter: Prisma.ServiceWhereInput = {
-		//	OR: [{ name }],
-		//}
 		const serviceExists = await prisma.service.findFirst({
 			where: { name },
 		})
@@ -88,6 +85,10 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const id = Number(req.params.id)
+		await prisma.professional.updateMany({
+			where: { serviceId: id },
+			data: { serviceId: null },
+		})
 		await prisma.service.delete({ where: { id } })
 
 		return res.status(200).json({

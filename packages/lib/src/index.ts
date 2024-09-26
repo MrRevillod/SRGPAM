@@ -35,7 +35,13 @@ export { AppError, AuthError, errorHandler } from "./errors"
 export { toPublicUser, findUser, isValidUserRole } from "./authorization/user"
 export { isValidRut } from "./authorization/rut"
 
-export { SeniorSchemas, AdministratorSchemas, ProfessionalSchemas, ServiceSchemas } from "./schemas"
+export {
+	SeniorSchemas,
+	AdministratorSchemas,
+	ProfessionalSchemas,
+	ServiceSchemas,
+	CentersSchemas,
+} from "./schemas"
 
 export {
 	signJsonwebtoken,

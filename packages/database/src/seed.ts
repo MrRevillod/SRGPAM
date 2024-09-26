@@ -67,6 +67,21 @@ const seed = async () => {
 				},
 				update: {},
 			})
+
+			await prisma.event.upsert({
+				where: { id: i },
+				create: {
+					id: i,
+					startsAt: new Date("1990-01-01"),
+					endsAt: new Date("1990-01-01"),
+					assistance: true,
+					seniorId: `Senior-${i}`,
+					professionalId: `Professional-${i}`,
+					serviceId: i,
+					centerId: i,
+				},
+				update: {},
+			})
 		} catch (error) {
 			console.error(`Error en la iteración ${i}:`, error)
 		}
