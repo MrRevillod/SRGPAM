@@ -1,10 +1,22 @@
 import React, { useEffect } from "react"
-import { Modal, Form, Input, message, Button } from "antd"
-import axios from "axios"
-import type { DataType, FieldType } from "../../lib/types"
+import { api } from "../../lib/axios"
+import { Input } from "../ui/Input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { SeniorSchemas } from "../../lib/schemas"
+import { Modal, message } from "antd"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import type { DataType, PasswordFields, Senior } from "../../lib/types"
 import { SetStateAction, Dispatch } from "react"
 
-interface EditPersonModalProps {
+import { es } from "date-fns/locale/es"
+import { registerLocale } from "react-datepicker"
+import ReactDatePicker from "react-datepicker"
+
+registerLocale("es", es)
+
+import "react-datepicker/dist/react-datepicker.css"
+
+interface ModalProps {
 	visible: boolean
 	person: DataType | null
 	modalType: string
@@ -14,163 +26,167 @@ interface EditPersonModalProps {
 	setData: Dispatch<SetStateAction<DataType[]>>
 }
 
-const EditPersonModal: React.FC<EditPersonModalProps> = ({
-	visible,
-	person,
-	modalType,
-	onCancel,
-	onOk,
-	data,
-	setData,
-}) => {
-	const [form] = Form.useForm()
+type FormValues = Partial<Senior> & PasswordFields
 
-	// Este useEffect se ejecutará cuando `person` cambie
+const EditPersonModal: React.FC<ModalProps> = ({ visible, person, onCancel, onOk, data, setData }) => {
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors },
+		reset,
+		clearErrors,
+		control,
+	} = useForm({
+		resolver: zodResolver(SeniorSchemas.Update),
+	})
+
 	useEffect(() => {
 		if (person) {
-			// Si hay una persona seleccionada, establece los valores del formulario
-			form.setFieldsValue({
+			reset({
 				name: person.name,
 				email: person.email,
 				address: person.address,
 				birthDate: person.birthDate,
-				password: "", // Si prefieres no mostrar la contraseña anterior
+				password: "",
+				confirmPassword: "",
 			})
-		} else {
-			// Si no hay persona seleccionada, resetea el formulario
-			form.resetFields()
 		}
-	}, [person, form])
+	}, [person, reset])
 
-	const handleSubmit = async () => {
+	const handleCancel = () => {
+		reset()
+		clearErrors()
+		onCancel()
+	}
+
+	const onSubmit: SubmitHandler<FormValues> = async (form) => {
 		try {
-			const values = await form.validateFields()
+			const res = await api.patch(`/dashboard/seniors/${person?.id}`, {
+				name: form.name,
+				email: form.email,
+				address: form.address,
+				birthDate: new Date(form.birthDate as string).toISOString(),
+				password: form.password,
+				confirmPassword: form.confirmPassword,
+			})
 
-			if (modalType === "Edit" && person?.id) {
-				await axios.patch(`http://localhost/api/dashboard/seniors/${person.id}`, {
-					name: values.name,
-					email: values.email,
-					password: values.password,
-					address: values.address,
-					birthDate: values.birthDate,
-				})
-				message.success("Persona actualizada correctamente")
-			} else {
-				message.error("No se pudo encontrar el ID de la persona")
-			}
+			const updatedUser = res.data.values.senior
+			const updatedData = data.map((senior) => {
+				if (senior.id === updatedUser.id) {
+					return updatedUser
+				}
+				return senior
+			})
 
-			const userUpdate = {
-				id: person?.id,
-				name: values.name,
-				email: values.email,
-				password: values.password,
-				address: values.address,
-				birthDate: values.birthDate,
-				createdAt: new Date().toUTCString(),
-				updatedAt: new Date().toUTCString(),
-			}
-
-			// Actualiza la lista de usuarios
-			const updatedData = data.map((item) => (item.id === person?.id ? { ...item, ...userUpdate } : item))
 			setData(updatedData)
-
-			form.resetFields()
+			reset()
 			onOk()
-		} catch (error) {
-			message.error("Error al enviar el formulario")
+		} catch (error: any) {
+			if (error.response) {
+				message.error(error.response.data.message)
+
+				if (error.response.status === 409) {
+					error.response.data.values.conflicts.forEach((element: string) => {
+						setError(element, {
+							type: "manual",
+							message: `El ${element} ya existe en el sistema`,
+						})
+					})
+				}
+
+				return
+			}
+			message.error("Error al actualizar el Adulto Mayor. Intente nuevamente")
 			console.error("Error en el submit:", error)
 		}
 	}
 
-	const handleDelete = async () => {
-		try {
-			if (person?.id) {
-				await axios.delete(`http://localhost/api/dashboard/seniors/${person.id}`)
-
-				message.success("Persona eliminada correctamente")
-
-				// Elimina el usuario de la lista
-				const updatedData = data.filter((item) => item.id !== person.id)
-				setData(updatedData)
-
-				form.resetFields()
-				onOk()
-			} else {
-				message.error("No se pudo encontrar el ID de la persona")
-			}
-		} catch (error) {
-			message.error("Error al eliminar la persona")
-			console.error("Error en el delete:", error)
-		}
-	}
-
 	return (
-		<Modal
-			title={`Administrar`}
-			open={visible}
-			onOk={handleSubmit}
-			onCancel={() => {
-				form.resetFields()
-				onCancel()
-			}}
-			footer={[
-				<Button key="back" onClick={onCancel}>
-					Cancelar
-				</Button>,
-				modalType === "Edit" && (
-					<Button key="delete" danger onClick={handleDelete}>
-						Eliminar
-					</Button>
-				),
-				<Button
-					style={{ backgroundColor: "#16a34a", borderColor: "#16a34a" }}
-					key="submit"
-					type="primary"
-					onClick={handleSubmit}
-				>
-					Guardar
-				</Button>,
-			]}
-		>
-			{person && (
-				<Form form={form} name="basic" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} autoComplete="off">
-					<Form.Item<FieldType>
-						label="Nombre"
-						name="name"
-						rules={[{ required: true, message: "Please input your name!" }]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item<FieldType>
-						label="Correo Electrónico"
-						name="email"
-						rules={[{ type: "email", message: "Please input a valid email!" }]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item<FieldType>
-						label="Dirección"
-						name="address"
-						rules={[{ required: true, message: "Please input your address!" }]}
-					>
-						<Input />
-					</Form.Item>
-					<Form.Item<FieldType>
-						label="Fecha de nacimiento"
+		<Modal title={`Actualizar la información de ${person?.name}`} open={visible} onCancel={onCancel} footer={[]}>
+			<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit as any)}>
+				<Input
+					label="Nombre"
+					type="text"
+					placeholder="Nombre"
+					error={errors.name ? errors.name.message?.toString() : ""}
+					defaultValue={person?.name}
+					{...register("name")}
+				/>
+				<Input
+					label="Correo Electrónico"
+					type="email"
+					placeholder="Correo Electrónico"
+					error={errors.email ? errors.email.message?.toString() : ""}
+					defaultValue={person?.email}
+					{...register("email")}
+				/>
+				<Input
+					label="Dirección"
+					type="text"
+					placeholder="Dirección"
+					error={errors.address ? errors.address.message?.toString() : ""}
+					defaultValue={person?.address}
+					{...register("address")}
+				/>
+
+				<div className="flex flex-col gap-3 w-full">
+					<div className="flex flex-row gap-2 items-center justify-between">
+						<label className="font-semibold">Fecha de Nacimiento</label>
+						{errors.birthDate && (
+							<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
+						)}
+					</div>
+					<Controller
+						control={control}
 						name="birthDate"
-						rules={[{ required: true, message: "Please input your birth date!" }]}
+						render={({ field: { onChange, value } }) => (
+							<ReactDatePicker
+								className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
+								placeholderText="Fecha de Nacimiento"
+								onChange={onChange}
+								selected={value}
+								maxDate={new Date()}
+								locale="es"
+							/>
+						)}
+					/>
+				</div>
+
+				<Input
+					label="PIN"
+					type="password"
+					placeholder="••••"
+					islogin="false"
+					error={errors.password ? errors.password.message?.toString() : ""}
+					{...register("password")}
+				/>
+				<Input
+					label="Confirmar PIN"
+					type="password"
+					placeholder="••••"
+					islogin="false"
+					error={errors.confirmPassword ? errors.confirmPassword.message?.toString() : ""}
+					{...register("confirmPassword")}
+				/>
+
+				<div className="flex flex-row gap-4 w-full justify-end -mb-6">
+					<button
+						key="back"
+						onClick={() => handleCancel()}
+						className="text-red-700 border-1 border-red-700 font-semibold px-6 py-2 rounded-lg"
 					>
-						<Input />
-					</Form.Item>
-					<Form.Item<FieldType>
-						label="Contraseña"
-						name="password"
-						rules={[{ message: "Please input a password!" }]}
+						Cancelar
+					</button>
+					<button
+						key="submit"
+						type="submit"
+						className="bg-green-700 text-neutral-100 font-semibold px-6 py-2 rounded-lg"
 					>
-						<Input.Password />
-					</Form.Item>
-				</Form>
-			)}
+						Guardar
+					</button>
+				</div>
+			</form>
 		</Modal>
 	)
 }

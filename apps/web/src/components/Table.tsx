@@ -1,12 +1,13 @@
 import React from "react"
 import { Table, Space } from "antd"
-import type { DataType } from "../lib/types"
-import { HiPencil } from "react-icons/hi"
+import type { BaseDataType, TableColumnType } from "../lib/types"
+import { FiEdit, FiDelete } from "react-icons/fi"
 
-interface PersonTableProps {
-	data: DataType[]
-	columnsConfig: Array<{ title: string; dataIndex: keyof DataType; key: string }>
-	onEdit?: (person: DataType) => void // Ahora es opcional
+interface TableProps<T> {
+	data: T[]
+	columnsConfig: TableColumnType<T>
+	onEdit?: (person: T) => void
+	onDelete?: (person: T) => void
 }
 
 const isDateString = (value: any) => {
@@ -15,51 +16,56 @@ const isDateString = (value: any) => {
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString)
-	return date.toLocaleDateString() // Puedes personalizar el formato aquí
+	return date.toLocaleDateString()
 }
 
 const renderBoolean = (value: boolean) => {
-	return value ? "Si" : "No" // Puedes cambiar este texto o usar íconos
+	return value ? "Si" : "No"
 }
 
-const PersonTable: React.FC<PersonTableProps> = ({ data, columnsConfig, onEdit }) => {
+const DataTable = <T extends BaseDataType>({ data, columnsConfig, onEdit, onDelete }: TableProps<T>) => {
 	const dateKeys = ["birthDate", "updatedAt", "createdAt"]
 	return (
-		<Table dataSource={data}>
+		<Table dataSource={data} rowKey={(record) => record.id} size="middle">
 			{columnsConfig.map((col) => (
 				<Table.Column
 					key={col.key}
 					title={col.title}
-					dataIndex={col.dataIndex}
+					dataIndex={col.dataIndex as string}
 					render={(value: any) => {
-						// Si la columna es updatedAt o createdAt, aplica formato de fecha
 						if (dateKeys.includes(col.key) && isDateString(value)) {
 							return formatDate(value)
 						}
-						// Si la columna es validate, renderiza el booleano como texto
 						if (col.key === "validated") {
 							return renderBoolean(value)
 						}
-						// Para el resto de los casos, renderiza el valor tal cual
 						return value
 					}}
 				/>
 			))}
-			{onEdit && (
+
+			{onEdit || onDelete ? (
 				<Table.Column
 					title="Administrar"
 					key="action"
-					render={(_, record: DataType) => (
-						<Space size="middle">
-							<a onClick={() => onEdit(record)}>
-								<HiPencil />
-							</a>
+					render={(_, record: T) => (
+						<Space size="large">
+							{onEdit && (
+								<a onClick={() => onEdit && onEdit(record)}>
+									<FiEdit className="text-green-700 text-md font-light h-6 w-6" />
+								</a>
+							)}
+							{onDelete && (
+								<a onClick={() => onDelete && onDelete(record)}>
+									<FiDelete className="text-red-700 text-md font-light h-6 w-6" />
+								</a>
+							)}
 						</Space>
 					)}
 				/>
-			)}
+			) : null}
 		</Table>
 	)
 }
 
-export default PersonTable
+export default DataTable

@@ -11,7 +11,9 @@ const seed = async () => {
 	console.log("DEFAULT_ADMIN_PASSWORD:", DEFAULT_ADMIN_PASSWORD)
 	console.log("DEFAULT_PROFESSIONAL_PASSWORD:", DEFAULT_PROFESSIONAL_PASSWORD)
 
-	for (let i = 1; i <= 5; i++) {
+	for (let i = 1; i <= 25; i++) {
+		const rand = Math.floor(Math.random() * 1000)
+
 		try {
 			await prisma.administrator.upsert({
 				where: { id: `Admin-${i}` },
@@ -32,7 +34,7 @@ const seed = async () => {
 					name: `Senior N${i}`,
 					address: `Address N${i}`,
 					birthDate: new Date("1990-01-01"),
-					validated: true,
+					validated: rand % 2 === 0,
 				},
 				update: {},
 			})

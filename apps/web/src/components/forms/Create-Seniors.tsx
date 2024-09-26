@@ -1,8 +1,18 @@
-// Create-Seniors.tsx
 import React from "react"
-import { Modal, Form, Input, message, Button } from "antd"
-import axios from "axios"
-import type { DataType } from "../../lib/types"
+import { api } from "../../lib/axios"
+import { Input } from "../ui/Input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { SeniorSchemas } from "../../lib/schemas"
+import { Modal, message } from "antd"
+import { FieldValues, SubmitHandler, useForm, Controller } from "react-hook-form"
+
+import { es } from "date-fns/locale/es"
+import { registerLocale } from "react-datepicker"
+import ReactDatePicker from "react-datepicker"
+
+registerLocale("es", es)
+
+import "react-datepicker/dist/react-datepicker.css"
 
 interface CreateSeniorsProps {
 	visible: boolean
@@ -12,107 +22,136 @@ interface CreateSeniorsProps {
 	setData: (data: any[]) => void
 }
 
+type FormValues = {
+	id: string
+	email: string
+	name: string
+	address: string
+	birthDate: string
+}
+
 const CreateSeniors: React.FC<CreateSeniorsProps> = ({ visible, onCancel, onOk, data, setData }) => {
-	const [form] = Form.useForm()
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors },
+		reset,
+		clearErrors,
+		control,
+	} = useForm({
+		resolver: zodResolver(SeniorSchemas.DashboardRegister),
+	})
 
-	const handleSubmit = async () => {
+	const handleCancel = () => {
+		reset()
+		onCancel()
+	}
+
+	const onSubmit: SubmitHandler<FormValues> = async (form) => {
 		try {
-			const values = await form.validateFields()
-
-			// Enviar el POST a la API
-			await axios.post("http://localhost/api/dashboard/seniors/pre-checked/", {
-				id: values.id,
-				email: values.email,
-				name: values.name,
-				address: values.address,
-				birthDate: values.birthDate,
+			const res = await api.post("/dashboard/seniors/pre-checked/", {
+				id: form.id,
+				email: form.email,
+				name: form.name,
+				address: form.address,
+				birthDate: form.birthDate,
 			})
 
-			message.success("Usuario creado correctamente")
-			const user = {
-				id: values.id,
-				email: values.email,
-				name: values.name,
-				address: values.address,
-				birthDate: values.birthDate,
-				createdAt: new Date().toUTCString(),
-				updatedAt: new Date().toUTCString(),
-			}
-			setData([...data, user])
-			form.resetFields()
+			setData([...data, res.data.values.senior])
+			message.success(res.data.message)
 			onOk()
-		} catch (error) {
-			message.error("Error al crear el usuario")
+		} catch (error: any) {
+			if (error.response) {
+				message.error(error.response.data.message)
+
+				if (error.response.status === 409) {
+					error.response.data.values.conflicts.forEach((element: string) => {
+						setError(element, {
+							type: "manual",
+							message: `El ${element === "id" ? "rut" : element} ya existe en el sistema`,
+						})
+					})
+				}
+
+				return
+			}
+
+			message.error("Error al crear el Adulto Mayor. Intente nuevamente")
 			console.error("Error en el submit:", error)
 		}
 	}
 
 	return (
-		<Modal
-			title="Crear Nuevo Usuario"
-			open={visible}
-			onOk={handleSubmit}
-			onCancel={onCancel}
-			footer={[
-				<Button key="back" onClick={onCancel}>
-					Cancelar
-				</Button>,
-				<Button
-					style={{ backgroundColor: "#16a34a", borderColor: "#16a34a" }}
-					key="submit"
-					type="primary"
-					onClick={handleSubmit}
-				>
-					Crear
-				</Button>,
-			]}
-		>
-			<Form
-				form={form}
-				name="create"
-				labelCol={{ span: 8 }}
-				wrapperCol={{ span: 16 }}
-				initialValues={{
-					id: "210279067",
-					email: "kristobalsandoval@gmail.com",
-					name: "Cristobal Sandoval",
-					address: "Agua Marina 661",
-					birthDate: "2024-09-22T19:42:46.791Z",
-				}}
-				autoComplete="off"
-			>
-				<Form.Item label="RUT" name="id" rules={[{ required: true, message: "Por favor, introduce el ID" }]}>
-					<Input />
-				</Form.Item>
-				<Form.Item
+		<Modal title="Añadir adulto mayor al sistema" open={visible} onCancel={onCancel} footer={[]}>
+			<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}>
+				<Input
+					label="Rut (sin puntos ni guión)"
+					type="text"
+					{...register("id")}
+					placeholder="123456789"
+					error={errors.id ? errors.id.message?.toString() : ""}
+				/>
+				<Input
 					label="Nombre"
-					name="name"
-					rules={[{ required: true, message: "Por favor, introduce tu nombre" }]}
-				>
-					<Input />
-				</Form.Item>
-				<Form.Item
+					type="text"
+					{...register("name")}
+					placeholder="Juan Perez"
+					error={errors.name ? errors.name.message?.toString() : ""}
+				/>
+
+				<Input
 					label="Correo Electrónico"
-					name="email"
-					rules={[{ type: "email", message: "Por favor, introduce un correo electrónico válido" }]}
-				>
-					<Input />
-				</Form.Item>
-				<Form.Item
+					type="email"
+					{...register("email")}
+					placeholder="JohnD@provider.com"
+					error={errors.email ? errors.email.message?.toString() : ""}
+				/>
+
+				<Input
 					label="Dirección"
-					name="address"
-					rules={[{ required: true, message: "Por favor, introduce tu dirección" }]}
-				>
-					<Input />
-				</Form.Item>
-				<Form.Item
-					label="Fecha de Nacimiento"
-					name="birthDate"
-					rules={[{ required: true, message: "Por favor, introduce tu fecha de nacimiento" }]}
-				>
-					<Input />
-				</Form.Item>
-			</Form>
+					type="text"
+					{...register("address")}
+					placeholder="Montt 123"
+					error={errors.address ? errors.address.message?.toString() : ""}
+				/>
+
+				<div className="flex flex-col gap-3 w-full">
+					<div className="flex flex-row gap-2 items-center justify-between">
+						<label className="font-semibold">Fecha de Nacimiento</label>
+						{errors.birthDate && (
+							<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
+						)}
+					</div>
+					<Controller
+						control={control}
+						name="birthDate"
+						render={({ field: { onChange, value } }) => (
+							<ReactDatePicker
+								className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
+								placeholderText="Fecha de Nacimiento"
+								onChange={onChange}
+								selected={value}
+								maxDate={new Date()}
+								locale="es"
+							/>
+						)}
+					/>
+				</div>
+
+				<div className="flex flex-row gap-4 w-full justify-end -mb-6">
+					<button
+						key="back"
+						onClick={() => handleCancel()}
+						className="border-1 border-red-700 text-red-700 font-semibold px-6 py-2 rounded-lg"
+					>
+						Cancelar
+					</button>
+					<button type="submit" className="bg-green-700 text-neutral-100 font-semibold px-6 py-2 rounded-lg">
+						Confirmar
+					</button>
+				</div>
+			</form>
 		</Modal>
 	)
 }

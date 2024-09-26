@@ -26,9 +26,12 @@ export const validateUserId = (role: UserRole) => async (req: Request, res: Resp
 export const validateSchema = (schema: SomeZodObject | ZodEffects<ZodObject<any, any>>) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
+			console.table(req.body)
+
 			schema.parse(req.body)
 			next()
 		} catch (error: any) {
+			console.error(error.message)
 			next(new AppError(400, "Error de validación de campos en el formulario"))
 		}
 	}
