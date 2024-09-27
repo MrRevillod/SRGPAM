@@ -43,13 +43,19 @@ const nameServiceSchema = z
 	.string()
 	.min(2, "El nombre debe tener al menos 2 caracteres")
 	.max(50, "El nombre no debe tener más de 50 caracteres")
-	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
 
 const titleServiceSchema = z
 	.string()
 	.min(2, "El título debe tener al menos 2 caracteres")
 	.max(50, "El título no debe tener más de 50 caracteres")
-	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El título solo puede contener letras y espacios")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
 
 const nameCenterSchema = z
 	.string()

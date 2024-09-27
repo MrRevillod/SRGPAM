@@ -26,7 +26,7 @@ export const createServer = (): express.Express => {
 	app.use("/api/dashboard/administrators", administrarorsRouter)
 	app.use("/api/dashboard/seniors", seniorsRouter)
 	app.use("/api/dashboard/services", serviceRouter)
-	app.use("/api/dashboard/center", centerRouter)
+	app.use("/api/dashboard/centers", centerRouter)
 	app.use(errorHandler)
 
 	return app
