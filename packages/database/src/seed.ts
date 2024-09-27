@@ -5,6 +5,7 @@ const prisma = new PrismaClient()
 
 const seed = async () => {
 	const DEFAULT_SENIOR_PASSWORD = "1234"
+	const DEFAULT_PHONE = "123456789"
 	const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD
 	const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSINAL_PASSWORD
 
@@ -47,6 +48,16 @@ const seed = async () => {
 				},
 				update: {},
 			})
+			await prisma.center.upsert({
+				where: { id: i },
+				create: {
+					id: i,
+					name: `Center N${i}`,
+					address: `Address N${i}`,
+					phone: DEFAULT_PHONE,
+				},
+				update: {},
+			})
 			await prisma.professional.upsert({
 				where: { id: `Professional-${i}` },
 				create: {
@@ -55,6 +66,21 @@ const seed = async () => {
 					password: await hash(DEFAULT_PROFESSIONAL_PASSWORD, 10),
 					name: `Professional N${i}`,
 					serviceId: i,
+				},
+				update: {},
+			})
+
+			await prisma.event.upsert({
+				where: { id: i },
+				create: {
+					id: i,
+					startsAt: new Date("1990-01-01"),
+					endsAt: new Date("1990-01-01"),
+					assistance: true,
+					seniorId: `Senior-${i}`,
+					professionalId: `Professional-${i}`,
+					serviceId: i,
+					centerId: i,
 				},
 				update: {},
 			})

@@ -37,9 +37,10 @@ export { isValidRut } from "./authorization/rut"
 
 export {
 	SeniorSchemas,
-	type SchemasKeys,
 	AdministratorSchemas,
 	ProfessionalSchemas,
+	ServiceSchemas,
+	CentersSchemas,
 } from "./schemas"
 
 export {

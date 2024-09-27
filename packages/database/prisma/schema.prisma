@@ -53,6 +53,8 @@ model Center {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Event     Event[]
+
+  @@map("center")
 }
 
 model Professional {
@@ -65,9 +67,11 @@ model Professional {
   updatedAt DateTime @updatedAt
 
   events    Event[]
-  serviceId Int
+  serviceId Int?
 
-  service Service @relation(fields: [serviceId], references: [id])
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  @@map("professionals")
 }
 
 model Event {
@@ -82,10 +86,10 @@ model Event {
   seniorId       String
   professionalId String
   serviceId      Int
-  centerId       Int
+  centerId       Int?
 
   senior       Senior       @relation(fields: [seniorId], references: [id])
   professional Professional @relation(fields: [professionalId], references: [id])
   service      Service      @relation(fields: [serviceId], references: [id])
-  center       Center       @relation(fields: [centerId], references: [id])
+  center       Center?      @relation(fields: [centerId], references: [id], onDelete: SetNull)
 }

@@ -14,6 +14,9 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				name: true,
 				email: true,
 				password: false,
+				serviceId: true,
+				updatedAt: true,
+				createdAt: true,
 			},
 		})
 
