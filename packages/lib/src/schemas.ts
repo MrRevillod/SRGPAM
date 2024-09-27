@@ -63,6 +63,10 @@ const nameCenterSchema = z
 	.max(50, "El nombre no debe tener más de 50 caracteres")
 	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
 
+const descriptionSchema = z
+	.string()
+	.min(5, "La descripcion debe tener al menos 5 caracteres")
+	.max(100, "La descripcion no debe tener mas de 100 palabras")
 const addressCenterSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
 
 const phoneSchema = z
@@ -103,10 +107,12 @@ export const ServiceSchemas = {
 	Create: z.object({
 		name: nameServiceSchema,
 		title: titleServiceSchema,
+		description: descriptionSchema,
 	}),
 	Update: z.object({
 		name: nameServiceSchema,
 		title: titleServiceSchema,
+		description: descriptionSchema,
 	}),
 }
 

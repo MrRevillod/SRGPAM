@@ -9,7 +9,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				id: true,
 				name: true,
 				address: true,
-				phone: false,
+				phone: true,
 			},
 		})
 

@@ -61,6 +61,10 @@ const nameSchema = z
 	.max(50, "El nombre no debe tener más de 50 caracteres")
 	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
 
+const descriptionSchema = z
+	.string()
+	.min(5, "La descripcion debe tener al menos 5 caracteres")
+	.max(100, "La descripcion no debe tener mas de 100 palabras")
 const addressSchema = z.string().min(4, "La dirección debe tener al menos 4 caracteres")
 
 const birthDateSchema = z.coerce.date({
@@ -115,4 +119,61 @@ export const AdministratorSchemas = {
 		}),
 }
 
+const nameServiceSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
+
+const titleServiceSchema = z
+	.string()
+	.min(2, "El título debe tener al menos 2 caracteres")
+	.max(50, "El título no debe tener más de 50 caracteres")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
+
+const nameCenterSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
+
+const addressCenterSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
+
+const phoneSchema = z
+	.string()
+	.regex(/^[0-9]+$/, "El teléfono solo puede contener números")
+	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
+	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
+
+export const ServiceSchemas = {
+	Create: z.object({
+		name: nameServiceSchema,
+		title: titleServiceSchema,
+		description: descriptionSchema,
+	}),
+	Update: z.object({
+		name: nameServiceSchema,
+		title: titleServiceSchema,
+		description: descriptionSchema,
+	}),
+}
+
+export const CentersSchemas = {
+	Create: z.object({
+		name: nameCenterSchema,
+		address: addressCenterSchema,
+		phone: phoneSchema,
+	}),
+	Update: z.object({
+		name: nameCenterSchema,
+		address: addressCenterSchema,
+		phone: phoneSchema,
+	}),
+}
 export const ProfessionalSchemas = AdministratorSchemas
