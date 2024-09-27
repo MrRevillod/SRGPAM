@@ -1,7 +1,6 @@
 import { prisma } from "@repo/database"
-
 import { Request, Response, NextFunction } from "express"
-
+import { bufferToBlob } from "../utils/files"
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const service = await prisma.service.findMany({
@@ -24,9 +23,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 		next(error)
 	}
 }
+
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, title } = req.body
+		const file = req.file as Express.Multer.File
+
 		const serviceExists = await prisma.service.findFirst({
 			where: { name },
 		})
@@ -38,6 +40,24 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				values: ["name"],
 			})
 		}
+
+		const formData = new FormData()
+		const image = bufferToBlob(file.buffer, file.mimetype)
+		formData.append("image", image, file.originalname)
+		console.log(formData)
+
+		/* 	const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/services/${req.body.id}`,
+			method: "POST",
+			variant: "MULTIPART",
+			body: formData,
+		})
+
+		if (response.type == "error") {
+			throw new AppError(response.status ?? 500, response.message)
+		} */
+
 		const service = await prisma.service.create({
 			data: {
 				name,
@@ -85,6 +105,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const id = Number(req.params.id)
+
 		await prisma.professional.updateMany({
 			where: { serviceId: id },
 			data: { serviceId: null },

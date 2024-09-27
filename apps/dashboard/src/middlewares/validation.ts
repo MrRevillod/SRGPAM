@@ -29,6 +29,7 @@ export const validateSchema = (schema: SomeZodObject | ZodEffects<ZodObject<any,
 			schema.parse(req.body)
 			next()
 		} catch (error: any) {
+			console.log(error.message)
 			next(new AppError(400, "Error de validación de campos en el formulario"))
 		}
 	}

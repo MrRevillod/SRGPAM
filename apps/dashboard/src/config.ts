@@ -23,4 +23,5 @@ export const seniorsRegisterMobileImages: RequestHandler = upload.fields([
 	{ name: "dni-b", maxCount: 1 },
 	{ name: "social", maxCount: 1 },
 ])
+export const singleImageupload: RequestHandler = upload.single("image")
 export const seniorsProfileImage: RequestHandler = upload.single("profile")
