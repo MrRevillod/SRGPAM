@@ -1,7 +1,7 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
 import { Administrator, Prisma } from "@prisma/client"
-import { constants, findUser } from "@repo/lib"
+import { constants } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 // Controlador para obtener todos los administradores de la base de datos
@@ -102,6 +102,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 				id: true,
 				name: true,
 				email: true,
+				createdAt: true,
+				updatedAt: true,
 			},
 		})
 
@@ -123,7 +125,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
-			values: null,
+			values: { deletedId: req.params.id },
 		})
 	} catch (error) {
 		next(error)

@@ -29,18 +29,20 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
-			<Show when={label === "Contraseña" && type === "password" && (islogin as boolean)}>
+			<Show when={label === "Contraseña" && type === "password"}>
 				<div className="flex justify-between w-full items-center mt-2">
 					<label htmlFor={name} className="font-semibold text-neutral-950">
 						{label}
 					</label>
 
-					<Link
-						to="/auth/reset-password"
-						className="text-neutral-950 text-sm hover:underline hover:text-blue-500"
-					>
-						¿Olvidaste tu contraseña?
-					</Link>
+					<Show when={islogin === "true"}>
+						<Link
+							to="/auth/reset-password"
+							className="text-neutral-950 text-sm hover:underline hover:text-blue-500"
+						>
+							¿Olvidaste tu contraseña?
+						</Link>
+					</Show>
 				</div>
 			</Show>
 
