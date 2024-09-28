@@ -296,11 +296,13 @@ export const newSeniors = async (req: Request, res: Response, next: NextFunction
 }
 
 // TODO: MANEJO DE ERRORES
-export const uniqueCheck = async (req: Request, res: Response, next: NextFunction) => {
+export const checkUnique = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { rut, email } = req.body
 		if (!rut && !email) {
-			Error
+			return res.status(400).json({
+				error: "Debe ingresar un valor en el campo.",
+			})
 		}
 		const field = rut ? rut : email
 		const senior = await prisma.senior.findFirst({
@@ -309,8 +311,16 @@ export const uniqueCheck = async (req: Request, res: Response, next: NextFunctio
 			},
 		})
 		if (senior) {
-			return res.status(409)
+			return res.status(409).json({
+				values: {
+					rut: "Este rut ya está registrado, si se trata de un error por favor contacte a soporte.",
+					email: "Esta dirección de correo ya está registrado, por favor ingrese otro.",
+				},
+			})
 		}
-		return res.status(200)
-	} catch (error) {}
+		console.log("No hay conflictos")
+		return res.status(200).send()
+	} catch (error) {
+		next(error)
+	}
 }

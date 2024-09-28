@@ -49,11 +49,22 @@ const FormNavigator = ({
 						getValues={getValues}
 						validateAndNavigate={validateAndNavigate}
 						setError={setError}
+						trigger={trigger}
+						handleSubmit={handleSubmit}
 					/>
 				)}
 			</Stack.Screen>
 			<Stack.Screen name="Email">
-				{(props) => <Email {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} setError={setError} />}
+				{(props) => (
+					<Email
+						{...props}
+						control={control}
+						errors={errors}
+						validateAndNavigate={validateAndNavigate}
+						setError={setError}
+						handleSubmit={handleSubmit}
+					/>
+				)}
 			</Stack.Screen>
 			<Stack.Screen name="Pin">
 				{(props) => <Pin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}

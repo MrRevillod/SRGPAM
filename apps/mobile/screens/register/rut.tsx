@@ -3,13 +3,15 @@ import Input from "@/components/input"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
+import { checkUniqueField } from "@/utils/request"
 
-const RUT = ({ navigation, control, errors, getValues, setError, validateAndNavigate }: commonProps) => {
+const RUT = ({ navigation, control, errors, getValues, setError, validateAndNavigate, trigger, handleSubmit }: commonProps) => {
 	const onSubmit = async () => {
-		const rutValue = getValues("rut")
-		// TODO: INGRESAR ENDPOINT CREADO, RESPONSE ? NAVIGATE : ERROR
-		// FIXME: NO SE DEBE USAR EL validateAndNavigate, en cambio se tiene
-		// que usar solo el trigger para verificacion manual del field (segun lo que pense ahora, sujeto a cambios)
+		const request = await checkUniqueField("rut", getValues, trigger, setError)
+		console.warn(request)
+		if (request) {
+			navigation.navigate("Email")
+		}
 	}
 
 	return (
@@ -21,7 +23,7 @@ const RUT = ({ navigation, control, errors, getValues, setError, validateAndNavi
 		>
 			<View style={styles.container}>
 				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} />
-				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("rut", navigation, "Email")} />
+				<CustomButton title="Siguiente" onPress={onSubmit} />
 			</View>
 		</GeneralView>
 	)

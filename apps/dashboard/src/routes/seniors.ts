@@ -37,6 +37,6 @@ router.patch("/:id/new", controllers.handleSeniorRequest)
 router.post("/profile", seniorsProfileImage, fileValidation, controllers.uploadProfilePicture)
 
 // Verificar si el RUT o email ya existe en la base de datos
-router.post("/unique-check", controllers.uniqueCheck)
+router.post("/check-unique", controllers.checkUnique)
 
 export default router
