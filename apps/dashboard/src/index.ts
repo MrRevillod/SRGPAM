@@ -9,6 +9,7 @@ import professionalsRouter from "./routes/professionals"
 import seniorsRouter from "./routes/seniors"
 import serviceRouter from "./routes/services"
 import centerRouter from "./routes/centers"
+import mailerRouter from "./routes/mailer"
 import { log, services, errorHandler, extensions } from "@repo/lib"
 
 export const createServer = (): express.Express => {
@@ -27,6 +28,7 @@ export const createServer = (): express.Express => {
 	app.use("/api/dashboard/seniors", seniorsRouter)
 	app.use("/api/dashboard/services", serviceRouter)
 	app.use("/api/dashboard/centers", centerRouter)
+	app.use("/api/dashboard/mailer", mailerRouter)
 	app.use(errorHandler)
 
 	return app
