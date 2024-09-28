@@ -3,11 +3,12 @@ import { Request, Response, NextFunction } from "express"
 import { bufferToBlob } from "../utils/files"
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const service = await prisma.service.findMany({
+		const services = await prisma.service.findMany({
 			select: {
 				id: true,
 				name: true,
 				title: true,
+				description: true,
 			},
 		})
 
@@ -15,8 +16,8 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 			message: "Servicios obtenidos correctamente",
 			type: "success",
 			values: {
-				service,
-				len: service.length,
+				services,
+				len: services.length,
 			},
 		})
 	} catch (error) {
@@ -26,7 +27,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { name, title } = req.body
+		const { name, title, description } = req.body
 		const file = req.file as Express.Multer.File
 
 		const serviceExists = await prisma.service.findFirst({
@@ -37,7 +38,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(409).json({
 				message: "El servicio con ese nombre ya existe",
 				type: "error",
-				values: ["name"],
+				values: { conflicts: ["name"] },
 			})
 		}
 
@@ -62,13 +63,14 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			data: {
 				name,
 				title,
+				description,
 			},
 		})
 
 		return res.status(201).json({
 			message: "Servicio creado correctamente",
 			type: "success",
-			values: service,
+			values: { service },
 		})
 	} catch (error) {
 		next(error)
@@ -78,17 +80,19 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
-		const { name, title } = req.body
+		const { name, title, description } = req.body
 		const updatedService = await prisma.service.update({
 			where: { id: Number(id) },
 			data: {
 				name,
 				title,
+				description,
 			},
 			select: {
 				id: true,
 				name: true,
 				title: true,
+				description: true,
 			},
 		})
 

@@ -75,3 +75,17 @@ export type PasswordFields = {
 }
 
 export type TableColumnType<T> = Array<{ title: string; dataIndex: keyof T; key: string }>
+
+export type Service = {
+	id: number
+	name: string
+	title: string
+	description: string
+}
+
+export type Center = {
+	id: number
+	name: string
+	address: string
+	phone: string
+}

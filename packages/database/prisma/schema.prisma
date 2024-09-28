@@ -33,12 +33,12 @@ model Senior {
 }
 
 model Service {
-  id    Int    @id @default(autoincrement())
-  name  String @db.Text
-  title String @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String   @db.Text
+  title       String   @db.Text
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   events        Event[]
   professionals Professional[]
