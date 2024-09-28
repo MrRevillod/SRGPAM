@@ -2,7 +2,7 @@ import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
 import { Prisma, Senior } from "@prisma/client"
-import { AppError, findUser, httpRequest } from "@repo/lib"
+import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 /// Controlador para manejar el registro de adultos mayores desde la aplicación móvil
@@ -131,7 +131,9 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 				throw new AppError(storageResponse.status || 500, storageResponse.message)
 			}
 
+			await prisma.event.deleteMany({ where: { seniorId: id } })
 			await prisma.senior.delete({ where: { id } })
+
 			return res.status(200).json({ message: "La solicitud ha sido denegada", type: "success", values: null })
 		}
 	} catch (error: unknown) {

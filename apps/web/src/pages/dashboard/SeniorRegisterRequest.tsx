@@ -1,160 +1,205 @@
 import React, { useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { Controller, useForm } from "react-hook-form"
-import { Input } from "../../components/ui/Input"
-import { Image } from "antd"
 import PageLayout from "../../layouts/PageLayout"
-import ReactDatePicker from "react-datepicker"
+
+import { Input } from "../../components/ui/Input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SeniorSchemas } from "../../lib/schemas"
+import { useLocation, useNavigate } from "react-router-dom"
+import { Controller, FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { api } from "../../lib/axios"
+import { message, Image } from "antd"
+
+import { es } from "date-fns/locale/es"
+import ReactDatePicker, { registerLocale } from "react-datepicker"
+
+registerLocale("es", es)
+
+import "react-datepicker/dist/react-datepicker.css"
+
+type FormValues = {
+	rut: string
+	name: string
+	email: string
+	address: string
+	birthDate: Date
+}
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()
 	const navigate = useNavigate()
+
 	const { senior } = location.state || {}
 
 	useEffect(() => {
 		if (!senior) {
 			navigate("/dashboard/adultos-mayores/nuevos")
 		}
-	}, [senior, navigate])
+	}, [senior])
 
 	const {
 		register,
-		handleSubmit,
 		control,
+		handleSubmit,
 		formState: { errors },
-		watch,
 	} = useForm({
-		resolver: zodResolver(SeniorSchemas.Update),
+		resolver: zodResolver(SeniorSchemas.Validate),
+		defaultValues: {
+			rut: senior.id,
+			name: "",
+			email: senior.email,
+			address: "",
+			birthDate: "",
+		},
 	})
 
-	const handleValidate = async (validate: boolean) => {
-		if (senior && senior.id) {
-			try {
-				await api.patch(`/dashboard/seniors/${senior.id}/new?validate=${validate}`)
-
-				console.log(`Solicitud ${validate ? "aceptada" : "denegada"} para el senior con ID: ${senior.id}`)
-				navigate("/dashboard/adultos-mayores/nuevos")
-			} catch (error) {
-				console.error("Error al actualizar el usuario:", error)
-			}
-		}
-	}
-
-	const onSubmit = async (data: any) => {
+	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		console.log("Form Data:", data)
 		try {
-			console.log("Datos del formulario:", data)
-			console.log("ID del senior:", senior.id)
+			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
+			await api.patch(`/dashboard/seniors/${senior.id}`, {
+				name: data.name,
+				email: data.email,
+				address: data.address,
+				birthDate: data.birthDate,
+				password: "",
+				confirmPassword: "",
+			})
 
-			await api.patch(`/dashboard/seniors/${senior.id}`, data)
-			await handleValidate(true)
-		} catch (error) {
-			console.error("Error al enviar el formulario:", error)
+			message.success("Solicitud aceptada")
+			navigate("/dashboard/adultos-mayores/nuevos")
+		} catch (error: any) {
+			console.error("Error al enviar el formulario:", error.response)
 		}
 	}
 
-	if (!senior) return null
+	const onDeny = async () => {
+		try {
+			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=false`)
+			console.log(`Solicitud denegada para el senior con ID: ${senior.id}`)
+			navigate("/dashboard/adultos-mayores/nuevos")
+			message.success("Solicitud denegada")
+		} catch (error) {
+			message.error("Error al actualizar la solicitud. Intente nuevamente.")
+			console.error("Error al actualizar el usuario:", error)
+		}
+	}
 
 	return (
-		<PageLayout pageTitle="Detalles de adulto mayor">
-			<div className="flex gap-8">
-				<div className="w-1/2">
-					<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit)}>
-						<Input
-							label="Rut"
-							type="text"
-							placeholder="Rut"
-							defaultValue={senior.id}
-							{...register("rut")}
-							disabled={true}
-						/>
-						<Input
-							label="Nombre"
-							type="text"
-							placeholder="Nombre"
-							error={errors.name ? errors.name.message?.toString() : ""}
-							{...register("name")}
-						/>
-						<Input
-							label="Correo Electrónico"
-							type="email"
-							placeholder="Correo"
-							defaultValue={senior.email}
-							{...register("email")}
-							disabled={true}
-						/>
-						<Input
-							label="Dirección"
-							type="text"
-							placeholder="Dirección"
-							error={errors.address ? errors.address.message?.toString() : ""}
-							{...register("address")}
-						/>
-						<div className="flex flex-col gap-3 w-full">
-							<div className="flex flex-row gap-2 items-center justify-between">
-								<label className="font-semibold">Fecha de Nacimiento</label>
-								{errors.birthDate && (
-									<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
-								)}
-							</div>
-							<Controller
-								control={control}
-								name="birthDate"
-								render={({ field: { onChange, value } }) => (
-									<ReactDatePicker
-										className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
-										placeholderText="Fecha de Nacimiento"
-										onChange={onChange}
-										selected={value}
-										maxDate={new Date()}
-										locale="es"
-									/>
-								)}
-							/>
+		<PageLayout pageTitle="Solicitud de registro de persona mayor">
+			<section className="flex flex-row gap-12 items-start w-full h-full">
+				<form
+					className="flex flex-col gap-4 w-2/5"
+					onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
+				>
+					<Input
+						label="Rut (Sin puntos ni guión)"
+						type="text"
+						placeholder="Rut"
+						defaultValue={senior.id}
+						{...register("rut")}
+						readOnly={true}
+						error={errors.rut ? errors.rut.message?.toString() : ""}
+					/>
+					<Input
+						label="Nombre"
+						type="text"
+						placeholder="Nombre"
+						{...register("name")}
+						error={errors.name ? errors.name.message?.toString() : ""}
+					/>
+					<Input
+						label="Correo Electrónico"
+						type="email"
+						placeholder="Email"
+						{...register("email")}
+						error={errors.email ? errors.email.message?.toString() : ""}
+						readOnly={true}
+					/>
+					<Input
+						label="Dirección"
+						type="text"
+						placeholder="Dirección"
+						{...register("address")}
+						error={errors.address ? errors.address.message?.toString() : ""}
+					/>
+					<div className="flex flex-col gap-3 w-full mb-2">
+						<div className="flex flex-row gap-2 items-center justify-between">
+							<label className="font-semibold">Fecha de Nacimiento</label>
+							{errors.birthDate && (
+								<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
+							)}
 						</div>
+						<Controller
+							control={control}
+							name="birthDate"
+							render={({ field: { onChange, value } }) => (
+								<ReactDatePicker
+									className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
+									placeholderText="Fecha de Nacimiento"
+									onChange={onChange}
+									selected={value as any}
+									maxDate={new Date()}
+									locale="es"
+								/>
+							)}
+						/>
+					</div>
+
+					<div className="flex flex-col gap-8">
+						<p>
+							<strong>Nota:</strong> Al aceptar esta solicitud, la persona mayor podrá iniciar sesión en
+							la aplicación móvil, solicitar servicios y asistir a las horas de atención solicitadas.
+						</p>
+
 						<div className="flex gap-4">
-							<button type="submit" className="bg-green-500 text-white px-4 py-2 rounded" key="submit">
+							<button key="submit" type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg">
 								Aceptar
 							</button>
-							<button
-								type="button"
-								className="bg-red-500 text-white px-4 py-2 rounded"
-								onClick={() => handleValidate(false)}
-							>
+							<button onClick={() => onDeny()} className="bg-red-500 text-white px-4 py-2 rounded-lg">
 								Denegar
 							</button>
 							<button
-								type="button"
-								className="border-red-500 border-1 text-red-500 px-4 py-2 rounded"
 								onClick={() => navigate("/dashboard/adultos-mayores/nuevos")}
+								className="border-red-500 border-1 text-red-500 px-4 py-2 rounded-lg"
 							>
 								Cancelar
 							</button>
 						</div>
-					</form>
-				</div>
+					</div>
+				</form>
 
-				<div className="w-4/5 grid grid-cols-2 gap-4 bg-red-500 p-4">
-					<div className="col-span-1 row-span-1 grid-rows-2 bg-blue-500">
-						<div className="row-span-1">
-							<Image src="/img/frontal.jpg" alt="Cédula Frontal" className="w-full h-full object-cover" />
-						</div>
-						<div className="row-span-2">
+				<div className="h-1/2 w-3/5 grid grid-cols-2 gap-2">
+					<div className="col-span-1 grid grid-rows-2">
+						<div className="row-span-1 h-1/2 rounded-lg">
 							<Image
-								src="/img/reverso.jpeg"
+								src="/img/frontal.jpg"
+								width="240"
+								height="152"
+								alt="Cédula Frontal"
+								style={{ objectFit: "cover" }}
+							/>
+						</div>
+						<div className="row-span-1 h-1/2 rounded-lg">
+							<Image
+								src="/img/reverso.jpg"
+								width="240"
+								height="152"
 								alt="Cédula Reverso"
-								className="w-full h-full object-cover"
+								style={{ objectFit: "cover" }}
 							/>
 						</div>
 					</div>
-					<div className="col-span-1 row-span-1 bg-blue-500">
-						<Image src="/img/regist.png" alt="Cartola Hogar" className="w-full h-full object-cover" />
+					<div className="col-span-1">
+						<Image
+							src="/img/rsh.png"
+							width="575"
+							height="800"
+							alt="Cartola Hogar"
+							style={{ objectFit: "cover" }}
+						/>
 					</div>
 				</div>
-			</div>
+			</section>
 		</PageLayout>
 	)
 }

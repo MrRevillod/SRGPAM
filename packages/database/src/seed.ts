@@ -3,6 +3,30 @@ const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
+const genRUT = (): string => {
+	const numero: string = Math.floor(Math.random() * 100000000)
+		.toString()
+		.padStart(7, "0")
+
+	const calcularDV = (rut: string): string => {
+		let suma: number = 0
+		let multiplicador: number = 2
+
+		for (let i = rut.length - 1; i >= 0; i--) {
+			suma += multiplicador * parseInt(rut[i])
+			multiplicador = multiplicador === 7 ? 2 : multiplicador + 1
+		}
+
+		const resto: number = 11 - (suma % 11)
+		if (resto === 11) return "0"
+		if (resto === 10) return "K"
+		return resto.toString()
+	}
+
+	const dv: string = calcularDV(numero)
+	return `${numero}${dv}`
+}
+
 const seed = async () => {
 	const DEFAULT_SENIOR_PASSWORD = "1234"
 	const DEFAULT_PHONE = "123456789"
@@ -16,10 +40,14 @@ const seed = async () => {
 		const rand = Math.floor(Math.random() * 1000)
 
 		try {
+			const AdminRUT = genRUT()
+			const SeniorRUT = genRUT()
+			const ProfessionalRUT = genRUT()
+
 			await prisma.administrator.upsert({
-				where: { id: `Admin-${i}` },
+				where: { id: AdminRUT },
 				create: {
-					id: `Admin-${i}`,
+					id: AdminRUT,
 					email: `admin${i}@admins.com`,
 					password: await hash(DEFAULT_ADMIN_PASSWORD, 10),
 					name: `Admin N${i}`,
@@ -27,9 +55,9 @@ const seed = async () => {
 				update: {},
 			})
 			await prisma.senior.upsert({
-				where: { id: `Senior-${i}` },
+				where: { id: SeniorRUT },
 				create: {
-					id: `Senior-${i}`,
+					id: SeniorRUT,
 					email: `senior${i}@seniors.com`,
 					password: await hash(DEFAULT_SENIOR_PASSWORD, 10),
 					name: `Senior N${i}`,
@@ -59,9 +87,9 @@ const seed = async () => {
 				update: {},
 			})
 			await prisma.professional.upsert({
-				where: { id: `Professional-${i}` },
+				where: { id: ProfessionalRUT },
 				create: {
-					id: `Professional-${i}`,
+					id: ProfessionalRUT,
 					email: `pro${i}@professionals.com`,
 					password: await hash(DEFAULT_PROFESSIONAL_PASSWORD, 10),
 					name: `Professional N${i}`,
@@ -77,8 +105,8 @@ const seed = async () => {
 					startsAt: new Date("1990-01-01"),
 					endsAt: new Date("1990-01-01"),
 					assistance: true,
-					seniorId: `Senior-${i}`,
-					professionalId: `Professional-${i}`,
+					seniorId: SeniorRUT,
+					professionalId: ProfessionalRUT,
 					serviceId: i,
 					centerId: i,
 				},
