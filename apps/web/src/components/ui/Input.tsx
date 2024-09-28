@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { Show } from "./Show"
 import { FieldError } from "react-hook-form"
 
-type InputType = "text" | "password" | "email" | "number" | "select"
+type InputType = "text" | "password" | "email" | "number" | "select" | "file"
 
 interface InputProps {
 	label: string

@@ -38,7 +38,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(409).json({
 				message: "El servicio con ese nombre ya existe",
 				type: "error",
-				values: ["name"],
+				values: { conflicts: ["name"] },
 			})
 		}
 
@@ -70,7 +70,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		return res.status(201).json({
 			message: "Servicio creado correctamente",
 			type: "success",
-			values: service,
+			values: { service },
 		})
 	} catch (error) {
 		next(error)

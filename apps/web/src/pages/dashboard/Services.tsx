@@ -3,9 +3,15 @@ import PageLayout from "../../layouts/PageLayout"
 import { api } from "../../lib/axios"
 import { Service } from "../../lib/types"
 import FlowbiteCard from "../../components/ui/Card"
+import CreateService from "../../components/forms/Create-Services"
+import ConfirmDelete from "../../components/ConfirmDelete"
+import EditServiceModal from "../../components/forms/Edit-Services"
 import { Pagination } from "antd"
 
 const ServicesPage: React.FC = () => {
+	const [modalType, setModalType] = useState("")
+	const [selectedService, setSelectedService] = useState<Service | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [data, setData] = useState<Service[]>([])
 	const [loading, setLoading] = useState(true)
 	const [currentPage, setCurrentPage] = useState(1)
@@ -27,6 +33,15 @@ const ServicesPage: React.FC = () => {
 		fetchServices()
 	}, [])
 
+	const handleDelete = async (element: any) => {
+		try {
+			const response = await api.delete(`/dashboard/services/${element.id}`)
+			return response
+		} catch (error) {
+			console.error("Error en el delete:", error)
+		}
+	}
+
 	const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
 	const onPageChange = (page: number, size: number) => {
@@ -34,11 +49,33 @@ const ServicesPage: React.FC = () => {
 		setPageSize(size)
 	}
 
+	const showModal = (type: string, element: Service | null) => {
+		setModalType(type)
+		setSelectedService(element)
+		setIsModalOpen(true)
+	}
+
+	const handleOk = () => {
+		setIsModalOpen(false)
+		setSelectedService(null)
+	}
+
+	const handleCancel = () => {
+		setIsModalOpen(false)
+		setSelectedService(null)
+	}
+
 	return (
-		<PageLayout pageTitle="Servicios" addFunction={() => {}} setData={() => {}}>
+		<PageLayout pageTitle="Servicios" addFunction={() => showModal("Create", null)} setData={() => {}}>
 			<div className="grid grid-cols-3 gap-2">
 				{paginatedData.map((service) => (
-					<FlowbiteCard key={service.id} title={service.title} description={service.description} />
+					<FlowbiteCard
+						onDelete={() => {}}
+						onUpdate={() => {}}
+						key={service.id}
+						title={service.name}
+						description={service.description}
+					/>
 				))}
 			</div>
 
@@ -48,6 +85,13 @@ const ServicesPage: React.FC = () => {
 				total={data.length}
 				onChange={onPageChange}
 				showSizeChanger
+			/>
+			<CreateService
+				visible={isModalOpen && modalType === "Create"}
+				onCancel={handleCancel}
+				onOk={handleOk}
+				setData={setData}
+				data={data}
 			/>
 		</PageLayout>
 	)

@@ -39,7 +39,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(409).json({
 				message: "El centro con ese nombre ya existe",
 				type: "error",
-				values: ["name"],
+				values: { conflicts: ["name"] },
 			})
 		}
 
@@ -58,7 +58,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		return res.status(201).json({
 			message: "Centro creado correctamente",
 			type: "success",
-			values: center,
+			values: { center },
 		})
 	} catch (error) {
 		next(error)
