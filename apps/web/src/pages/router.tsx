@@ -11,6 +11,7 @@ import NotFoundPage from "./NotFound"
 import NewSeniorsPage from "./dashboard/SeniorsNew"
 import AdministratorPage from "./dashboard/Administrators"
 import ProfessionalsPage from "./dashboard/Professionals"
+import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
@@ -54,6 +55,7 @@ const Router: React.FC = () => {
 				<Route path="/dashboard/eventos" element={<EventsPage />} />
 				<Route path="/dashboard/servicios" element={<ServicesPage />} />
 				<Route path="/dashboard/centros-de-atencion" element={<CentersPage />} />
+				<Route path="/dashboard/ver-seniors" element={<SeniorRegisterRequestPage />} />
 			</Route>
 
 			<Route path="*" element={<NotFoundPage />} />
