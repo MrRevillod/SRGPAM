@@ -15,10 +15,11 @@ interface InputProps {
 	value?: string | number
 	defaultValue?: string | number
 	options?: { value: string; label: string }[]
+	disabled?: boolean
 }
 
 export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps>((props, ref) => {
-	const { label, type, placeholder, error, name, islogin = false, defaultValue, options } = props
+	const { label, type, placeholder, error, name, islogin = false, defaultValue, options, disabled } = props
 
 	const classes = `border-1 ${error ? "border-red-400" : "border-neutral-500"} rounded-lg 
         p-2 focus:outline-none  focus:ring-blue-500 focus:border-blue-500 w-full 
@@ -76,6 +77,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 						{...props}
 						type={inputType}
 						defaultValue={defaultValue}
+						disabled={disabled ? disabled : false}
 					/>
 				)}
 			</div>
