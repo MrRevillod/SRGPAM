@@ -318,7 +318,6 @@ export const checkUnique = async (req: Request, res: Response, next: NextFunctio
 				},
 			})
 		}
-		console.log("No hay conflictos")
 		return res.status(200).send()
 	} catch (error) {
 		next(error)

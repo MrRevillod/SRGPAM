@@ -5,10 +5,9 @@ import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
 import { checkUniqueField } from "@/utils/request"
 
-const RUT = ({ navigation, control, errors, getValues, setError, validateAndNavigate, trigger, handleSubmit }: commonProps) => {
+const RUT = ({ navigation, control, errors, getValues, setError, trigger }: commonProps) => {
 	const onSubmit = async () => {
 		const request = await checkUniqueField("rut", getValues, trigger, setError)
-		console.warn(request)
 		if (request) {
 			navigation.navigate("Email")
 		}

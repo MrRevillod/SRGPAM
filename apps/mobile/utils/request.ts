@@ -48,20 +48,19 @@ export const checkUniqueField = async (field: string, getValues: any, trigger: a
 	} catch (error: any) {
 		if (error.response && error.response.status === 409) {
 			const values = error.response.data.values
-
-			if (values.rut === field) {
+			if (values.hasOwnProperty(field)) {
 				setError(field, {
 					type: "manual",
 					message: values.rut,
 				})
 			}
-			if (values.email === field) {
+			if (values.hasOwnProperty(field)) {
 				setError(field, {
 					type: "manual",
 					message: values.email,
 				})
 			}
+			return false
 		}
-		return false
 	}
 }

@@ -41,30 +41,10 @@ const FormNavigator = ({
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="RUT">
-				{(props) => (
-					<RUT
-						{...props}
-						control={control}
-						errors={errors}
-						getValues={getValues}
-						validateAndNavigate={validateAndNavigate}
-						setError={setError}
-						trigger={trigger}
-						handleSubmit={handleSubmit}
-					/>
-				)}
+				{(props) => <RUT {...props} control={control} errors={errors} getValues={getValues} setError={setError} trigger={trigger} />}
 			</Stack.Screen>
 			<Stack.Screen name="Email">
-				{(props) => (
-					<Email
-						{...props}
-						control={control}
-						errors={errors}
-						validateAndNavigate={validateAndNavigate}
-						setError={setError}
-						handleSubmit={handleSubmit}
-					/>
-				)}
+				{(props) => <Email {...props} control={control} getValues={getValues} errors={errors} setError={setError} trigger={trigger} />}
 			</Stack.Screen>
 			<Stack.Screen name="Pin">
 				{(props) => <Pin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
