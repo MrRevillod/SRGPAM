@@ -1,30 +1,27 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { bufferToBlob } from "../utils/files"
+import { bufferToBlob, filesToFormData } from "../utils/files"
 import { Prisma, Senior } from "@prisma/client"
 import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
 /// Controlador para manejar el registro de adultos mayores desde la aplicación móvil
 export const registerFromMobile = async (req: Request, res: Response, next: NextFunction) => {
-	const { rut, pin, email } = req.body
-	const files = req.files as {
-		[fieldname: string]: Express.Multer.File[]
-	}
-
 	try {
-		const userExists = await prisma.senior.findUnique({ where: { id: rut } })
-		if (userExists) {
+		// Verificar si el adulto mayor ya existe en la base de datos
+		const { rut, pin, email } = req.body
+
+		if (await prisma.senior.findUnique({ where: { id: rut } })) {
 			throw new AppError(409, "La persona que estas tratando de registrar ya existe")
 		}
 
-		// Si el adulto mayor no existe, se crea
+		// Si el adulto mayor no existe, se crea un registro en la base de datos
 
 		await prisma.senior.create({
 			data: {
 				id: rut,
 				name: "",
-				email: email ?? null,
+				email: email,
 				password: await hash(pin, 10),
 				address: "",
 				birthDate: new Date(),
@@ -32,24 +29,16 @@ export const registerFromMobile = async (req: Request, res: Response, next: Next
 		})
 
 		// Se envían los archivos a la API de almacenamiento (storage)
+
+		const files = Object.values(req.files || {})
+		const formData = filesToFormData(files.flat())
+
 		// Para ello se deben convertir los buffers de la librería MULTER a blobs
 		// compatibles con la API de FETCH
 
-		const formData = new FormData()
-
-		const dniA = bufferToBlob(files["dni-a"][0].buffer, files["dni-a"][0].mimetype)
-		const dniB = bufferToBlob(files["dni-b"][0].buffer, files["dni-b"][0].mimetype)
-		const social = bufferToBlob(files["social"][0].buffer, files["social"][0].mimetype)
-
-		formData.append("dni-a", dniA, files["dni-a"][0].originalname)
-		formData.append("dni-b", dniB, files["dni-b"][0].originalname)
-		formData.append("social", social, files["social"][0].originalname)
-
-		// Se envían los archivos a la API de almacenamiento (storage)
-
 		const response = await httpRequest<null>({
 			service: "STORAGE",
-			endpoint: `/seniors/${rut}`,
+			endpoint: `/upload?path=%2Fseniors%2F${rut}`,
 			method: "POST",
 			variant: "MULTIPART",
 			body: formData,
@@ -60,7 +49,11 @@ export const registerFromMobile = async (req: Request, res: Response, next: Next
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(200).json({ message: "El adulto mayor se a registrado correctamente", type: "success", values: null })
+		return res.status(200).json({
+			message: "El adulto mayor se a registrado correctamente",
+			type: "success",
+			values: null,
+		})
 	} catch (error: unknown) {
 		next(error)
 	}
@@ -207,7 +200,11 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(200).json({ message: "Creación exitosa", type: "success", values: { senior } })
+		return res.status(200).json({
+			message: "Creación exitosa",
+			type: "success",
+			values: senior,
+		})
 	} catch (error) {
 		next(error)
 	}
@@ -243,7 +240,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Actualización exitosa",
 			type: "success",
-			values: { senior },
+			values: senior,
 		})
 	} catch (error) {
 		next(error)
@@ -258,7 +255,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 
 		const storageResponse = await httpRequest({
 			service: "STORAGE",
-			endpoint: `/seniors/${req.params.id}`,
+			endpoint: `/delete?path=%2Fseniors%2F${req.params.id}`,
 			method: "DELETE",
 		})
 

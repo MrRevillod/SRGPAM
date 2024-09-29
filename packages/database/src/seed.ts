@@ -1,5 +1,6 @@
 const { hash } = require("bcrypt")
 const { PrismaClient } = require("@prisma/client")
+const { faker } = require("@faker-js/faker")
 
 const prisma = new PrismaClient()
 
@@ -30,8 +31,8 @@ const genRUT = (): string => {
 const seed = async () => {
 	const DEFAULT_SENIOR_PASSWORD = "1234"
 	const DEFAULT_PHONE = "123456789"
-	const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD
-	const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSINAL_PASSWORD
+	const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123"
+	const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD || "pro123"
 	const servicesName = [
 		{ name: "Psicología", title: "Psicólogo(a)" },
 		{ name: "Fisioterapia", title: "Fisioterapeuta" },
@@ -59,70 +60,85 @@ const seed = async () => {
 		{ name: "Clínica Los Pinos", address: "Avenida Los Pinos 707" },
 	]
 
-	console.log("DEFAULT_ADMIN_PASSWORD:", DEFAULT_ADMIN_PASSWORD)
-	console.log("DEFAULT_PROFESSIONAL_PASSWORD:", DEFAULT_PROFESSIONAL_PASSWORD)
-
 	for (let i = 1; i <= 25; i++) {
 		const rand = Math.floor(Math.random() * 1000)
-		const randomService = servicesName[Math.floor(Math.random() * servicesName.length)] // Seleccionar servicio aleatoriamente
-		const randomCenter = centers[Math.floor(Math.random() * centers.length)] // Seleccionar centro aleatoriamente
+		const randomService = servicesName[Math.floor(Math.random() * servicesName.length)]
+		const randomCenter = centers[Math.floor(Math.random() * centers.length)]
 
 		try {
 			const AdminRUT = genRUT()
 			const SeniorRUT = genRUT()
 			const ProfessionalRUT = genRUT()
 
+			const adminFirstName = faker.person.firstName()
+			const adminLastName = faker.person.lastName()
+			const professionalFirstName = faker.person.firstName()
+			const professionalLastName = faker.person.lastName()
+			const seniorFirstName = faker.person.firstName()
+			const seniorLastName = faker.person.lastName()
+
+			const adminEmail = `${adminFirstName[0].toLowerCase()}${adminLastName.toLowerCase()}@admins.com`
+			const professionalEmail = `${professionalFirstName[0].toLowerCase()}${professionalLastName.toLowerCase()}@professionals.com`
+			const seniorEmail = `${seniorFirstName[0].toLowerCase()}${seniorLastName.toLowerCase()}@seniors.com`
+
+			const randomBirthDate = faker.date.between({ from: "1950-01-01", to: "2005-12-31" })
+			const randomStartDate = faker.date.between({ from: "2022-01-01", to: "2022-12-31" })
+			const randomEndDate = faker.date.between({ from: randomStartDate, to: "2023-12-31" })
+
 			await prisma.administrator.upsert({
 				where: { id: AdminRUT },
 				create: {
 					id: AdminRUT,
-					email: `admin${i}@admins.com`,
+					email: adminEmail,
 					password: await hash(DEFAULT_ADMIN_PASSWORD, 10),
-					name: `Admin N${i}`,
+					name: `${adminFirstName} ${adminLastName}`,
 				},
 				update: {},
 			})
+
 			await prisma.senior.upsert({
 				where: { id: SeniorRUT },
 				create: {
 					id: SeniorRUT,
-					email: `senior${i}@seniors.com`,
+					email: seniorEmail,
 					password: await hash(DEFAULT_SENIOR_PASSWORD, 10),
-					name: `Senior N${i}`,
-					address: `Address N${i}`,
-					birthDate: new Date("1990-01-01"),
+					name: `${seniorFirstName} ${seniorLastName}`,
+					address: faker.location.streetAddress(),
+					birthDate: randomBirthDate,
 					validated: rand % 2 === 0,
 				},
 				update: {},
 			})
+
 			await prisma.service.upsert({
 				where: { id: i },
 				create: {
 					id: i,
-					name: randomService.name, // Asignar el nombre del servicio aleatorio
-					title: randomService.title, // Asignar el título del servicio aleatorio
-					description:
-						"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+					name: randomService.name,
+					title: randomService.title,
+					description: faker.lorem.paragraph(),
 				},
 				update: {},
 			})
+
 			await prisma.center.upsert({
 				where: { id: i },
 				create: {
 					id: i,
-					name: randomCenter.name, // Asignar el nombre del centro aleatorio
-					address: randomCenter.address, // Asignar la dirección del centro aleatorio
+					name: randomCenter.name,
+					address: randomCenter.address,
 					phone: DEFAULT_PHONE,
 				},
 				update: {},
 			})
+
 			await prisma.professional.upsert({
 				where: { id: ProfessionalRUT },
 				create: {
 					id: ProfessionalRUT,
-					email: `pro${i}@professionals.com`,
+					email: professionalEmail,
 					password: await hash(DEFAULT_PROFESSIONAL_PASSWORD, 10),
-					name: `Professional N${i}`,
+					name: `${professionalFirstName} ${professionalLastName}`,
 					serviceId: i,
 				},
 				update: {},
@@ -132,8 +148,8 @@ const seed = async () => {
 				where: { id: i },
 				create: {
 					id: i,
-					startsAt: new Date("1990-01-01"),
-					endsAt: new Date("1990-01-01"),
+					startsAt: randomStartDate,
+					endsAt: randomEndDate,
 					assistance: true,
 					seniorId: SeniorRUT,
 					professionalId: ProfessionalRUT,

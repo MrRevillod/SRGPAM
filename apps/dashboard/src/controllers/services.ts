@@ -1,6 +1,8 @@
 import { prisma } from "@repo/database"
-import { Request, Response, NextFunction } from "express"
 import { bufferToBlob } from "../utils/files"
+import { Request, Response, NextFunction } from "express"
+import { AppError } from "@repo/lib"
+
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const services = await prisma.service.findMany({
@@ -70,17 +72,20 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		return res.status(201).json({
 			message: "Servicio creado correctamente",
 			type: "success",
-			values: { service },
+			values: service,
 		})
 	} catch (error) {
 		next(error)
 	}
 }
 
+// !TODO: Implementar la actualización de la imagen del servicio
+// !TODO: Implementar validación de existencia de nombre de servicio
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
 		const { name, title, description } = req.body
+
 		const updatedService = await prisma.service.update({
 			where: { id: Number(id) },
 			data: {
@@ -110,10 +115,17 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 	try {
 		const id = Number(req.params.id)
 
+		const center = await prisma.service.findUnique({
+			where: { id },
+		})
+
+		if (!center) throw new AppError(400, "El centro no existe")
+
 		await prisma.professional.updateMany({
 			where: { serviceId: id },
 			data: { serviceId: null },
 		})
+
 		await prisma.service.delete({ where: { id } })
 
 		return res.status(200).json({

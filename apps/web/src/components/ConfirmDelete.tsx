@@ -26,6 +26,11 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 	const handleConfirm = async () => {
 		try {
 			const response = await executeAction(selectedElement)
+
+			if (!response || response?.data.type === "error") {
+				throw new Error("Error al eliminar el registro")
+			}
+
 			const deletedId = response?.data.values.deletedId
 
 			if (data && setData) {
@@ -35,7 +40,9 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 			message.success("Hecho")
 			onOk()
 		} catch (error) {
+			console.error("Error en el delete:", error)
 			message.error("Error al eliminar el registro")
+			onCancel()
 		}
 	}
 

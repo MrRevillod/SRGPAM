@@ -1,7 +1,8 @@
 import React from "react"
 import { Table, Space } from "antd"
-import type { BaseDataType, TableColumnType } from "../lib/types"
 import { FiEdit, FiDelete, FiEye } from "react-icons/fi"
+import { BaseDataType, TableColumnType } from "../lib/types"
+import { tableColumnsFormatters } from "../lib/formatters"
 
 interface TableProps<T> {
 	data: T[]
@@ -11,36 +12,20 @@ interface TableProps<T> {
 	onDelete?: (person: T) => void
 }
 
-const isDateString = (value: any) => {
-	return typeof value === "string" && !isNaN(Date.parse(value))
-}
-
-const formatDate = (dateString: string) => {
-	const date = new Date(dateString)
-	return date.toLocaleDateString()
-}
-
-const renderBoolean = (value: boolean) => {
-	return value ? "Si" : "No"
-}
-
 const DataTable = <T extends BaseDataType>({ data, columnsConfig, onView, onEdit, onDelete }: TableProps<T>) => {
-	const dateKeys = ["birthDate", "updatedAt", "createdAt"]
-
 	return (
-		<Table dataSource={data} rowKey={(record) => record.id} size="middle">
+		<Table dataSource={data} rowKey={(record) => record.id} size="middle" pagination={{ size: "default" }}>
 			{columnsConfig.map((col) => (
 				<Table.Column
 					key={col.key}
 					title={col.title}
 					dataIndex={col.dataIndex as string}
 					render={(value: any) => {
-						if (dateKeys.includes(col.key) && isDateString(value)) {
-							return formatDate(value)
+						if (tableColumnsFormatters[col.key as keyof typeof tableColumnsFormatters]) {
+							const colKey = col.key as keyof typeof tableColumnsFormatters
+							return tableColumnsFormatters[colKey](value as never)
 						}
-						if (col.key === "validated") {
-							return renderBoolean(value)
-						}
+
 						return value
 					}}
 				/>

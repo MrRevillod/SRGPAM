@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from "react"
-import PageLayout from "../../layouts/PageLayout"
 import { api } from "../../lib/axios"
 import { Center } from "../../lib/types"
-import FlowbiteCard from "../../components/ui/Card"
 import { Pagination } from "antd"
-import CreateCenter from "../../components/forms/Create-Centers"
+
+import React, { useState, useEffect } from "react"
+import PageLayout from "../../layouts/PageLayout"
+import FlowbiteCard from "../../components/ui/Card"
+import UpdateCenter from "../../components/forms/update/Center"
+import CreateCenter from "../../components/forms/create/Center"
+import ConfirmDelete from "../../components/ConfirmDelete"
+
 const CentersPage: React.FC = () => {
 	const [modalType, setModalType] = useState("")
-	const [selectedService] = useState<Center | null>(null)
+	const [selectedCenter, setSelectedCenter] = useState<Center | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [data, setData] = useState<Center[]>([])
 	const [loading, setLoading] = useState(true)
 	const [currentPage, setCurrentPage] = useState(1)
-	const [pageSize, setPageSize] = useState(10)
+	const [pageSize, setPageSize] = useState(6)
 
 	const fetchCenters = async () => {
 		try {
@@ -25,9 +29,11 @@ const CentersPage: React.FC = () => {
 			setLoading(false)
 		}
 	}
+
 	useEffect(() => {
 		fetchCenters()
 	}, [])
+
 	const handleDelete = async (element: any) => {
 		try {
 			const response = await api.delete(`/dashboard/centers/${element.id}`)
@@ -44,8 +50,9 @@ const CentersPage: React.FC = () => {
 		setPageSize(size)
 	}
 
-	const showModal = (type: string) => {
+	const showModal = (type: string, center: any) => {
 		setModalType(type)
+		setSelectedCenter(center)
 		setIsModalOpen(true)
 	}
 
@@ -57,29 +64,34 @@ const CentersPage: React.FC = () => {
 		setIsModalOpen(false)
 	}
 	return (
-		<PageLayout pageTitle="Centros" addFunction={() => showModal("Create")} setData={() => {}}>
-			<div className="grid grid-cols-3 gap-2 ">
-				{paginatedData.map((center) => {
-					return (
-						<FlowbiteCard
-							onDelete={() => {}}
-							onUpdate={() => {}}
-							key={center.id}
-							title={center.name}
-							description={center.address}
-							other={`Teléfono: ${center.phone}`}
-						/>
-					)
-				})}
-			</div>
+		<PageLayout pageTitle="Centros de atención" addFunction={() => showModal("Create", null)} setData={() => {}}>
+			<section className="flex flex-col w-full h-full gap-8">
+				<div className="grid grid-cols-3 gap-8">
+					{paginatedData.map((center) => {
+						return (
+							<FlowbiteCard
+								onDelete={() => showModal("Delete", center)}
+								onUpdate={() => showModal("Update", center)}
+								key={center.id}
+								title={center.name}
+								description={center.address}
+								other={`Teléfono: ${center.phone}`}
+							/>
+						)
+					})}
+				</div>
 
-			<Pagination
-				current={currentPage}
-				pageSize={pageSize}
-				total={data.length}
-				onChange={onPageChange}
-				showSizeChanger
-			/>
+				<Pagination
+					defaultPageSize={6}
+					pageSizeOptions={["6", "12", "24", "48"]}
+					current={currentPage}
+					pageSize={pageSize}
+					total={data.length}
+					onChange={onPageChange}
+					size="default"
+					align="end"
+				/>
+			</section>
 
 			<CreateCenter
 				visible={isModalOpen && modalType === "Create"}
@@ -87,6 +99,27 @@ const CentersPage: React.FC = () => {
 				onOk={handleOk}
 				setData={setData}
 				data={data}
+			/>
+
+			<UpdateCenter
+				visible={isModalOpen && modalType === "Update"}
+				entity={selectedCenter}
+				onCancel={handleCancel}
+				onOk={handleOk}
+				data={data}
+				setData={setData}
+			/>
+
+			<ConfirmDelete
+				modalType="Delete"
+				text="Centro de atención"
+				visible={isModalOpen && modalType === "Delete"}
+				onCancel={handleCancel}
+				onOk={handleOk}
+				data={data}
+				setData={setData}
+				selectedElement={selectedCenter}
+				executeAction={handleDelete}
 			/>
 		</PageLayout>
 	)

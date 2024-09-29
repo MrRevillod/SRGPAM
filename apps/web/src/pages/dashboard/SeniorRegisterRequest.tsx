@@ -1,15 +1,15 @@
 import React, { useEffect } from "react"
 import PageLayout from "../../layouts/PageLayout"
 
+import { es } from "date-fns/locale/es"
+import { api } from "../../lib/axios"
 import { Input } from "../../components/ui/Input"
+import { message, Image } from "antd"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SeniorSchemas } from "../../lib/schemas"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Controller, FieldValues, SubmitHandler, useForm } from "react-hook-form"
-import { api } from "../../lib/axios"
-import { message, Image } from "antd"
 
-import { es } from "date-fns/locale/es"
 import ReactDatePicker, { registerLocale } from "react-datepicker"
 
 registerLocale("es", es)
