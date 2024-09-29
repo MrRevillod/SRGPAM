@@ -6,3 +6,12 @@ export const bufferToBlob = (buffer: Buffer, mimeType: string): Blob => {
 	const arrayBuffer = bufferToArrayBuffer(buffer)
 	return new Blob([arrayBuffer], { type: mimeType })
 }
+
+export const filesToFormData = (files: Express.Multer.File[]): FormData => {
+	const formData = new FormData()
+	files.forEach((file) => {
+		const blob = bufferToBlob(file.buffer, file.mimetype)
+		formData.append("files", blob, file.originalname)
+	})
+	return formData
+}
