@@ -4,8 +4,15 @@ import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "@/utils/types"
+import { checkUniqueField } from "@/utils/request"
 
-const Email = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
+const Email = ({ navigation, control, errors, getValues, trigger, setError }: commonProps) => {
+	const onSubmit = async () => {
+		const request = await checkUniqueField("email", getValues, trigger, setError)
+		if (request) {
+			navigation.navigate("Pin")
+		}
+	}
 	return (
 		<GeneralView
 			title="Datos del Registro"
@@ -15,7 +22,7 @@ const Email = ({ navigation, control, errors, validateAndNavigate }: commonProps
 		>
 			<View style={styles.container}>
 				<Input name="email" placeholder="TuCorreo@gmail.com" control={control} errors={errors} />
-				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("email", navigation, "Pin")} />
+				<CustomButton title="Siguiente" onPress={onSubmit} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
 					textStyle={styles.customButtonText}
