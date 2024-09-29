@@ -11,17 +11,17 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		throw new AppError(400, "Inicio de sesión inválido")
 	}
 
-	const expireDate = new Date() // Token de acceso expira en 15 minutos
+	const expireDate = new Date()
 	expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
 
-	const refreshDate = new Date() // Token de refresco expira en 30 días
+	const refreshDate = new Date()
 	refreshDate.setDate(refreshDate.getDate() + 30)
 
 	try {
 		const user = await findUser({ email: req.body.email }, loginKind)
 
 		if (!user || !(await compare(req.body.password, user.password))) {
-			throw new AppError(401, "Credenciales inválidas")
+			throw new AppError(401, "Correo electrónico o contraseña incorrectos")
 		}
 
 		const payload = { id: user.id, role: loginKind }

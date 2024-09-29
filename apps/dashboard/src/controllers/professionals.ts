@@ -64,7 +64,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 		}
 
-		await prisma.administrator.create({
+		const { password, ...professional } = await prisma.administrator.create({
 			data: {
 				id,
 				name,
@@ -76,7 +76,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		return res.status(200).json({
 			message: "Creación exitosa",
 			type: "success",
-			values: null,
+			values: professional,
 		})
 	} catch (error) {
 		next(error)

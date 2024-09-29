@@ -207,7 +207,11 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(200).json({ message: "Creación exitosa", type: "success", values: { senior } })
+		return res.status(200).json({
+			message: "Creación exitosa",
+			type: "success",
+			values: senior,
+		})
 	} catch (error) {
 		next(error)
 	}
@@ -243,7 +247,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Actualización exitosa",
 			type: "success",
-			values: { senior },
+			values: senior,
 		})
 	} catch (error) {
 		next(error)

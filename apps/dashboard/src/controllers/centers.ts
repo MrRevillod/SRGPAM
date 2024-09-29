@@ -1,6 +1,7 @@
 import { prisma } from "@repo/database"
-import { Request, Response, NextFunction } from "express"
 import { bufferToBlob } from "../utils/files"
+import { Request, Response, NextFunction } from "express"
+import { AppError } from "@repo/lib"
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -37,16 +38,15 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 		if (centerExists) {
 			return res.status(409).json({
-				message: "El centro con ese nombre ya existe",
+				message: "Ya existe un centro de atención con este nombre",
 				type: "error",
 				values: { conflicts: ["name"] },
 			})
 		}
 
 		const formData = new FormData()
-		const image = bufferToBlob(file.buffer, file.mimetype)
-		formData.append("image", image, file.originalname)
-		console.log(formData)
+		formData.append("image", bufferToBlob(file.buffer, file.mimetype), file.originalname)
+
 		const center = await prisma.center.create({
 			data: {
 				name,
@@ -58,17 +58,20 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		return res.status(201).json({
 			message: "Centro creado correctamente",
 			type: "success",
-			values: { center },
+			values: center,
 		})
 	} catch (error) {
 		next(error)
 	}
 }
 
+// !TODO: Implementar la actualización de la imagen del centro
+// !TODO: Implementar validación de existencia de nombre de centro
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
 		const { name, address, phone } = req.body
+
 		const updatedCenter = await prisma.center.update({
 			where: { id: Number(id) },
 			data: {
@@ -87,7 +90,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Centro actualizado exitosamente",
 			type: "success",
-			values: { updatedCenter },
+			values: updatedCenter,
 		})
 	} catch (error) {
 		next(error)
@@ -98,16 +101,23 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 	try {
 		const id = Number(req.params.id)
 
+		const center = await prisma.center.findUnique({
+			where: { id },
+		})
+
+		if (!center) throw new AppError(400, "El centro no existe")
+
 		await prisma.event.updateMany({
 			where: { centerId: id },
 			data: { centerId: null },
 		})
+
 		await prisma.center.delete({ where: { id } })
 
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
-			values: null,
+			values: { deletedId: id },
 		})
 	} catch (error) {
 		next(error)

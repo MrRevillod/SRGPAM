@@ -1,5 +1,6 @@
 import React from "react"
 import { api } from "../lib/axios"
+import { ApiResponse } from "../lib/types"
 import { createContext, useState, useEffect, ReactNode } from "react"
 
 interface User {
@@ -12,6 +13,7 @@ interface AuthContextType {
 	isAuthenticated: boolean
 	user: User | null
 	loading: boolean
+	error: string | null
 	login: (credentials: LoginCredentials) => Promise<void>
 	logout: () => Promise<void>
 	refreshToken: () => Promise<void>
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
 	const [user, setUser] = useState<User | null>(null)
 	const [loading, setLoading] = useState<boolean>(true)
+	const [error, setError] = useState<string | null>(null)
 
 	const login = async (credentials: LoginCredentials) => {
 		setLoading(true)
@@ -36,9 +39,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await api.post("/auth/login?variant=ADMIN", credentials)
 			setUser(response.data.values.user)
 			setIsAuthenticated(true)
-		} catch (error) {
+			setError(null)
+		} catch (error: any) {
 			console.log(error)
-			throw new Error("Error en el login")
+			setError(error.response.data.message)
 		}
 
 		setLoading(false)
@@ -93,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	}, [])
 
 	return (
-		<AuthContext.Provider value={{ user, login, logout, refreshToken, loading, isAuthenticated }}>
+		<AuthContext.Provider value={{ user, login, error, logout, refreshToken, loading, isAuthenticated }}>
 			{children}
 		</AuthContext.Provider>
 	)

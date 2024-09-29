@@ -1,33 +1,4 @@
-// Definimos la estructura principal de los datos que maneja el sistema
-export interface DataType {
-	id: string // Identificador único, puede ser el 'id' del senior
-	name: string // Nombre del senior
-	email: string // Correo electrónico
-	address: string // Dirección del senior
-	birthDate: string // Fecha de nacimiento en formato de string (ISO 8601)
-	validated: boolean // Indica si el senior ha sido validado
-	createdAt: string // Fecha de creación en formato de string (ISO 8601)
-	updatedAt: string // Fecha de actualización en formato de string (ISO 8601)
-}
-
-// Opciones para los campos editables en un formulario de seniors
-export type FieldType = {
-	id?: string
-	name?: string // Nombre, opcional en algunas operaciones
-	email?: string // Correo, opcional en algunas operaciones
-	password?: string // Contraseña, opcional
-	address?: string // Dirección, opcional
-	birthDate?: string // Fecha de nacimiento, opcional
-}
-
-export interface newSenior {
-	id: string
-	name: string
-	email: string
-	birthDate: string
-	address: string
-	validated: boolean
-}
+import { Dispatch, SetStateAction } from "react"
 
 export type BaseDataType = {
 	id: string
@@ -53,6 +24,20 @@ interface IUser {
 export interface Administrator extends IUser {}
 export interface Professional extends IUser {}
 
+export type Service = {
+	id: number
+	name: string
+	title: string
+	description: string
+}
+
+export type Center = {
+	id: number
+	name: string
+	address: string
+	phone: string
+}
+
 export interface Senior extends IUser {
 	address: string
 	birthDate: string
@@ -76,16 +61,19 @@ export type PasswordFields = {
 
 export type TableColumnType<T> = Array<{ title: string; dataIndex: keyof T; key: string }>
 
-export type Service = {
-	id: number
-	name: string
-	title: string
-	description: string
+export type CreateEntityFormProps<T> = {
+	visible: boolean
+	onCancel: () => void
+	onOk: () => void
+	data: T[]
+	setData: Dispatch<SetStateAction<T[]>>
 }
 
-export type Center = {
-	id: number
-	name: string
-	address: string
-	phone: string
+export type UpdateEntityFormProps<T> = {
+	visible: boolean
+	entity: T | null
+	onCancel: () => void
+	onOk: () => void
+	data: T[]
+	setData: Dispatch<SetStateAction<T[]>>
 }

@@ -39,8 +39,7 @@
 				"^clean",
 				"^install",
 				"^build",
-				"^generate",
-				"^db:seed"
+				"^generate"
 			],
 			"cache": false,
 			"persistent": true
