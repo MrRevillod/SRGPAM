@@ -38,8 +38,8 @@
 			"dependsOn": [
 				"^clean",
 				"^install",
-				"^build",
-				"^generate"
+				"^generate",
+				"^build"
 			],
 			"cache": false,
 			"persistent": true
