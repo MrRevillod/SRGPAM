@@ -1,34 +1,36 @@
-import nodemailer from "nodemailer"
+import { prisma } from "@repo/database"
+import { Request, Response, NextFunction } from "express"
+import sendMail from "../utils/mailer"
+import { AppError, CustomTokenOpts, signJsonwebtoken, services } from "@repo/lib"
 
-// Create a transporter object using Gmail SMTP
-const transporter = nodemailer.createTransport({
-	service: "gmail",
-	auth: {
-		user: process.env.EMAIL_USER,
-		pass: process.env.EMAIL_PASSWORD,
-	},
-})
+// dinamic usuarios
 
-// Email options
-const sendMail = async (to: string, subject: string, text: string) => {
-	const mailOptions = {
-		from: process.env.EMAIL_USER,
-		to,
-		subject,
-		text,
-	}
-
+export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const info = await transporter.sendMail(mailOptions)
-		console.log("✅ Email sent:", info.response)
-	} catch (error: unknown) {
-		if (error instanceof Error) {
-			console.error("❌ Error:", error.message)
-		} else {
-			console.error("❌ Error:", error)
-		}
-		throw error
+		const { email } = req.body
+		const user = await prisma.senior.findFirst({
+			where: { email },
+		})
+
+		if (!user) throw new AppError(404, "El usuario no existe.")
+
+		const payload = { id: user.id, email: email }
+		const tokenOpt = CustomTokenOpts(user.password, "30d")
+		const token = signJsonwebtoken(payload, tokenOpt)
+
+		const resetLink = `${services.WEB_APP.url}/reset-password/${token}`
+
+		await sendMail(
+			email,
+			"Restablecimiento de contraseña",
+			`Hola, ${user.name}. Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
+		)
+
+		return res.status(200).json({
+			message: "Correo de restauración enviado correctamente",
+			type: "success",
+		})
+	} catch (error) {
+		next(error)
 	}
 }
-
-export default sendMail
