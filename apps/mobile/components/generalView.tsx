@@ -1,6 +1,7 @@
 import React from "react"
 import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform, Image } from "react-native"
 import Colors from "@/components/colors"
+import GoBackButton from "@/components/goBack"
 const { width, height } = Dimensions.get("window")
 
 type GeneralViewProps = {
@@ -19,6 +20,7 @@ const GeneralView = ({ title, children, textCircle, textTitle, textDescription }
 			enabled={true}
 		>
 			<View style={styles.greenContainer}>
+				<GoBackButton></GoBackButton>
 				<Text style={styles.title}>{title} </Text>
 			</View>
 			<View style={styles.whiteContainer}>
