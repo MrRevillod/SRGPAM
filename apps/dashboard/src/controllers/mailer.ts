@@ -1,16 +1,22 @@
-import { prisma } from "@repo/database"
 import { Request, Response, NextFunction } from "express"
 import sendMail from "../utils/mailer"
-import { AppError, CustomTokenOpts, signJsonwebtoken, services } from "@repo/lib"
-
-// dinamic usuarios
+import { AppError, CustomTokenOpts, signJsonwebtoken, services, findUser } from "@repo/lib"
 
 export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction) => {
+	const userRole = req.query.variant
+
+	if (userRole !== "ADMIN" && userRole !== "PROFESSIONAL" && userRole !== "SENIOR") {
+		throw new AppError(400, "Rol de usuario no valido")
+	}
+
 	try {
 		const { email } = req.body
-		const user = await prisma.senior.findFirst({
-			where: { email },
-		})
+
+		if (!email) {
+			throw new AppError(400, "Se requiere un correo electrónico")
+		}
+
+		const user = await findUser(email, userRole)
 
 		if (!user) throw new AppError(404, "El usuario no existe.")
 
