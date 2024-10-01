@@ -4,11 +4,12 @@ import { validateSchema } from "../middlewares/validation"
 import { validateRole } from "../middlewares/authentication"
 import { singleImageupload } from "../config"
 import { CentersSchemas } from "@repo/lib"
+
 const { Create, Update } = CentersSchemas
+
 const router: Router = Router()
 
 router.get("/", validateRole("ADMIN"), center.getAll)
-
 router.post("/", validateRole("ADMIN"), singleImageupload, validateSchema(Create), center.create)
 
 router.patch("/:id", validateRole("ADMIN"), validateSchema(Update), center.updateById)

@@ -8,7 +8,6 @@ import { SubmitHandler, useForm } from "react-hook-form"
 
 const LoginPage: React.FC = () => {
 	const {
-		getValues,
 		register,
 		handleSubmit,
 		formState: { errors },
@@ -16,9 +15,10 @@ const LoginPage: React.FC = () => {
 		resolver: zodResolver(LoginFormSchema),
 	})
 
-	const { login } = useAuth()
+	const { login, error } = useAuth()
+
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
-		login(formData)
+		await login(formData)
 	}
 
 	return (
@@ -30,11 +30,13 @@ const LoginPage: React.FC = () => {
 						Dirección de adultos mayores de la municipalidad de Temuco.
 					</p>
 
+					{error && <p className="text-red-600 text-center mb-4">{error}</p>}
+
 					<form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit as any)}>
 						<Input
 							label="Correo electrónico"
 							type="email"
-							value={"admin1@admins.com"}
+							defaultValue={"jhuels@admins.com"}
 							{...register("email")}
 							placeholder="example@gmail.com"
 							error={errors.email ? errors.email.message?.toString() : ""}

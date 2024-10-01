@@ -20,6 +20,8 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 
 		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
 
+		console.log("payload", payload)
+
 		if (!payload.id || !payload.role) {
 			throw new AppError(401, "No tienes autorización para acceder a este recurso")
 		}

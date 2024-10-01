@@ -32,12 +32,9 @@ const registerSchema = z
 		rut: z.string().refine(isValidRut, {
 			message: "El RUT ingresado no es válido",
 		}),
-		email: z
-			.string()
-			.optional()
-			.refine((email) => email === "" || z.string().email().safeParse(email).success, {
-				message: "Email Invalido",
-			}),
+		email: z.string().email({
+			message: "El formato del correo electrónico no es válido",
+		}),
 		pin: z.string().refine((value) => value.length === 4, {
 			message: "El PIN debe tener 4 dígitos",
 		}),
@@ -65,4 +62,5 @@ export const profileSchema = z.object({
 		message: "Debe subir una foto de perfil",
 	}),
 })
+
 export default registerSchema

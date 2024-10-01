@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { Show } from "./Show"
 import { FieldError } from "react-hook-form"
 
-type InputType = "text" | "password" | "email" | "number" | "select"
+type InputType = "text" | "password" | "email" | "number" | "select" | "file"
 
 interface InputProps {
 	label: string
@@ -15,10 +15,11 @@ interface InputProps {
 	value?: string | number
 	defaultValue?: string | number
 	options?: { value: string; label: string }[]
+	readOnly?: boolean
 }
 
 export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps>((props, ref) => {
-	const { label, type, placeholder, error, name, islogin = false, defaultValue, options } = props
+	const { label, type, placeholder, error, name, islogin = false, defaultValue, options, readOnly } = props
 
 	const classes = `border-1 ${error ? "border-red-400" : "border-neutral-500"} rounded-lg 
         p-2 focus:outline-none  focus:ring-blue-500 focus:border-blue-500 w-full 
@@ -76,6 +77,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 						{...props}
 						type={inputType}
 						defaultValue={defaultValue}
+						readOnly={readOnly ? true : false}
 					/>
 				)}
 			</div>
