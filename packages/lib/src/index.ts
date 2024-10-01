@@ -40,6 +40,7 @@ export {
 	type SchemasKeys,
 	AdministratorSchemas,
 	ProfessionalSchemas,
+	EventSchemas,
 } from "./schemas"
 
 export {

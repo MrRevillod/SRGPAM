@@ -39,6 +39,8 @@ const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), 
 	message: "La fecha de nacimiento ingresada no es válida",
 })
 
+const dateTimeSchema = z.string().datetime()
+
 export type SchemasKeys =
 	| keyof typeof SeniorSchemas
 	| keyof typeof AdministratorSchemas
@@ -89,6 +91,26 @@ export const AdministratorSchemas = {
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
 		}),
+}
+
+export const EventSchemas = {
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.string(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
+	Update: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.string(),
+		assistance: z.optional(z.boolean()),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
 }
 
 export const ProfessionalSchemas = AdministratorSchemas
