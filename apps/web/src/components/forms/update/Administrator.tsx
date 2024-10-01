@@ -1,17 +1,23 @@
 import React from "react"
 import Form from "../Form"
-import DatePicker from "../../ui/InputDate"
 
 import { Input } from "../../ui/Input"
 import { useForm } from "react-hook-form"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SeniorSchemas } from "../../../lib/schemas"
-import { Senior, UpdateEntityFormProps } from "../../../lib/types"
+import { AdministratorSchemas } from "../../../lib/schemas"
+import { Administrator, UpdateEntityFormProps } from "../../../lib/types"
 
-const UpdateSenior: React.FC<UpdateEntityFormProps<Senior>> = ({ visible, entity, onCancel, onOk, data, setData }) => {
+const UpdateAdministrator: React.FC<UpdateEntityFormProps<Administrator>> = ({
+	visible,
+	entity,
+	onCancel,
+	onOk,
+	data,
+	setData,
+}) => {
 	const formContext = useForm({
-		resolver: zodResolver(SeniorSchemas.Update),
+		resolver: zodResolver(AdministratorSchemas.Update),
 	})
 
 	const {
@@ -26,8 +32,6 @@ const UpdateSenior: React.FC<UpdateEntityFormProps<Senior>> = ({ visible, entity
 			reset({
 				name: entity.name,
 				email: entity.email,
-				address: entity.address,
-				birthDate: entity.birthDate,
 				password: "",
 				confirmPassword: "",
 			})
@@ -37,7 +41,7 @@ const UpdateSenior: React.FC<UpdateEntityFormProps<Senior>> = ({ visible, entity
 	return (
 		<Form
 			modalTitle={`Editar la información de ${entity?.name}`}
-			entityName="persona mayor"
+			entityName="administrador"
 			onOk={onOk}
 			data={data}
 			setData={setData}
@@ -64,22 +68,6 @@ const UpdateSenior: React.FC<UpdateEntityFormProps<Senior>> = ({ visible, entity
 				{...register("email")}
 			/>
 			<Input
-				label="Dirección"
-				type="text"
-				placeholder="Dirección"
-				error={errors.address ? errors.address.message?.toString() : ""}
-				defaultValue={entity?.address}
-				{...register("address")}
-			/>
-
-			<DatePicker
-				name="birthDate"
-				label="Fecha de nacimiento"
-				control={control}
-				error={errors.birthDate ? errors.birthDate.message?.toString() : ""}
-			/>
-
-			<Input
 				label="PIN"
 				type="password"
 				placeholder="••••"
@@ -99,4 +87,4 @@ const UpdateSenior: React.FC<UpdateEntityFormProps<Senior>> = ({ visible, entity
 	)
 }
 
-export default UpdateSenior
+export default UpdateAdministrator
