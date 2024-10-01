@@ -1,17 +1,12 @@
 import { prisma } from "@repo/database"
-import { bufferToBlob } from "../utils/files"
-import { Request, Response, NextFunction } from "express"
+import { fileToFormData } from "../utils/files"
 import { AppError, httpRequest } from "@repo/lib"
+import { Request, Response, NextFunction } from "express"
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const centers = await prisma.center.findMany({
-			select: {
-				id: true,
-				name: true,
-				address: true,
-				phone: true,
-			},
+			select: { id: true, name: true, address: true, phone: true },
 		})
 
 		return res.status(200).json({
@@ -32,13 +27,10 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const { name, address, phone } = req.body
 		const file = req.file as Express.Multer.File
 
-		if (!file) {
-			throw new AppError(400, "No se a enviado un archivo")
-		}
+		if (!file) throw new AppError(400, "No se ha enviado un archivo")
 
-		const centerExists = await prisma.center.findFirst({
-			where: { name },
-		})
+		const centerExists = await prisma.center.findFirst({ where: { name } })
+
 		if (centerExists) {
 			return res.status(409).json({
 				message: "Ya existe un centro de atención con este nombre",
@@ -48,26 +40,15 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		}
 
 		const center = await prisma.center.create({
-			data: {
-				name,
-				address,
-				phone,
-			},
+			data: { name, address, phone },
 		})
-
-		const renameFile = file
-		const extFile = file.originalname.split(".")[1]
-		renameFile.originalname = `${center.id}.${extFile}`
-		const formData = new FormData()
-
-		formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
 
 		const response = await httpRequest<null>({
 			service: "STORAGE",
 			endpoint: `/upload?path=%2Fcenters`,
 			method: "POST",
 			variant: "MULTIPART",
-			body: formData,
+			body: fileToFormData(file, center.id.toString()),
 		})
 
 		if (response.type == "error") {
@@ -94,34 +75,19 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 		const center = await prisma.center.update({
 			where: { id: Number(id) },
-			data: {
-				name,
-				address,
-				phone,
-			},
-			select: {
-				id: true,
-				name: true,
-				address: true,
-				phone: true,
-			},
+			data: { name, address, phone },
+			select: { id: true, name: true, address: true, phone: true },
 		})
 
 		if (req.file) {
-			const file = req.file
-			const renameFile = file
-			const extFile = file.originalname.split(".")[1]
-			renameFile.originalname = `${center.id}.${extFile}`
-			const formData = new FormData()
-
-			formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
 			const response = await httpRequest<null>({
 				service: "STORAGE",
 				endpoint: `/upload?path=%2Fcenters`,
 				method: "POST",
 				variant: "MULTIPART",
-				body: formData,
+				body: fileToFormData(req.file, center.id.toString()),
 			})
+
 			if (response.type == "error") {
 				await prisma.center.delete({ where: { id: center.id } })
 				throw new AppError(response.status ?? 500, response.message)
@@ -157,12 +123,12 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 
 		const response = await httpRequest<null>({
 			service: "STORAGE",
-			endpoint: `/delete?path=%2Fcenters%2F${center.id}`,
+			endpoint: `/delete?path=%2Fcenters%2F${center.id}.webp`,
 			method: "DELETE",
 			variant: "JSON",
 			body: {},
 		})
-		console.log(response)
+
 		if (response.type == "error") {
 			throw new AppError(response.status ?? 500, response.message)
 		}

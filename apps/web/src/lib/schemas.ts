@@ -57,11 +57,19 @@ const passwordSchema = z
 
 const optionalPasswordSchema = z
 	.string()
-	.min(0)
-	.regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
-	.regex(/[a-z]/, "La contraseña debe contener al menos una letra minúscula")
-	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
-	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
+	.refine(
+		(value) =>
+			value === "" ||
+			(value.length >= 8 &&
+				/[A-Z]/.test(value) &&
+				/[a-z]/.test(value) &&
+				/[0-9]/.test(value) &&
+				/[\W_]/.test(value)),
+		{
+			message:
+				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial, o ser vacía",
+		},
+	)
 
 const nameSchema = z
 	.string()
@@ -141,7 +149,7 @@ const nameServiceSchema = z
 	.max(50, "El nombre no debe tener más de 50 caracteres")
 	.regex(
 		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()"
+		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()",
 	)
 
 const titleServiceSchema = z
@@ -150,7 +158,7 @@ const titleServiceSchema = z
 	.max(50, "El título no debe tener más de 50 caracteres")
 	.regex(
 		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()"
+		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()",
 	)
 
 const nameCenterSchema = z
@@ -173,7 +181,7 @@ const imageSchemaCreate = z
 	.refine((files) => files?.[0]?.size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
 	.refine(
 		(files) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files?.[0]?.type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP"
+		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP",
 	)
 const imageSchemaUpdate = z
 	.any()
@@ -182,7 +190,7 @@ const imageSchemaUpdate = z
 	.refine((files) => !files || files?.[0]?.size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
 	.refine(
 		(files) => !files || ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files?.[0]?.type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP"
+		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP",
 	)
 export const ServiceSchemas = {
 	Create: z.object({

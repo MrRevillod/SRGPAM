@@ -58,7 +58,7 @@ const SeniorsPage: React.FC = () => {
 	}
 
 	return (
-		<PageLayout pageTitle="Adultos mayores" addFunction={() => showModal("Create", null)} setData={() => {}}>
+		<PageLayout pageTitle="Personas mayores" addFunction={() => showModal("Create", null)} setData={() => {}}>
 			<Fragment>
 				<DataTable<Senior>
 					data={data}
@@ -84,7 +84,7 @@ const SeniorsPage: React.FC = () => {
 				<ConfirmDelete
 					executeAction={(element) => handleDelete(element)}
 					modalType={modalType}
-					text="Adulto mayor"
+					text="Persona mayor"
 					visible={isModalOpen && modalType === "Delete"}
 					onCancel={handleCancel}
 					onOk={handleOk}

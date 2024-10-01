@@ -19,6 +19,7 @@ const LoginPage: React.FC = () => {
 
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
 		await login(formData)
+		return
 	}
 
 	return (
@@ -36,7 +37,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Correo electrónico"
 							type="email"
-							defaultValue={"jhuels@admins.com"}
+							defaultValue={"ccormier-kihn@admins.com"}
 							{...register("email")}
 							placeholder="example@gmail.com"
 							error={errors.email ? errors.email.message?.toString() : ""}

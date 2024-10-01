@@ -1,6 +1,5 @@
 import React from "react"
 import { api } from "../lib/axios"
-import { ApiResponse } from "../lib/types"
 import { createContext, useState, useEffect, ReactNode } from "react"
 
 interface User {
@@ -41,11 +40,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setIsAuthenticated(true)
 			setError(null)
 		} catch (error: any) {
-			console.log(error)
 			setError(error.response.data.message)
 		}
 
 		setLoading(false)
+
+		return
 	}
 
 	const logout = async () => {

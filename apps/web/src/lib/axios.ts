@@ -18,13 +18,20 @@ api.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config
-		const excludeUrls = ["/auth/login", "/auth/refresh"]
 
 		// 2. Si la respuesta es un 401 (No autorizado) y no es una petición de refresco o login
 		//    principalmalmente debido a que si el refresh falla no se debe intentar de nuevo
 		//    y si el login falla no se debe intentar de nuevo
 
-		if (error.response?.status === 401 && !originalRequest._retry && !excludeUrls.includes(originalRequest.url)) {
+		const isUnauthorized = error.response?.status === 401
+		const isRefresheable =
+			!originalRequest._retry &&
+			!originalRequest.url.includes("/auth/refresh") &&
+			!originalRequest.url.includes("/auth/login") &&
+			!originalRequest.url.includes("/auth/validate-auth") &&
+			!window.location.pathname.includes("/auth/login")
+
+		if (isUnauthorized && isRefresheable) {
 			originalRequest._retry = true
 
 			// 3. Intentamos refrescar el token de acceso haciendo una petición
@@ -44,5 +51,5 @@ api.interceptors.response.use(
 		}
 
 		return Promise.reject(error)
-	}
+	},
 )

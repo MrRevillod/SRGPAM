@@ -50,7 +50,7 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 		<Modal open={visible} onCancel={onCancel} footer={[]}>
 			<div className="mt-12 flex flex-col gap-8 justify-center items-center">
 				<h2 className="text-lg font-light text-center">
-					{`¿Estás seguro de eliminar la información de este ${text}? Esta acción no se puede deshacer.`}
+					{`¿Estás seguro de eliminar la información de este/esta ${text}? Esta acción no se puede deshacer.`}
 				</h2>
 				<div className="flex flex-row gap-4 w-full justify-center">
 					<button

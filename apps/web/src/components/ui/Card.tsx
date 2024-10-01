@@ -27,7 +27,7 @@ const Card: React.FC<Props> = ({ title, description, imageSrc, other, onUpdate, 
 							placement="bottom"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex flex-col justify-between gap-1 cursor-pointer">
+								<div className="flex flex-col justify-between gap-1 cursor-pointer p-4">
 									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>
 									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>
 									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>

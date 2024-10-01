@@ -31,11 +31,11 @@ const NewSeniorsPage: React.FC = () => {
 	}, [])
 
 	const handleView = (senior: UnvalidatedSenior) => {
-		navigate(`/dashboard/ver-seniors`, { state: { senior } })
+		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, { state: { senior } })
 	}
 
 	return (
-		<PageLayout pageTitle="Solicitudes de registro nuevos adultos mayores">
+		<PageLayout pageTitle="Solicitudes de registro de personas mayores">
 			<DataTable<UnvalidatedSenior> data={data} onView={handleView} columnsConfig={UnvalidatedSeniorsColumns} />
 		</PageLayout>
 	)

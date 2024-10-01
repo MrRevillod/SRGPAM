@@ -36,7 +36,6 @@ router.post("/upload", upload.array("files"), async (req, res, next) => {
 			const filename = file.originalname.split(".")[0]
 			const filePath = path.join(storagePath, `${filename}.webp`)
 			await sharp(file.buffer).webp({ quality: 80 }).toFile(filePath)
-			console.log(`File ${file.originalname} uploaded`)
 		})
 
 		await Promise.all(uploadPromises)
@@ -49,12 +48,9 @@ router.post("/upload", upload.array("files"), async (req, res, next) => {
 router.delete("/delete", async (req, res, next) => {
 	const query: Query = req.query as Query
 
-	console.log(query)
-
 	try {
 		if (!query.path) throw new AppError(400, "Path is required")
 		const storagePath = path.join(__dirname, `../public/${query.path}`)
-		console.log(storagePath)
 		if (fs.existsSync(storagePath)) {
 			fs.rmSync(storagePath, { recursive: true })
 		}

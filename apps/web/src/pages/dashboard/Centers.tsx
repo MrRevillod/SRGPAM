@@ -23,7 +23,6 @@ const CentersPage: React.FC = () => {
 			const response = await api.get("/dashboard/centers/")
 			setData(response.data.values.centers)
 		} catch (err) {
-			console.log(err)
 			console.error("Error al obtener los datos de seniors")
 		} finally {
 			setLoading(false)

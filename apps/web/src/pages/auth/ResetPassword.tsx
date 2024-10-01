@@ -59,7 +59,7 @@ const ResetPasswordPage: React.FC = () => {
 							options={[
 								{ value: "ADMIN", label: "Administrador" },
 								{ value: "PROFESSIONAL", label: "Profesional" },
-								{ value: "SENIOR", label: "Adulto Mayor" },
+								{ value: "SENIOR", label: "Persona Mayor" },
 							]}
 							defaultValue="SENIOR"
 							error={errors.role ? errors.role.message?.toString() : ""}
