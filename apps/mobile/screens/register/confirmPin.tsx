@@ -7,9 +7,14 @@ import { commonProps } from "@/utils/types"
 
 const ConfirmPin = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (
-		<GeneralView title="Datos del Registro" textCircle="4/7" textTitle="Vuelve a ingresar tu Pin.">
+		<GeneralView
+			title="Datos del Registro"
+			textCircle="4/7"
+			textTitle="Vuelva a ingresar su Pin."
+			textDescription="Antes de confirmar su pin, asegúrese de que le sea fácil de recordar."
+		>
 			<View style={styles.container}>
-				<Input name="pinConfirm" placeholder="Confirma tu PIN" control={control} errors={errors} secureTextEntry />
+				<Input name="pinConfirm" placeholder="Confirme su Pin" control={control} errors={errors} secureTextEntry />
 				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("pinConfirm", navigation, "DNI")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}

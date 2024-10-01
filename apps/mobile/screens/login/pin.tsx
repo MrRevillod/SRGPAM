@@ -20,22 +20,18 @@ const Pin = ({ navigation, control, errors, setValue, handleSubmit, rutSenior }:
 	const onSubmit = async (data: any) => {
 		try {
 			const response = await axios.post(`${SERVER_URL}/api/auth/login-senior`, data)
-			if (response.status !== 200) {
-				throw new Error("Error en la solicitud")
-			}
 			const { message, values } = response.data
-			Alert.alert(message)
 			const { accessToken, refreshToken, publicUser } = values
 			storeTokens(accessToken, refreshToken)
 			storeUser(publicUser)
-		} catch (error) {
-			console.error(error)
-			Alert.alert("Error", "Hubo un problema al enviar los datos. Intenta nuevamente.")
+			Alert.alert("Éxito", message)
+		} catch (error: any) {
+			error.response.data.message && Alert.alert("Error", error.response.data.message)
 		}
 	}
 
 	return (
-		<GeneralView title="Datos del Registro" textCircle="2/2" textTitle="Ingresa tu Pin de 4 dígitos.">
+		<GeneralView title="Datos del Registro" textCircle="2/2" textTitle="Ingrese su Pin de 4 dígitos">
 			<View style={styles.container}>
 				<Input name="password" placeholder="Ingresa tu pin" control={control} errors={errors} secureTextEntry />
 				<CustomButton title="Siguiente" onPress={handleSubmit(onSubmit)} />

@@ -16,8 +16,8 @@ const Final = ({ navigation }: commonProps) => {
 			<CustomButton
 				style={{ backgroundColor: Colors.white }}
 				textStyle={styles.customButtonText}
-				title="Volver"
-				onPress={() => navigation.goBack()}
+				title="Volver al Inicio"
+				onPress={() => navigation.navigate("Menu")}
 			/>
 		</GeneralView>
 	)
