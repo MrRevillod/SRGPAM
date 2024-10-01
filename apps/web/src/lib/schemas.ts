@@ -55,6 +55,14 @@ const passwordSchema = z
 	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
 	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
 
+const optionalPasswordSchema = z
+	.string()
+	.min(0)
+	.regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
+	.regex(/[a-z]/, "La contraseña debe contener al menos una letra minúscula")
+	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
+	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
+
 const nameSchema = z
 	.string()
 	.min(2, "El nombre debe tener al menos 2 caracteres")
@@ -119,8 +127,8 @@ export const AdministratorSchemas = {
 		.object({
 			name: nameSchema,
 			email: emailSchema,
-			password: passwordSchema,
-			confirmPassword: passwordSchema,
+			password: optionalPasswordSchema,
+			confirmPassword: optionalPasswordSchema,
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
