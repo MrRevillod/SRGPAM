@@ -16,7 +16,7 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
 			throw new AppError(400, "Se requiere un correo electrónico")
 		}
 
-		const user = await findUser(email, userRole)
+		const user = await findUser({ email }, userRole)
 
 		if (!user) throw new AppError(404, "El usuario no existe.")
 

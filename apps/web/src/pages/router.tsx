@@ -14,6 +14,7 @@ import ProfessionalsPage from "./dashboard/Professionals"
 
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
+import ResetPasswordPage from "./auth/ResetPassword"
 
 interface RouteProps {
 	condition: boolean
@@ -44,6 +45,8 @@ const Router: React.FC = () => {
 			>
 				<Route path="" element={<LoginPage />} />
 			</Route>
+
+			<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
 				<Route path="/profile" element={<ProfilePage />} />

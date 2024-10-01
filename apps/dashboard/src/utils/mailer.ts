@@ -1,22 +1,18 @@
-// Utilizar o nodemailer para enviar e-mails
-// import nodemailer from "nodemailer"
-// recomiendo crear una función que envíe el correo y tipar sus argumentos
-
 import nodemailer from "nodemailer"
+import { constants } from "@repo/lib"
 
-const { MAIL_USERNAME, MAIL_PASSWORD, OAUTH_CLIENTID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN } = process.env
-
+const { PROJECT_EMAIL_ADDRESS, PROJECT_EMAIL_PASSWORD, PROJECT_EMAIL_HOST } = constants
 const transporter = nodemailer.createTransport({
-	service: "gmail",
+	service: PROJECT_EMAIL_HOST,
 	auth: {
-		user: MAIL_USERNAME,
-		pass: MAIL_PASSWORD,
+		user: PROJECT_EMAIL_ADDRESS,
+		pass: PROJECT_EMAIL_PASSWORD,
 	},
 })
 
 const sendMail = async (to: string, subject: string, text: string) => {
 	const mailOptions = {
-		from: MAIL_USERNAME,
+		from: PROJECT_EMAIL_ADDRESS,
 		to,
 		subject,
 		text,
