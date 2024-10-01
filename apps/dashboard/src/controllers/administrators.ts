@@ -1,7 +1,7 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { Administrator, Prisma } from "@prisma/client"
 import { constants } from "@repo/lib"
+import { Administrator, Prisma } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
 
 // Controlador para obtener todos los administradores de la base de datos
@@ -9,12 +9,7 @@ import { Request, Response, NextFunction } from "express"
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const administrators = await prisma.administrator.findMany({
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: false,
-			},
+			select: { id: true, name: true, email: true, password: false, createdAt: true, updatedAt: true },
 		})
 
 		return res.status(200).json({
@@ -43,6 +38,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		}
 
 		const userExists = await prisma.administrator.findFirst({ where: filter })
+
 		if (userExists) {
 			const conflicts = []
 
@@ -61,23 +57,18 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(409).json({
 				message: "El administrador ya existe",
 				type: "error",
-				values: conflicts,
+				values: { conflicts },
 			})
 		}
 
-		await prisma.administrator.create({
-			data: {
-				id,
-				name,
-				email,
-				password: defaulAdminPassword,
-			},
+		const { password, ...administrator } = await prisma.administrator.create({
+			data: { id, name, email, password: defaulAdminPassword },
 		})
 
 		return res.status(200).json({
 			message: "Creación exitosa",
 			type: "success",
-			values: null,
+			values: administrator,
 		})
 	} catch (error) {
 		next(error)
@@ -93,24 +84,14 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 		const user = await prisma.administrator.update({
 			where: { id: req.params.id },
-			data: {
-				name,
-				email,
-				password: password ? await hash(password, 10) : reqUser.password,
-			},
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				createdAt: true,
-				updatedAt: true,
-			},
+			data: { name, email, password: password ? await hash(password, 10) : reqUser.password },
+			select: { id: true, name: true, email: true, createdAt: true, updatedAt: true },
 		})
 
 		return res.status(200).json({
 			message: "Actualización exitosa",
 			type: "success",
-			values: { user },
+			values: user,
 		})
 	} catch (error) {
 		next(error)

@@ -26,6 +26,11 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 	const handleConfirm = async () => {
 		try {
 			const response = await executeAction(selectedElement)
+
+			if (!response || response?.data.type === "error") {
+				throw new Error("Error al eliminar el registro")
+			}
+
 			const deletedId = response?.data.values.deletedId
 
 			if (data && setData) {
@@ -35,7 +40,9 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 			message.success("Hecho")
 			onOk()
 		} catch (error) {
+			console.error("Error en el delete:", error)
 			message.error("Error al eliminar el registro")
+			onCancel()
 		}
 	}
 
@@ -43,7 +50,7 @@ const ConfirmDelete: React.FC<ConfirmActionProps> = ({
 		<Modal open={visible} onCancel={onCancel} footer={[]}>
 			<div className="mt-12 flex flex-col gap-8 justify-center items-center">
 				<h2 className="text-lg font-light text-center">
-					{`¿Estás seguro de eliminar la información de este ${text}? Esta acción no se puede deshacer.`}
+					{`¿Estás seguro de eliminar la información de este/esta ${text}? Esta acción no se puede deshacer.`}
 				</h2>
 				<div className="flex flex-row gap-4 w-full justify-center">
 					<button

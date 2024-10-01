@@ -38,9 +38,8 @@
 			"dependsOn": [
 				"^clean",
 				"^install",
-				"^build",
 				"^generate",
-				"^db:seed"
+				"^build"
 			],
 			"cache": false,
 			"persistent": true

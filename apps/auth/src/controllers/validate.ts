@@ -24,10 +24,11 @@ export const refreshController = async (req: Request, res: Response, next: NextF
 		// Si no hay un token de refresco, lanzamos un error
 
 		const tokens = getServerTokens(req.headers, req.cookies)
+
 		if (!tokens?.refresh) throw new AppError(401, "No autorizado")
 
 		const payload = verifyJsonwebtoken(tokens.refresh, RefreshTokenOpts)
-		const newAccessToken = signJsonwebtoken({ id: payload.id, role: payload.id }, AccessTokenOpts)
+		const newAccessToken = signJsonwebtoken({ id: payload.id, role: payload.role }, AccessTokenOpts)
 
 		const expireDate = new Date()
 		expireDate.setTime(expireDate.getTime() + 15 * 60 * 1000)
@@ -39,8 +40,6 @@ export const refreshController = async (req: Request, res: Response, next: NextF
 			expires: expireDate,
 			httpOnly: true,
 			path: "/",
-			sameSite: "none",
-			domain: "localhost",
 		})
 
 		return res.status(200).json({

@@ -1,6 +1,7 @@
 import { constants } from "../config"
 import { IncomingHttpHeaders } from "http"
 import { JwtPayload, sign, verify, JsonWebTokenError } from "jsonwebtoken"
+import { log } from ".."
 
 const { JWT_SECRET } = constants
 
@@ -48,25 +49,20 @@ export type ServerTokens = {
 }
 
 export const getServerTokens = (headers: IncomingHttpHeaders, cookies: any) => {
-	const tokens = { access: null, refresh: null } as ServerTokens
+	let ACCESS_TOKEN = cookies["ACCESS_TOKEN"]
+	let REFRESH_TOKEN = cookies["REFRESH_TOKEN"]
 
-	if (
-		cookies &&
-		(cookies["ACCESS_TOKEN"] !== undefined || cookies["REFRESH_TOKEN"] !== undefined)
-	) {
-		tokens.access = cookies["ACCESS_TOKEN"] || null
-		tokens.refresh = cookies["REFRESH_TOKEN"] || null
-		return tokens
+	if (!ACCESS_TOKEN && !REFRESH_TOKEN && headers.authorization) {
+		const [bearer, tokens] = headers.authorization.split(" ")
+
+		if (bearer !== "Bearer") throw new JsonWebTokenError("Invalid token")
+		const [access, refresh] = tokens.split(",")
+
+		if (!access && !refresh) throw new JsonWebTokenError("Invalid token")
+
+		ACCESS_TOKEN = access
+		REFRESH_TOKEN = refresh
 	}
 
-	if (headers.authorization && headers.authorization.startsWith("Bearer ")) {
-		const tokensString = headers.authorization.split("Bearer ")[1]
-		const [accessToken, refreshToken] = tokensString.split(",").map((token) => token.trim())
-
-		tokens.access = accessToken || null
-		tokens.refresh = refreshToken || null
-		return tokens
-	}
-
-	return null
+	return { access: ACCESS_TOKEN, refresh: REFRESH_TOKEN }
 }

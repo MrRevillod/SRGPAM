@@ -5,9 +5,9 @@ import { SeniorsColumns } from "../../lib/columns"
 
 import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
-import CreateSeniors from "../../components/forms/Create-Seniors"
+import CreateSenior from "../../components/forms/create/Senior"
+import UpdateSenior from "../../components/forms/update/Senior"
 import ConfirmDelete from "../../components/ConfirmDelete"
-import EditPersonModal from "../../components/forms/Edit-Seniors"
 
 const SeniorsPage: React.FC = () => {
 	const [modalType, setModalType] = useState("")
@@ -58,7 +58,7 @@ const SeniorsPage: React.FC = () => {
 	}
 
 	return (
-		<PageLayout pageTitle="Adultos mayores" addFunction={() => showModal("Create", null)} setData={() => {}}>
+		<PageLayout pageTitle="Personas mayores" addFunction={() => showModal("Create", null)} setData={() => {}}>
 			<Fragment>
 				<DataTable<Senior>
 					data={data}
@@ -66,16 +66,15 @@ const SeniorsPage: React.FC = () => {
 					onEdit={(person) => showModal("Edit", person)}
 					onDelete={(person) => showModal("Delete", person)}
 				/>
-				<EditPersonModal
+				<UpdateSenior
 					visible={isModalOpen && modalType === "Edit"}
-					person={selectedPerson}
-					modalType={modalType}
+					entity={selectedPerson}
 					onCancel={handleCancel}
 					onOk={handleOk}
 					data={data}
 					setData={setData}
 				/>
-				<CreateSeniors
+				<CreateSenior
 					visible={isModalOpen && modalType === "Create"}
 					onCancel={handleCancel}
 					onOk={handleOk}
@@ -85,7 +84,7 @@ const SeniorsPage: React.FC = () => {
 				<ConfirmDelete
 					executeAction={(element) => handleDelete(element)}
 					modalType={modalType}
-					text="Adulto mayor"
+					text="Persona mayor"
 					visible={isModalOpen && modalType === "Delete"}
 					onCancel={handleCancel}
 					onOk={handleOk}

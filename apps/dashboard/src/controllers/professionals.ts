@@ -1,20 +1,15 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
-import { constants, findUser } from "@repo/lib"
-import { Request, Response, NextFunction } from "express"
+import { constants } from "@repo/lib"
 import { Prisma, Professional } from "@prisma/client"
+import { Request, Response, NextFunction } from "express"
 
 // Controlador para obtener todos los profesionales de la base de datos
 // se excluye el campo password de la respuesta
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const professionals = await prisma.professional.findMany({
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: false,
-			},
+			select: { id: true, name: true, email: true, password: false, serviceId: true, updatedAt: true, createdAt: true },
 		})
 
 		return res.status(200).json({
@@ -57,23 +52,18 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(409).json({
 				message: "El profesional ya existe",
 				type: "error",
-				values: conflicts,
+				values: { conflicts },
 			})
 		}
 
-		await prisma.administrator.create({
-			data: {
-				id,
-				name,
-				email,
-				password: defaulAdminPassword,
-			},
+		const { password, ...professional } = await prisma.administrator.create({
+			data: { id, name, email, password: defaulAdminPassword },
 		})
 
 		return res.status(200).json({
 			message: "Creación exitosa",
 			type: "success",
-			values: null,
+			values: professional,
 		})
 	} catch (error) {
 		next(error)
@@ -89,16 +79,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 		const user = await prisma.professional.update({
 			where: { id: req.params.id },
-			data: {
-				name,
-				email,
-				password: password ? await hash(password, 10) : reqUser.password,
-			},
-			select: {
-				id: true,
-				name: true,
-				email: true,
-			},
+			data: { name, email, password: password ? await hash(password, 10) : reqUser.password },
+			select: { id: true, name: true, email: true },
 		})
 
 		return res.status(200).json({

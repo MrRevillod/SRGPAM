@@ -3,8 +3,16 @@ import Input from "@/components/input"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
+import { checkUniqueField } from "@/utils/request"
 
-const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
+const RUT = ({ navigation, control, errors, getValues, setError, trigger }: commonProps) => {
+	const onSubmit = async () => {
+		const request = await checkUniqueField("rut", getValues, trigger, setError)
+		if (request) {
+			navigation.navigate("Email")
+		}
+	}
+
 	return (
 		<GeneralView
 			title="Datos del Registro"
@@ -14,7 +22,7 @@ const RUT = ({ navigation, control, errors, validateAndNavigate }: commonProps) 
 		>
 			<View style={styles.container}>
 				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} />
-				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("rut", navigation, "Email")} />
+				<CustomButton title="Siguiente" onPress={onSubmit} />
 			</View>
 		</GeneralView>
 	)
