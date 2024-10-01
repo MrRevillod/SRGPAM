@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
 import { Request, Response, NextFunction } from "express"
-import { AppError } from "@repo/lib"
+import { AppError, httpRequest, services } from "@repo/lib"
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -30,7 +30,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, title, description } = req.body
-		const file = req.file as Express.Multer.File
+		const file = req.file
+
+		if (!file) {
+			throw new AppError(400, "No se a enviado un archivo")
+		}
 
 		const serviceExists = await prisma.service.findFirst({
 			where: { name },
@@ -44,23 +48,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 		}
 
-		const formData = new FormData()
-		const image = bufferToBlob(file.buffer, file.mimetype)
-		formData.append("image", image, file.originalname)
-		console.log(formData)
-
-		/* 	const response = await httpRequest<null>({
-			service: "STORAGE",
-			endpoint: `/services/${req.body.id}`,
-			method: "POST",
-			variant: "MULTIPART",
-			body: formData,
-		})
-
-		if (response.type == "error") {
-			throw new AppError(response.status ?? 500, response.message)
-		} */
-
 		const service = await prisma.service.create({
 			data: {
 				name,
@@ -68,6 +55,25 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				description,
 			},
 		})
+
+		const renameFile = file
+		const extFile = file.originalname.split(".")[1]
+		renameFile.originalname = `${service.id}.${extFile}`
+		const formData = new FormData()
+
+		formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/upload?path=%2Fservices`,
+			method: "POST",
+			variant: "MULTIPART",
+			body: formData,
+		})
+
+		if (response.type == "error") {
+			await prisma.service.delete({ where: { id: service.id } })
+			throw new AppError(response.status ?? 500, response.message)
+		}
 
 		return res.status(201).json({
 			message: "Servicio creado correctamente",
@@ -86,7 +92,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		const { id } = req.params
 		const { name, title, description } = req.body
 
-		const updatedService = await prisma.service.update({
+		const service = await prisma.service.update({
 			where: { id: Number(id) },
 			data: {
 				name,
@@ -101,10 +107,31 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			},
 		})
 
+		if (req.file) {
+			const file = req.file
+			const renameFile = file
+			const extFile = file.originalname.split(".")[1]
+			renameFile.originalname = `${service.id}.${extFile}`
+			const formData = new FormData()
+
+			formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
+			const response = await httpRequest<null>({
+				service: "STORAGE",
+				endpoint: `/upload?path=%2Fservices`,
+				method: "POST",
+				variant: "MULTIPART",
+				body: formData,
+			})
+			if (response.type == "error") {
+				await prisma.service.delete({ where: { id: service.id } })
+				throw new AppError(response.status ?? 500, response.message)
+			}
+		}
+
 		return res.status(200).json({
 			message: "Servicio actualizado exitosamente",
 			type: "success",
-			values: { updatedService },
+			values: service,
 		})
 	} catch (error) {
 		next(error)
@@ -115,11 +142,11 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 	try {
 		const id = Number(req.params.id)
 
-		const center = await prisma.service.findUnique({
+		const service = await prisma.service.findUnique({
 			where: { id },
 		})
 
-		if (!center) throw new AppError(400, "El centro no existe")
+		if (!service) throw new AppError(400, "El centro no existe")
 
 		await prisma.professional.updateMany({
 			where: { serviceId: id },
@@ -127,6 +154,18 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		})
 
 		await prisma.service.delete({ where: { id } })
+
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/delete?path=%2Fservices%2F${service.id}`,
+			method: "DELETE",
+			variant: "JSON",
+			body: {},
+		})
+		console.log(response)
+		if (response.type == "error") {
+			throw new AppError(response.status ?? 500, response.message)
+		}
 
 		return res.status(200).json({
 			message: "Eliminación exitosa",

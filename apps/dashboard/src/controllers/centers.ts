@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database"
 import { bufferToBlob } from "../utils/files"
 import { Request, Response, NextFunction } from "express"
-import { AppError } from "@repo/lib"
+import { AppError, httpRequest } from "@repo/lib"
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -32,10 +32,13 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const { name, address, phone } = req.body
 		const file = req.file as Express.Multer.File
 
+		if (!file) {
+			throw new AppError(400, "No se a enviado un archivo")
+		}
+
 		const centerExists = await prisma.center.findFirst({
 			where: { name },
 		})
-
 		if (centerExists) {
 			return res.status(409).json({
 				message: "Ya existe un centro de atención con este nombre",
@@ -44,9 +47,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 		}
 
-		const formData = new FormData()
-		formData.append("image", bufferToBlob(file.buffer, file.mimetype), file.originalname)
-
 		const center = await prisma.center.create({
 			data: {
 				name,
@@ -54,6 +54,26 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				phone,
 			},
 		})
+
+		const renameFile = file
+		const extFile = file.originalname.split(".")[1]
+		renameFile.originalname = `${center.id}.${extFile}`
+		const formData = new FormData()
+
+		formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
+
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/upload?path=%2Fcenters`,
+			method: "POST",
+			variant: "MULTIPART",
+			body: formData,
+		})
+
+		if (response.type == "error") {
+			await prisma.center.delete({ where: { id: center.id } })
+			throw new AppError(response.status ?? 500, response.message)
+		}
 
 		return res.status(201).json({
 			message: "Centro creado correctamente",
@@ -72,7 +92,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		const { id } = req.params
 		const { name, address, phone } = req.body
 
-		const updatedCenter = await prisma.center.update({
+		const center = await prisma.center.update({
 			where: { id: Number(id) },
 			data: {
 				name,
@@ -87,10 +107,31 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			},
 		})
 
+		if (req.file) {
+			const file = req.file
+			const renameFile = file
+			const extFile = file.originalname.split(".")[1]
+			renameFile.originalname = `${center.id}.${extFile}`
+			const formData = new FormData()
+
+			formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
+			const response = await httpRequest<null>({
+				service: "STORAGE",
+				endpoint: `/upload?path=%2Fcenters`,
+				method: "POST",
+				variant: "MULTIPART",
+				body: formData,
+			})
+			if (response.type == "error") {
+				await prisma.center.delete({ where: { id: center.id } })
+				throw new AppError(response.status ?? 500, response.message)
+			}
+		}
+
 		return res.status(200).json({
 			message: "Centro actualizado exitosamente",
 			type: "success",
-			values: updatedCenter,
+			values: center,
 		})
 	} catch (error) {
 		next(error)
@@ -113,6 +154,18 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		})
 
 		await prisma.center.delete({ where: { id } })
+
+		const response = await httpRequest<null>({
+			service: "STORAGE",
+			endpoint: `/delete?path=%2Fcenters%2F${center.id}`,
+			method: "DELETE",
+			variant: "JSON",
+			body: {},
+		})
+		console.log(response)
+		if (response.type == "error") {
+			throw new AppError(response.status ?? 500, response.message)
+		}
 
 		return res.status(200).json({
 			message: "Eliminación exitosa",

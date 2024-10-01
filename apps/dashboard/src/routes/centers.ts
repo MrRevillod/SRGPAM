@@ -12,7 +12,7 @@ const router: Router = Router()
 router.get("/", validateRole("ADMIN"), center.getAll)
 router.post("/", validateRole("ADMIN"), singleImageupload, validateSchema(Create), center.create)
 
-router.patch("/:id", validateRole("ADMIN"), validateSchema(Update), center.updateById)
+router.patch("/:id", validateRole("ADMIN"), singleImageupload, validateSchema(Update), center.updateById)
 router.delete("/:id", validateRole("ADMIN"), center.deleteById)
 
 export default router
