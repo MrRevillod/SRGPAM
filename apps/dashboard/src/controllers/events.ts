@@ -97,7 +97,14 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			select: eventSelect,
 		})
 
-		if (canAddEvent(events, { startsAt, endsAt })) {
+        
+        
+
+
+        if (canAddEvent(events, {
+            startsAt: new Date(startsAt),
+            endsAt: new Date(endsAt)
+        })) {
 			await prisma.event.create({
 				data: {
 					startsAt,

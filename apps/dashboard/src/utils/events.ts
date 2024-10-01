@@ -4,6 +4,7 @@ export const canAddEvent = (events: Event[], newEvent: { startsAt: Date; endsAt:
 	// Ordenar los eventos por la fecha de inicio
 	events.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
 
+
 	// Revisar si el nuevo evento se superpone con los eventos existentes
 	for (let i = 0; i < events.length; i++) {
 		const event = events[i]
