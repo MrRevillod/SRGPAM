@@ -5,6 +5,7 @@ import express from "express"
 import cookieParser from "cookie-parser"
 
 import centerRouter from "./routes/centers"
+import mailerRouter from "./routes/mailer"
 import serviceRouter from "./routes/services"
 import seniorsRouter from "./routes/seniors"
 import professionalsRouter from "./routes/professionals"
@@ -26,8 +27,10 @@ export const createServer = (): express.Express => {
 	app.use("/api/dashboard/centers", centerRouter)
 	app.use("/api/dashboard/seniors", seniorsRouter)
 	app.use("/api/dashboard/services", serviceRouter)
+	app.use("/api/dashboard/mailer", mailerRouter)
 	app.use("/api/dashboard/professionals", professionalsRouter)
 	app.use("/api/dashboard/administrators", administrarorsRouter)
+
 	app.use(errorHandler)
 
 	return app
