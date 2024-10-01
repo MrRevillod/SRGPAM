@@ -20,7 +20,6 @@ const GeneralView = ({ title, children, textCircle, textTitle, textDescription }
 			enabled={true}
 		>
 			<View style={styles.greenContainer}>
-				<GoBackButton></GoBackButton>
 				<Text style={styles.title}>{title} </Text>
 			</View>
 			<View style={styles.whiteContainer}>

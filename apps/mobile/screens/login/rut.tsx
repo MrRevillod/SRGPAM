@@ -9,7 +9,7 @@ const RUT = ({ navigation, control, errors }: commonProps) => {
 		<GeneralView
 			title="Datos del Registro"
 			textCircle="1/2"
-			textTitle="Ingresa tu RUT"
+			textTitle="Ingrese su RUT"
 			textDescription="Su RUT debe ingresarse sin puntos ni guión."
 		>
 			<View style={styles.container}>

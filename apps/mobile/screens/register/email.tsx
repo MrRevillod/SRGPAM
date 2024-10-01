@@ -17,8 +17,8 @@ const Email = ({ navigation, control, errors, getValues, trigger, setError }: co
 		<GeneralView
 			title="Datos del Registro"
 			textCircle="2/7"
-			textTitle="¿Deseas Ingresar Email?"
-			textDescription="Este campo es opcional por lo que usted decide si ingresarlo."
+			textTitle="Ingrese su Correo Electrónico"
+			textDescription="Debe ingresar un correo real y al que usted tenga acceso."
 		>
 			<View style={styles.container}>
 				<Input name="email" placeholder="TuCorreo@gmail.com" control={control} errors={errors} />

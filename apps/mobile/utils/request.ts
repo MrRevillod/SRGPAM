@@ -37,6 +37,7 @@ export const makeAuthenticatedRequest = async (
 
 export const checkUniqueField = async (field: string, getValues: any, trigger: any, setError: any): Promise<boolean | undefined> => {
 	try {
+		console.log(field)
 		const fieldValue = getValues(field)
 		const isValid = await trigger(field)
 		if (isValid) {
@@ -48,13 +49,13 @@ export const checkUniqueField = async (field: string, getValues: any, trigger: a
 	} catch (error: any) {
 		if (error.response && error.response.status === 409) {
 			const values = error.response.data.values
-			if (values.hasOwnProperty(field)) {
+			if (field === "rut") {
 				setError(field, {
 					type: "manual",
 					message: values.rut,
 				})
 			}
-			if (values.hasOwnProperty(field)) {
+			if (field === "email") {
 				setError(field, {
 					type: "manual",
 					message: values.email,

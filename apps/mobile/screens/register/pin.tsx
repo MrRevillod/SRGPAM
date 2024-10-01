@@ -7,9 +7,14 @@ import { commonProps } from "@/utils/types"
 
 const Pin = ({ navigation, control, errors, validateAndNavigate }: commonProps) => {
 	return (
-		<GeneralView title="Datos del Registro" textCircle="3/7" textTitle="Ingresa tu Pin de 4 dígitos.">
+		<GeneralView
+			title="Datos del Registro"
+			textCircle="3/7"
+			textTitle="Ingrese su Pin de 4 dígitos."
+			textDescription="Su pin no debe repetir números, ni usar secuencias (1234). Además, debe ser un pin que recuerde fácilmente."
+		>
 			<View style={styles.container}>
-				<Input name="pin" placeholder="Ingresa tu pin" control={control} errors={errors} secureTextEntry />
+				<Input name="pin" placeholder="Ingrese su pin aquí" control={control} errors={errors} secureTextEntry />
 				<CustomButton title="Siguiente" onPress={() => validateAndNavigate("pin", navigation, "ConfirmPin")} />
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}

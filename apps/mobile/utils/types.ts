@@ -1,10 +1,10 @@
-import { Control, FieldErrors, FieldValues } from "react-hook-form"
+import { Control, FieldValues } from "react-hook-form"
 
 export type commonProps = {
 	route: any
 	navigation: any
 	control?: Control<FieldValues>
-	errors?: FieldErrors<FieldValues>
+	errors?: any
 	handleSubmit?: any
 	setValue?: any
 	getValues?: any
