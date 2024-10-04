@@ -1,7 +1,18 @@
 import React from "react"
 import { Input } from "../components/ui/Input"
 
+import { useAuth } from "../context/AuthContext"
+
 const ProfilePage: React.FC = () => {
+	const { role } = useAuth()
+
+	console.log(role)
+
+	const roleFormatter = {
+		ADMIN: "Administrador",
+		PROFESSIONAL: "Profesional",
+	}
+
 	return (
 		<div className="flex w-full login-container items-center justify-center absolute">
 			<div className="bg-white flex flex-col justify-center items-center px-12 w-11/12 md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/3 rounded-lg h-auto py-6">
@@ -18,8 +29,7 @@ const ProfilePage: React.FC = () => {
 					</div>
 
 					<div className="text-center">
-						<h2 className="text-4xl font-bold text-gray-900 mb-2">Benjamin Luis Ignacio Espinoza Parra</h2>
-						<p className="text-gray-600">Rol</p>
+						<p className="text-gray-900">{roleFormatter[role as keyof typeof roleFormatter]}</p>
 					</div>
 				</div>
 

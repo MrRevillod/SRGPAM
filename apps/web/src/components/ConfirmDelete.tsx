@@ -4,7 +4,6 @@ import { Modal, message } from "antd"
 interface ConfirmActionProps {
 	text: string
 	visible: boolean
-	modalType: string
 	onCancel: () => void
 	onOk: () => void
 	executeAction: (element: any) => any | Promise<any>

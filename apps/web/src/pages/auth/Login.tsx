@@ -15,11 +15,10 @@ const LoginPage: React.FC = () => {
 		resolver: zodResolver(LoginFormSchema),
 	})
 
-	const { login, error } = useAuth()
+	const { login, error, role } = useAuth()
 
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
 		await login(formData)
-		return
 	}
 
 	return (
@@ -61,7 +60,7 @@ const LoginPage: React.FC = () => {
 								{ value: "ADMIN", label: "Administrador" },
 								{ value: "PROFESSIONAL", label: "Profesional" },
 							]}
-							defaultValue={localStorage.getItem("SELECTED_ROLE") || "ADMIN"}
+							defaultValue={role || "ADMIN"}
 							error={errors.role ? errors.role.message?.toString() : ""}
 						/>
 

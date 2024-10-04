@@ -10,7 +10,6 @@ export type LoginFormData = {
 	email: string
 	password: string
 	role: LoginVariant
-	rememberMe: boolean
 }
 
 interface IUser {
