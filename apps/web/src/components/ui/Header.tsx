@@ -37,7 +37,7 @@ const Header: React.FC = () => {
 							<span className="block text-sm">{user?.name}</span>
 							<span className="block truncate text-sm font-medium">{user?.email}</span>
 						</Dropdown.Header>
-						<Link to="/dashboard/perfil">
+						<Link to="/perfil">
 							<Dropdown.Item>Mi perfíl</Dropdown.Item>
 						</Link>
 						<Dropdown.Divider />

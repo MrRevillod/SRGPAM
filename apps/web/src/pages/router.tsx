@@ -50,7 +50,7 @@ const Router: React.FC = () => {
 			<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
-				<Route path="/profile" element={<ProfilePage />} />
+				<Route path="/perfil" element={<ProfilePage />} />
 				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
 				<Route path="/dashboard/profesionales" element={<ProfessionalsPage />} />
 				<Route path="/dashboard/adultos-mayores" element={<SeniorsPage />} />

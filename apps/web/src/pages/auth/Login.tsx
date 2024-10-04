@@ -14,13 +14,23 @@ const LoginPage: React.FC = () => {
 	} = useForm({
 		resolver: zodResolver(LoginFormSchema),
 	})
-
-	const { login, error } = useAuth()
-
+	type Roles = "Administrador" | "Profesional"
+	const { login, error, isAuthenticated } = useAuth()
+	const roliverso = {
+		Administrador: "ADMIN",
+		Profesional: "PROFESSIONAL",
+	}
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
 		await login(formData)
+		if (isAuthenticated) {
+			const roles = {
+				ADMIN: "Administrador",
+				PROFESSIONAL: "Profesional",
+			}
+			localStorage.setItem("SELECTED_ROLE", roles[formData.role])
+		}
+		return
 	}
-
 	return (
 		<div className="flex w-full login-container items-center justify-center absolute">
 			<div className="bg-white flex flex-col justify-center items-center px-12 w-11/12 md:w-1/2 lg:w-1/3 xl:w-5/12 2xl:w-1/4 rounded-lg h-4/6 login-form-container">
@@ -60,7 +70,7 @@ const LoginPage: React.FC = () => {
 								{ value: "ADMIN", label: "Administrador" },
 								{ value: "PROFESSIONAL", label: "Profesional" },
 							]}
-							defaultValue={localStorage.getItem("SELECTED_ROLE") || "ADMIN"}
+							defaultValue={roliverso[localStorage.getItem("SELECTED_ROLE") as Roles] || "ADMIN"}
 							error={errors.role ? errors.role.message?.toString() : ""}
 						/>
 

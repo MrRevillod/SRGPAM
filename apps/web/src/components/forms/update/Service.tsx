@@ -7,6 +7,7 @@ import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ServiceSchemas } from "../../../lib/schemas"
 import { Service, UpdateEntityFormProps } from "../../../lib/types"
+import InputFile from "../../ui/InputFile"
 
 const UpdateService: React.FC<UpdateEntityFormProps<Service>> = (props) => {
 	const { visible, onCancel, onOk, data, setData, entity } = props
@@ -67,6 +68,11 @@ const UpdateService: React.FC<UpdateEntityFormProps<Service>> = (props) => {
 				error={errors.description ? errors.description.message?.toString() : ""}
 				defaultValue={entity?.description}
 				{...register("description")}
+			/>
+			<InputFile
+				label="Imagen"
+				{...register("image")}
+				error={errors.image ? errors.image.message?.toString() : ""}
 			/>
 		</Form>
 	)

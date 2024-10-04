@@ -1,16 +1,39 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Dropdown } from "flowbite-react"
+import axios from "axios"
 
 interface Props {
 	title: string
 	description: string
-	imageSrc?: string
+	imageSrcUrl?: string
 	other?: string
 	onDelete: () => void | Promise<void>
 	onUpdate: () => void | Promise<void>
 }
 
-const Card: React.FC<Props> = ({ title, description, imageSrc, other, onUpdate, onDelete }) => {
+const Card: React.FC<Props> = ({ title, description, imageSrcUrl, other, onUpdate, onDelete }) => {
+	const [imageSrc, setImageSrc] = useState<string | null>(null)
+
+	useEffect(() => {
+		console.log(import.meta.env.STORAGE_KEY)
+		if (imageSrcUrl) {
+			const fetchImage = async () => {
+				try {
+					const response = await axios.get(imageSrcUrl, {
+						headers: {
+							"x-storage-key": `${import.meta.env.VITE_STORAGE_KEY}`,
+						},
+						responseType: "blob",
+					})
+					const imageBlobUrl = URL.createObjectURL(response.data)
+					setImageSrc(imageBlobUrl)
+				} catch (error) {
+					console.error("Error al obtener la imagen:", error)
+				}
+			}
+			fetchImage()
+		}
+	}, [imageSrcUrl])
 	return (
 		<div className="w-full border rounded-lg overflow-hidden shadow-lg flex">
 			<img

@@ -76,6 +76,7 @@ const CentersPage: React.FC = () => {
 								title={center.name}
 								description={center.address}
 								other={`Teléfono: ${center.phone}`}
+								imageSrcUrl={`http://localhost/api/storage/public/centers/${center.id}.webp`}
 							/>
 						)
 					})}

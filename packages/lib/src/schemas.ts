@@ -146,5 +146,17 @@ export const AdministratorSchemas = {
 			message: "Las contraseñas ingresadas no coinciden",
 		}),
 }
+export const ProfileSchemas = {
+	Update: z
+		.object({
+			name: nameSchema,
+			email: emailSchema,
+			password: passwordSchema,
+			confirmPassword: passwordSchema,
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Las contraseñas ingresadas no coinciden",
+		}),
+}
 
 export const ProfessionalSchemas = AdministratorSchemas
