@@ -10,7 +10,6 @@ import { User } from "../lib/types"
 import { Image } from "antd"
 import InputFile from "../components/ui/InputFile"
 
-import { useAuth } from "../context/AuthContext"
 
 const ProfilePage: React.FC = () => {
 
