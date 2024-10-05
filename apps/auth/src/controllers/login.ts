@@ -35,7 +35,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 		return res.status(200).json({
 			message: "Has iniciado sesión correctamente",
 			type: "success",
-			values: { user: toPublicUser(user) },
+			values: { user: toPublicUser(user), role: loginKind },
 		})
 	} catch (error) {
 		next(error)

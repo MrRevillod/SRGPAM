@@ -1,26 +1,17 @@
 import React from "react"
 import { api } from "../lib/axios"
-import { createContext, useState, useEffect, ReactNode } from "react"
-
-interface User {
-	id: number
-	name: string
-	email: string
-}
+import { LoginFormData, LoginVariant, User } from "../lib/types"
+import { createContext, ReactNode, useEffect, useState } from "react"
 
 interface AuthContextType {
 	isAuthenticated: boolean
 	user: User | null
 	loading: boolean
 	error: string | null
-	login: (credentials: LoginCredentials) => Promise<void>
+	role: LoginVariant | null
+	login: (credentials: LoginFormData) => Promise<void>
 	logout: () => Promise<void>
 	refreshToken: () => Promise<void>
-}
-
-interface LoginCredentials {
-	email: string
-	password: string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -30,8 +21,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null)
 	const [loading, setLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
+	const [role, setRole] = useState<LoginVariant | null>(null)
 
-	const login = async (credentials: LoginCredentials) => {
+	const login = async (credentials: LoginFormData) => {
 		setLoading(true)
 
 		try {
@@ -39,13 +31,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setUser(response.data.values.user)
 			setIsAuthenticated(true)
 			setError(null)
+			setRole(response.data.values.role)
 		} catch (error: any) {
 			setError(error.response.data.message)
+			setRole(null)
+			setUser(null)
 		}
 
 		setLoading(false)
-
-		return
 	}
 
 	const logout = async () => {
@@ -58,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		} finally {
 			setIsAuthenticated(false)
 			setUser(null)
+			setRole(null)
 		}
 
 		setLoading(false)
@@ -70,6 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await api.get("/auth/validate-auth")
 			setIsAuthenticated(true)
 			setUser(response.data.values.user)
+			setRole(response.data.values.role)
 		} catch (error) {
 			setUser(null)
 			setIsAuthenticated(false)
@@ -81,11 +76,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(true)
 
 		try {
-			const response = await api.post("/auth/refresh")
-			setUser(response.data.user)
+			const response = await api.get("/auth/refresh")
+			setRole(response.data.values.role)
 			setIsAuthenticated(true)
 		} catch (error) {
 			setUser(null)
+			setRole(null)
 			setIsAuthenticated(false)
 		}
 
@@ -97,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	}, [])
 
 	return (
-		<AuthContext.Provider value={{ user, login, error, logout, refreshToken, loading, isAuthenticated }}>
+		<AuthContext.Provider value={{ role, user, login, error, logout, refreshToken, loading, isAuthenticated }}>
 			{children}
 		</AuthContext.Provider>
 	)
