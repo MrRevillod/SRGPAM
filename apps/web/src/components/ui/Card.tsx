@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Dropdown } from "flowbite-react"
 import axios from "axios"
+import { useImage } from "../../hooks/image"
 
 interface Props {
 	title: string
@@ -15,23 +16,8 @@ const Card: React.FC<Props> = ({ title, description, imageSrcUrl, other, onUpdat
 	const [imageSrc, setImageSrc] = useState<string | null>(null)
 
 	useEffect(() => {
-		console.log(import.meta.env.STORAGE_KEY)
 		if (imageSrcUrl) {
-			const fetchImage = async () => {
-				try {
-					const response = await axios.get(imageSrcUrl, {
-						headers: {
-							"x-storage-key": `${import.meta.env.VITE_STORAGE_KEY}`,
-						},
-						responseType: "blob",
-					})
-					const imageBlobUrl = URL.createObjectURL(response.data)
-					setImageSrc(imageBlobUrl)
-				} catch (error) {
-					console.error("Error al obtener la imagen:", error)
-				}
-			}
-			fetchImage()
+			useImage(imageSrcUrl, setImageSrc)
 		}
 	}, [imageSrcUrl])
 	return (

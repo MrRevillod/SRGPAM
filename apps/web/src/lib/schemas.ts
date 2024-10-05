@@ -57,11 +57,19 @@ const passwordSchema = z
 
 const optionalPasswordSchema = z
 	.string()
-	.min(0)
-	.regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
-	.regex(/[a-z]/, "La contraseña debe contener al menos una letra minúscula")
-	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
-	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
+	.refine(
+		(value) =>
+			value === "" ||
+			(value.length >= 8 &&
+				/[A-Z]/.test(value) &&
+				/[a-z]/.test(value) &&
+				/[0-9]/.test(value) &&
+				/[\W_]/.test(value)),
+		{
+			message:
+				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial, o ser vacía",
+		},
+	)
 
 const nameSchema = z
 	.string()
@@ -213,17 +221,4 @@ export const CentersSchemas = {
 		image: imageSchemaUpdate,
 	}),
 }
-export const ProfileSchemas = {
-	Update: z
-		.object({
-			name: nameSchema,
-			email: emailSchema,
-			password: passwordSchema,
-			confirmPassword: passwordSchema,
-		})
-		.refine((data) => data.password === data.confirmPassword, {
-			message: "Las contraseñas ingresadas no coinciden",
-		}),
-}
-
 export const ProfessionalSchemas = AdministratorSchemas

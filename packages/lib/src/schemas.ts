@@ -27,6 +27,22 @@ const passwordSchema = z
 	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
 	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
 
+const optionalPasswordSchema = z
+	.string()
+	.refine(
+		(value) =>
+			value === "" ||
+			(value.length >= 8 &&
+				/[A-Z]/.test(value) &&
+				/[a-z]/.test(value) &&
+				/[0-9]/.test(value) &&
+				/[\W_]/.test(value)),
+		{
+			message:
+				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial, o ser vacía",
+		},
+	)
+
 const nameSchema = z
 	.string()
 	.min(2, "El nombre debe tener al menos 2 caracteres")
@@ -38,6 +54,13 @@ const addressSchema = z.string().min(2, "La dirección debe tener al menos 2 car
 const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), {
 	message: "La fecha de nacimiento ingresada no es válida",
 })
+
+const dateTimeSchema = z.string().datetime()
+
+export type SchemasKeys =
+	| keyof typeof SeniorSchemas
+	| keyof typeof AdministratorSchemas
+	| keyof typeof ProfessionalSchemas
 
 const nameServiceSchema = z
 	.string()
@@ -139,24 +162,32 @@ export const AdministratorSchemas = {
 		.object({
 			name: nameSchema,
 			email: emailSchema,
-			password: passwordSchema,
-			confirmPassword: passwordSchema,
+			password: optionalPasswordSchema,
+			confirmPassword: optionalPasswordSchema,
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
 		}),
 }
-export const ProfileSchemas = {
-	Update: z
-		.object({
-			name: nameSchema,
-			email: emailSchema,
-			password: passwordSchema,
-			confirmPassword: passwordSchema,
-		})
-		.refine((data) => data.password === data.confirmPassword, {
-			message: "Las contraseñas ingresadas no coinciden",
-		}),
+
+export const EventSchemas = {
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.string(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
+	Update: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.string(),
+		assistance: z.optional(z.boolean()),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
 }
 
 export const ProfessionalSchemas = AdministratorSchemas

@@ -21,12 +21,14 @@ const LoginPage: React.FC = () => {
 		Profesional: "PROFESSIONAL",
 	}
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
+		console.log(formData.role)
 		await login(formData)
 		if (isAuthenticated) {
 			const roles = {
 				ADMIN: "Administrador",
 				PROFESSIONAL: "Profesional",
 			}
+
 			localStorage.setItem("SELECTED_ROLE", roles[formData.role])
 		}
 		return
