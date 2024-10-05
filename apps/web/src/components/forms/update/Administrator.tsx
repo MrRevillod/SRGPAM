@@ -22,7 +22,6 @@ const UpdateAdministrator: React.FC<UpdateEntityFormProps<Administrator>> = ({
 
 	const {
 		reset,
-		control,
 		register,
 		formState: { errors },
 	} = formContext
@@ -47,7 +46,7 @@ const UpdateAdministrator: React.FC<UpdateEntityFormProps<Administrator>> = ({
 			setData={setData}
 			visible={visible}
 			onCancel={onCancel}
-			apiEndpoint={`/dashboard/seniors/${entity?.id}`}
+			apiEndpoint={`/dashboard/administrators/${entity?.id}`}
 			formContext={formContext as any}
 			method="PATCH"
 		>

@@ -1,28 +1,15 @@
-import React, { useEffect } from "react"
+import React from "react"
 import PageLayout from "../../layouts/PageLayout"
+import DatePicker from "../../components/ui/InputDate"
 
-import { es } from "date-fns/locale/es"
 import { api } from "../../lib/axios"
 import { Input } from "../../components/ui/Input"
+import { useEffect } from "react"
 import { message, Image } from "antd"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SeniorSchemas } from "../../lib/schemas"
 import { useLocation, useNavigate } from "react-router-dom"
-import { Controller, FieldValues, SubmitHandler, useForm } from "react-hook-form"
-
-import ReactDatePicker, { registerLocale } from "react-datepicker"
-
-registerLocale("es", es)
-
-import "react-datepicker/dist/react-datepicker.css"
-
-type FormValues = {
-	rut: string
-	name: string
-	email: string
-	address: string
-	birthDate: Date
-}
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()
@@ -52,8 +39,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 		},
 	})
 
-	const onSubmit: SubmitHandler<FormValues> = async (data) => {
-		console.log("Form Data:", data)
+	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 		try {
 			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
 			await api.patch(`/dashboard/seniors/${senior.id}`, {
@@ -87,10 +73,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 	return (
 		<PageLayout pageTitle="Solicitud de registro de persona mayor">
 			<section className="flex flex-row gap-12 items-start w-full h-full">
-				<form
-					className="flex flex-col gap-4 w-2/5"
-					onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
-				>
+				<form className="flex flex-col gap-4 w-2/5" onSubmit={handleSubmit(onSubmit)}>
 					<Input
 						label="Rut (Sin puntos ni guión)"
 						type="text"
@@ -122,28 +105,13 @@ const SeniorRegisterRequestPage: React.FC = () => {
 						{...register("address")}
 						error={errors.address ? errors.address.message?.toString() : ""}
 					/>
-					<div className="flex flex-col gap-3 w-full mb-2">
-						<div className="flex flex-row gap-2 items-center justify-between">
-							<label className="font-semibold">Fecha de Nacimiento</label>
-							{errors.birthDate && (
-								<div className="text-red-600 text-sm">{errors.birthDate.message?.toString()}</div>
-							)}
-						</div>
-						<Controller
-							control={control}
-							name="birthDate"
-							render={({ field: { onChange, value } }) => (
-								<ReactDatePicker
-									className="border-1 border-neutral-500 rounded-lg p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full pl-4 placeholder-neutral-400 text-neutral-950 mb-1"
-									placeholderText="Fecha de Nacimiento"
-									onChange={onChange}
-									selected={value as any}
-									maxDate={new Date()}
-									locale="es"
-								/>
-							)}
-						/>
-					</div>
+
+					<DatePicker
+						control={control as any}
+						label="Fecha de nacimiento"
+						name="birthDate"
+						error={errors.birthDate ? errors.birthDate.message?.toString() : ""}
+					/>
 
 					<div className="flex flex-col gap-8">
 						<p>
@@ -159,7 +127,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 								Denegar
 							</button>
 							<button
-								onClick={() => navigate("/dashboard/adultos-mayores/nuevos")}
+								onClick={() => navigate("/dashboard/personas-mayores/nuevos")}
 								className="border-red-500 border-1 text-red-500 px-4 py-2 rounded-lg"
 							>
 								Cancelar

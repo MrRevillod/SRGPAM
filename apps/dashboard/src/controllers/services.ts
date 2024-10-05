@@ -1,17 +1,12 @@
 import { prisma } from "@repo/database"
-import { bufferToBlob } from "../utils/files"
+import { bufferToBlob, fileToFormData } from "../utils/files"
+import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
-import { AppError, httpRequest, services } from "@repo/lib"
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const services = await prisma.service.findMany({
-			select: {
-				id: true,
-				name: true,
-				title: true,
-				description: true,
-			},
+			select: { id: true, name: true, title: true, description: true },
 		})
 
 		return res.status(200).json({
@@ -49,25 +44,15 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		}
 
 		const service = await prisma.service.create({
-			data: {
-				name,
-				title,
-				description,
-			},
+			data: { name, title, description },
 		})
 
-		const renameFile = file
-		const extFile = file.originalname.split(".")[1]
-		renameFile.originalname = `${service.id}.${extFile}`
-		const formData = new FormData()
-
-		formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
 		const response = await httpRequest<null>({
 			service: "STORAGE",
 			endpoint: `/upload?path=%2Fservices`,
 			method: "POST",
 			variant: "MULTIPART",
-			body: formData,
+			body: fileToFormData(file, service.id.toString()),
 		})
 
 		if (response.type == "error") {
@@ -85,8 +70,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 	}
 }
 
-// !TODO: Implementar la actualización de la imagen del servicio
-// !TODO: Implementar validación de existencia de nombre de servicio
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
@@ -94,34 +77,19 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 		const service = await prisma.service.update({
 			where: { id: Number(id) },
-			data: {
-				name,
-				title,
-				description,
-			},
-			select: {
-				id: true,
-				name: true,
-				title: true,
-				description: true,
-			},
+			data: { name, title, description },
+			select: { id: true, name: true, title: true, description: true },
 		})
 
 		if (req.file) {
-			const file = req.file
-			const renameFile = file
-			const extFile = file.originalname.split(".")[1]
-			renameFile.originalname = `${service.id}.${extFile}`
-			const formData = new FormData()
-
-			formData.append("files", bufferToBlob(renameFile.buffer, renameFile.mimetype), renameFile.originalname)
 			const response = await httpRequest<null>({
 				service: "STORAGE",
 				endpoint: `/upload?path=%2Fservices`,
 				method: "POST",
 				variant: "MULTIPART",
-				body: formData,
+				body: fileToFormData(req.file, service.id.toString()),
 			})
+
 			if (response.type == "error") {
 				await prisma.service.delete({ where: { id: service.id } })
 				throw new AppError(response.status ?? 500, response.message)
@@ -157,12 +125,12 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 
 		const response = await httpRequest<null>({
 			service: "STORAGE",
-			endpoint: `/delete?path=%2Fservices%2F${service.id}`,
+			endpoint: `/delete?path=%2Fservices%2F${service.id}.webp`,
 			method: "DELETE",
 			variant: "JSON",
 			body: {},
 		})
-		console.log(response)
+
 		if (response.type == "error") {
 			throw new AppError(response.status ?? 500, response.message)
 		}

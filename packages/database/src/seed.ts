@@ -1,10 +1,17 @@
 const { hash } = require("bcrypt")
-const { PrismaClient } = require("@prisma/client")
 const { faker } = require("@faker-js/faker")
+const { readFileSync } = require("node:fs")
+const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
-const genRUT = (): string => {
+const DEFAULT_CENTER_PHONE = process.env.DEV_DEFAULT_CENTER_PHONE || "123456789"
+const DEFAULT_SENIOR_PASSWORD = process.env.DEV_DEFAULT_SENIOR_PASSWORD || "1234"
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123"
+const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD || "pro123"
+const DEFAULT_PROFILE_PICTURE = "https://i.pinimg.com/originals/58/51/2e/58512eb4e598b5ea4e2414e3c115bef9.jpg"
+
+const generateRUT = (): string => {
 	const numero: string = Math.floor(Math.random() * 100000000)
 		.toString()
 		.padStart(7, "0")
@@ -28,52 +35,67 @@ const genRUT = (): string => {
 	return `${numero}${dv}`
 }
 
-const seed = async () => {
-	const DEFAULT_SENIOR_PASSWORD = "1234"
-	const DEFAULT_PHONE = "123456789"
-	const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123"
-	const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD || "pro123"
-	const servicesName = [
-		{ name: "Psicología", title: "Psicólogo(a)" },
-		{ name: "Fisioterapia", title: "Fisioterapeuta" },
-		{ name: "Nutrición", title: "Nutricionista" },
-		{ name: "Cardiología", title: "Cardiólogo(a)" },
-		{ name: "Odontología", title: "Odontólogo(a)" },
-		{ name: "Dermatología", title: "Dermatólogo(a)" },
-		{ name: "Ginecología", title: "Ginecólogo(a)" },
-		{ name: "Pediatría", title: "Pediatra" },
-		{ name: "Oftalmología", title: "Oftalmólogo(a)" },
-		{ name: "Psiquiatría", title: "Psiquiatra" },
-		{ name: "Traumatología", title: "Traumatólogo(a)" },
-	]
+const uploadImage = async (url: string, name: string, uploadPath: string) => {
+	const STORAGE_URL = process.env.STORAGE_SERVICE_URL
 
-	const centers = [
-		{ name: "Centro Médico Norte", address: "Calle Norte 123" },
-		{ name: "Centro de Salud Sur", address: "Avenida Sur 456" },
-		{ name: "Clínica Este", address: "Avenida Este 789" },
-		{ name: "Hospital Oeste", address: "Calle Oeste 101" },
-		{ name: "Policlínico Central", address: "Plaza Central 202" },
-		{ name: "Centro Médico Las Flores", address: "Calle Flores 303" },
-		{ name: "Clínica del Valle", address: "Avenida Valle 404" },
-		{ name: "Hospital San Juan", address: "Calle San Juan 505" },
-		{ name: "Centro de Especialidades El Prado", address: "Paseo El Prado 606" },
-		{ name: "Clínica Los Pinos", address: "Avenida Los Pinos 707" },
-	]
+	try {
+		const response = await fetch(url)
+		const blob = await response.blob()
+
+		const formData = new FormData()
+		formData.append("files", blob, `${name}.jpg`)
+
+		const res = await fetch(`${STORAGE_URL}${uploadPath}`, {
+			method: "POST",
+			body: formData,
+			headers: {
+				"x-storage-key": process.env.STORAGE_KEY || "",
+			},
+		})
+
+		if (!res.ok) throw new Error(`Error uploading image ${name}`)
+	} catch (error) {
+		console.error(error)
+	}
+}
+
+const seed = async () => {
+	if (process.argv[2] && process.argv[2] === "drop") {
+		await prisma.$transaction([
+			prisma.event.deleteMany(),
+			prisma.professional.deleteMany(),
+			prisma.center.deleteMany(),
+			prisma.service.deleteMany(),
+			prisma.senior.deleteMany(),
+			prisma.administrator.deleteMany(),
+		])
+
+		console.log("All records dropped.")
+	}
+
+	await uploadImage(DEFAULT_PROFILE_PICTURE, "default-profile", "/upload?path=%2Fusers")
+
+	const data = JSON.parse(readFileSync("./src/data.json", "utf-8"))
+
+	const services = data.services
+	const centers = data.centers
 
 	for (let i = 1; i <= 25; i++) {
 		const rand = Math.floor(Math.random() * 1000)
-		const randomService = servicesName[Math.floor(Math.random() * servicesName.length)]
+		const randomService = services[Math.floor(Math.random() * services.length)]
 		const randomCenter = centers[Math.floor(Math.random() * centers.length)]
 
 		try {
-			const AdminRUT = genRUT()
-			const SeniorRUT = genRUT()
-			const ProfessionalRUT = genRUT()
+			const AdminRUT = generateRUT()
+			const SeniorRUT = generateRUT()
+			const ProfessionalRUT = generateRUT()
 
 			const adminFirstName = faker.person.firstName()
 			const adminLastName = faker.person.lastName()
+
 			const professionalFirstName = faker.person.firstName()
 			const professionalLastName = faker.person.lastName()
+
 			const seniorFirstName = faker.person.firstName()
 			const seniorLastName = faker.person.lastName()
 
@@ -121,16 +143,20 @@ const seed = async () => {
 				update: {},
 			})
 
+			await uploadImage(randomService.img, i.toString(), "/upload?path=%2Fservices")
+
 			await prisma.center.upsert({
 				where: { id: i },
 				create: {
 					id: i,
 					name: randomCenter.name,
 					address: randomCenter.address,
-					phone: DEFAULT_PHONE,
+					phone: DEFAULT_CENTER_PHONE,
 				},
 				update: {},
 			})
+
+			await uploadImage(randomCenter.img, i.toString(), "/upload?path=%2Fcenters")
 
 			await prisma.professional.upsert({
 				where: { id: ProfessionalRUT },

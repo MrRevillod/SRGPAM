@@ -15,3 +15,11 @@ export const filesToFormData = (files: Express.Multer.File[]): FormData => {
 	})
 	return formData
 }
+
+export const fileToFormData = (file: Express.Multer.File, filename: string): FormData => {
+	const extFile = file.originalname.split(".")[1]
+	file.originalname = `${filename}.${extFile}`
+	const formData = new FormData()
+	formData.append("files", bufferToBlob(file.buffer, file.mimetype), file.originalname)
+	return formData
+}

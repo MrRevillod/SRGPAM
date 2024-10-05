@@ -1,0 +1,111 @@
+{
+    "centers": [
+        {
+            "name": "Centro Médico Norte",
+            "address": "Calle Norte 123",
+            "img": "https://images.adsttc.com/media/images/63b3/6722/987c/9501/706c/2d3f/large_jpg/centro-de-atencion-diurno-del-adulto-mayor-side-fx-arquitectura_13.jpg?1672701784"
+        },
+        {
+            "name": "Centro de Salud Sur",
+            "address": "Avenida Sur 456",
+            "img": "https://gonzalezpaezabogados.co/wp-content/uploads/2023/12/Aprobaron-creacion-de-Centros-de-Atencion-Primaria-en-Salud_DEST-BLOG.jpg"
+        },
+        {
+            "name": "Clínica Este",
+            "address": "Avenida Este 789",
+            "img": "https://www.radiofestival.cl/wp-content/uploads/2022/01/aps-551x330.jpeg"
+        },
+        {
+            "name": "Hospital Oeste",
+            "address": "Calle Oeste 101",
+            "img": "https://buenosaires.gob.ar/sites/default/files/media/image/2014/07/08/9c844a9ebba9a569adddb044aa165441c071a5df.jpg"
+        },
+        {
+            "name": "Policlínico Central",
+            "address": "Plaza Central 202",
+            "img": "https://s3.amazonaws.com/gobcl-prod/filer_public_thumbnails/public_files/Campa%C3%B1as/Corona-Virus/Reportes/centro-cuidados-saavedra.jpeg__1440x2000_q70_subsampling-2.jpg"
+        },
+        {
+            "name": "Centro Médico Las Flores",
+            "address": "Calle Flores 303",
+            "img": "https://uchile.cl/.imaging/default/dam/imagenes/Uchile/imagenes-noticias/153516_1_urgencias-800-l-08_L/jcr:content.jpg"
+        },
+        {
+            "name": "Clínica del Valle",
+            "address": "Avenida Valle 404",
+            "img": "https://blog.fundacionjuanxxiii.org/hubfs/centro%20de%20atenci%C3%B3n%20temprana.jpg"
+        },
+        {
+            "name": "Hospital San Juan",
+            "address": "Calle San Juan 505",
+            "img": "https://emera-group.es/wp-content/uploads/2022/04/que-es-un-centro-de-dia-para-mayores-scaled-1.webp"
+        },
+        {
+            "name": "Centro de Especialidades El Prado",
+            "address": "Paseo El Prado 606",
+            "img": "https://f.hubspotusercontent30.net/hubfs/3108333/Belmont-Village-el-centro-para-adultos-mayores-ideal-para-su-familiar-mayor.jpg"
+        },
+        {
+            "name": "Clínica Los Pinos",
+            "address": "Avenida Los Pinos 707",
+            "img": "https://lh5.googleusercontent.com/proxy/0k3jXHmHqx_Tj8nwYOof6ntC5NWs9BXi0M37TTQJ8fMfGKsivs7m5CHAsryyODv6t_fsqNLgf4gFcbSmjKXg-zp31pGfyDLsJlEjR-I"
+        }
+    ],
+    "services": [
+        {
+            "name": "Psicología",
+            "title": "Psicólogo(a)",
+            "img": "https://img.freepik.com/vector-premium/circuito-linea-ilustracion-vectorial-psicologia_764382-140070.jpg?semt=ais_hybrid"
+        },
+        {
+            "name": "Fisioterapia",
+            "title": "Fisioterapeuta",
+            "img": "https://img.freepik.com/vector-gratis/ilustracion-fisioterapia-deportiva_23-2150076874.jpg"
+        },
+        {
+            "name": "Nutrición",
+            "title": "Nutricionista",
+            "img": "https://img.freepik.com/foto-gratis/surtido-piramides-alimentos-reales_23-2150239069.jpg"
+        },
+        {
+            "name": "Cardiología",
+            "title": "Cardiólogo(a)",
+            "img": "https://img.freepik.com/foto-gratis/surtido-piramides-alimentos-reales_23-2150239069.jpg"
+        },
+        {
+            "name": "Odontología",
+            "title": "Odontólogo(a)",
+            "img": "https://img.freepik.com/foto-gratis/dentista-sonrisa_144627-886.jpg"
+        },
+        {
+            "name": "Dermatología",
+            "title": "Dermatólogo(a)",
+            "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxF4Jli-84vMzes_DWPqoU6QFTPKD0ht0n3g&s"
+        },
+        {
+            "name": "Leyes",
+            "title": "Abogado(a)",
+            "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxF4Jli-84vMzes_DWPqoU6QFTPKD0ht0n3g&s"
+        },
+        {
+            "name": "Peluquería",
+            "title": "Peluquero(a)",
+            "img": "https://img.freepik.com/foto-gratis/propietario-peluqueria-latina-cuidando-cliente_23-2150286029.jpg"
+        },
+        {
+            "name": "Oftalmología",
+            "title": "Oftalmólogo(a)",
+            "img": "https://d328k6xhl3lmif.cloudfront.net/images/default-source/default-album/img-neuro-oftalmologia.jpg?sfvrsn=68cf079d_0"
+        },
+        {
+            "name": "Psiquiatría",
+            "title": "Psiquiatra",
+            "img": "https://media.istockphoto.com/id/1479494606/es/vector/concepto-de-salud-mental.jpg?s=612x612&w=0&k=20&c=DrQQBbPjZStIBAb6ZgUsbI2_0InKKo8u2512fx0N0MA="
+        },
+        {
+            "name": "Traumatología",
+            "title": "Traumatólogo(a)",
+            "img": "https://img.freepik.com/vector-premium/traumatologia-tratamiento-pacientes-trauma-vector-medico-traumatologo-tratar-mujer-pierna-rota-gabinete-hospital-traumatologia-aplicar-vendaje-elastico-ilustracion-dibujos-animados-plana-personajes_87720-5993.jpg"
+        }
+    ]
+}

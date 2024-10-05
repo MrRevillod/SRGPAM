@@ -39,6 +39,7 @@ export {
 	SeniorSchemas,
 	AdministratorSchemas,
 	ProfessionalSchemas,
+	EventSchemas,
 	ServiceSchemas,
 	CentersSchemas,
 } from "./schemas"

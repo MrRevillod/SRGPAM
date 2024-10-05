@@ -69,11 +69,11 @@ const Header: React.FC = () => {
 								)}
 								className="w-48"
 							>
-								<Link to="/dashboard/adultos-mayores">
+								<Link to="/dashboard/personas-mayores">
 									<Dropdown.Item as="div">Todos</Dropdown.Item>
 								</Link>
 
-								<Link to="/dashboard/adultos-mayores/nuevos">
+								<Link to="/dashboard/personas-mayores/nuevos">
 									<Dropdown.Item as="div">Solicitudes de registro</Dropdown.Item>{" "}
 								</Link>
 							</Dropdown>

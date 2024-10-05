@@ -14,12 +14,9 @@ const LoginPage: React.FC = () => {
 	} = useForm({
 		resolver: zodResolver(LoginFormSchema),
 	})
-	type Roles = "Administrador" | "Profesional"
-	const { login, error, isAuthenticated } = useAuth()
-	const roliverso = {
-		Administrador: "ADMIN",
-		Profesional: "PROFESSIONAL",
-	}
+
+	const { login, error, role } = useAuth()
+
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
 		console.log(formData.role)
 		await login(formData)
@@ -48,7 +45,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Correo electrónico"
 							type="email"
-							defaultValue={"jhuels@admins.com"}
+							defaultValue={"ccormier-kihn@admins.com"}
 							{...register("email")}
 							placeholder="example@gmail.com"
 							error={errors.email ? errors.email.message?.toString() : ""}
@@ -72,7 +69,7 @@ const LoginPage: React.FC = () => {
 								{ value: "ADMIN", label: "Administrador" },
 								{ value: "PROFESSIONAL", label: "Profesional" },
 							]}
-							defaultValue={roliverso[localStorage.getItem("SELECTED_ROLE") as Roles] || "ADMIN"}
+							defaultValue={role || "ADMIN"}
 							error={errors.role ? errors.role.message?.toString() : ""}
 						/>
 

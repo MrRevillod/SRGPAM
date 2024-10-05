@@ -50,7 +50,7 @@ export const registerFromMobile = async (req: Request, res: Response, next: Next
 		}
 
 		return res.status(200).json({
-			message: "El adulto mayor se a registrado correctamente",
+			message: "La persona mayor se ha registrado correctamente",
 			type: "success",
 			values: null,
 		})
@@ -182,7 +182,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			if (userExists?.email === email) conflicts.push("email")
 
 			return res.status(409).json({
-				message: "El adulto mayor ya existe",
+				message: "La persona mayor ya existe",
 				type: "error",
 				values: { conflicts },
 			})
@@ -249,6 +249,11 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
+		await prisma.event.updateMany({
+			where: { seniorId: req.params.id },
+			data: { seniorId: null },
+		})
+
 		const senior = await prisma.senior.delete({
 			where: { id: req.params.id },
 		})

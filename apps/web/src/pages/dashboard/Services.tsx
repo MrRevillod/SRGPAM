@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import PageLayout from "../../layouts/PageLayout"
-import { api } from "../../lib/axios"
-import { Service } from "../../lib/types"
 import FlowbiteCard from "../../components/ui/Card"
 import CreateService from "../../components/forms/create/Service"
 import UpdateService from "../../components/forms/update/Service"
-import { Pagination } from "antd"
 import ConfirmDelete from "../../components/ConfirmDelete"
 
+import { api } from "../../lib/axios"
+import { Service } from "../../lib/types"
+import { useModal } from "../../hooks/modal"
+import { Pagination } from "antd"
+import { useState, useEffect } from "react"
+
 const ServicesPage: React.FC = () => {
-	const [modalType, setModalType] = useState("")
-	const [selectedService, setSelectedService] = useState<Service | null>(null)
-	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [data, setData] = useState<Service[]>([])
+	const [originalData, setOriginalData] = useState<Service[]>([])
 	const [loading, setLoading] = useState(true)
 	const [currentPage, setCurrentPage] = useState(1)
 	const [pageSize, setPageSize] = useState(6)
@@ -21,6 +22,7 @@ const ServicesPage: React.FC = () => {
 		try {
 			const response = await api.get("/dashboard/services/")
 			setData(response.data.values.services)
+			setOriginalData(response.data.values.services)
 		} catch (err) {
 			console.log(err)
 			console.error("Error al obtener los datos de servicios")
@@ -49,30 +51,22 @@ const ServicesPage: React.FC = () => {
 		setPageSize(size)
 	}
 
-	const showModal = (type: string, element: Service | null) => {
-		setModalType(type)
-		setSelectedService(element)
-		setIsModalOpen(true)
-	}
-
-	const handleOk = () => {
-		setIsModalOpen(false)
-		setSelectedService(null)
-	}
-
-	const handleCancel = () => {
-		setIsModalOpen(false)
-		setSelectedService(null)
-	}
+	const { isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData } = useModal()
 
 	return (
-		<PageLayout pageTitle="Servicios" addFunction={() => showModal("Create", null)} setData={() => {}}>
+		<PageLayout
+			pageTitle="Servicios"
+			addFunction={() => showModal("Create", null)}
+			setData={setData}
+			data={originalData}
+			searchKeys={["name"]}
+		>
 			<section className="flex flex-col w-full h-full gap-8">
 				<div className="grid grid-cols-3 gap-8 h-full">
 					{paginatedData.map((service) => (
 						<FlowbiteCard
 							onDelete={() => showModal("Delete", service)}
-							onUpdate={() => showModal("Update", service)}
+							onUpdate={() => showModal("Edit", service)}
 							key={service.id}
 							title={service.name}
 							description={service.description}
@@ -102,8 +96,8 @@ const ServicesPage: React.FC = () => {
 			/>
 
 			<UpdateService
-				visible={isModalOpen && modalType === "Update"}
-				entity={selectedService}
+				visible={isModalOpen && modalType === "Edit"}
+				entity={selectedData}
 				onCancel={handleCancel}
 				onOk={handleOk}
 				data={data}
@@ -112,14 +106,13 @@ const ServicesPage: React.FC = () => {
 
 			<ConfirmDelete
 				executeAction={handleDelete}
-				modalType="Delete"
 				text="Servicio"
 				visible={isModalOpen && modalType === "Delete"}
 				onCancel={handleCancel}
 				onOk={handleOk}
 				data={data}
 				setData={setData}
-				selectedElement={selectedService}
+				selectedElement={selectedData}
 			/>
 		</PageLayout>
 	)

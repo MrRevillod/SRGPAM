@@ -1,6 +1,7 @@
 import React from "react"
 import { View, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Platform, Image } from "react-native"
 import Colors from "@/components/colors"
+import GoBackButton from "@/components/goBack"
 const { width, height } = Dimensions.get("window")
 
 type GeneralViewProps = {

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import Modals from "../../components/Modal"
+import React from "react"
 import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
 
 import { api } from "../../lib/axios"
-import { Button } from "antd"
+import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
 import { Senior, UnvalidatedSenior } from "../../lib/types"
 import { UnvalidatedSeniorsColumns } from "../../lib/columns"
 
@@ -31,11 +30,11 @@ const NewSeniorsPage: React.FC = () => {
 	}, [])
 
 	const handleView = (senior: UnvalidatedSenior) => {
-		navigate(`/dashboard/ver-seniors`, { state: { senior } })
+		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, { state: { senior } })
 	}
 
 	return (
-		<PageLayout pageTitle="Solicitudes de registro nuevos adultos mayores">
+		<PageLayout pageTitle="Solicitudes de registro de personas mayores">
 			<DataTable<UnvalidatedSenior> data={data} onView={handleView} columnsConfig={UnvalidatedSeniorsColumns} />
 		</PageLayout>
 	)

@@ -52,9 +52,21 @@ const FormNavigator = ({
 			<Stack.Screen name="ConfirmPin">
 				{(props) => <ConfirmPin {...props} control={control} errors={errors} validateAndNavigate={validateAndNavigate} />}
 			</Stack.Screen>
-			<Stack.Screen name="DNI">{(props) => <DNI {...props} control={control} errors={errors} setValue={setValue} />}</Stack.Screen>
+			<Stack.Screen name="DNI">
+				{(props) => <DNI {...props} control={control} errors={errors} setValue={setValue} getValues={getValues} trigger={trigger} />}
+			</Stack.Screen>
 			<Stack.Screen name="Social">
-				{(props) => <Social {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
+				{(props) => (
+					<Social
+						{...props}
+						control={control}
+						errors={errors}
+						setValue={setValue}
+						getValues={getValues}
+						handleSubmit={handleSubmit}
+						trigger={trigger}
+					/>
+				)}
 			</Stack.Screen>
 			<Stack.Screen name="Final">{(props) => <Final {...props} />}</Stack.Screen>
 			<Stack.Screen name="Camera" component={Camera} options={{ headerShown: true }} />

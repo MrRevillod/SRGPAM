@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { View, StyleSheet, Text, Alert } from "react-native"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
@@ -7,22 +7,33 @@ import { commonProps } from "@/utils/types"
 import { Controller } from "react-hook-form"
 import * as mime from "react-native-mime-types"
 import axios from "axios"
+import Feather from "@expo/vector-icons/Feather"
 
 import { SERVER_URL } from "@/constants/colors"
 
-const Social = ({ navigation, route, control, setValue, handleSubmit }: commonProps) => {
+const Social = ({ navigation, route, control, setValue, errors, getValues, trigger, handleSubmit }: commonProps) => {
+	const [isPhotoValid, setPhotoValid] = useState<boolean>(false)
+
 	useEffect(() => {
 		if (route.params?.photoUri) {
-			console.log("RSH photo URI:", route.params.photoUri)
 			setValue("social", route.params.photoUri)
 		}
 	}, [route.params?.photoUri])
+
+	useEffect(() => {
+		const photo = getValues(["social"])
+		if (photo[0]) {
+			setPhotoValid(true)
+		}
+	}, [getValues(["social"])])
 
 	const openCamera = () => {
 		navigation.navigate("Camera", { from: "Social" })
 	}
 
 	const onSubmit = async (data: any) => {
+		const isValid = await trigger("social")
+
 		const formData = new FormData()
 
 		formData.append("rut", data.rut)
@@ -53,19 +64,17 @@ const Social = ({ navigation, route, control, setValue, handleSubmit }: commonPr
 			formData.append("social", socialFile as any)
 		}
 		try {
-			const response = await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData, {
+			await axios.post(`${SERVER_URL}/api/dashboard/seniors/new-mobile`, formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},
 			})
 
-			if (response.status !== 200) {
-				throw new Error("Error en la solicitud")
+			if (isValid) {
+				navigation.navigate("Final")
 			}
-
-			navigation.navigate("Final")
 		} catch (error: any) {
-			Alert.alert("Error", "Hubo un problema al enviar los datos. Intenta nuevamente.")
+			error.response.data.message && Alert.alert("Error", error.response.data.message)
 		}
 	}
 
@@ -78,23 +87,37 @@ const Social = ({ navigation, route, control, setValue, handleSubmit }: commonPr
 		>
 			<View>
 				<Controller
-					name="social"
 					control={control}
+					name="social"
 					render={({ field: { value } }) => (
-						<>
+						<View style={styles.takePhotoContainer}>
+							<View style={{ width: "10%" }}>
+								{value ? <Feather name="check-square" size={30} color="green" /> : <Feather name="square" size={30} color="black" />}
+							</View>
 							<CustomButton
-								style={{ marginTop: 30 }}
+								style={{ width: "85%" }}
 								title={value ? "Re-tomar Foto" : "Tomar Foto"}
 								onPress={() => {
 									openCamera()
 								}}
 							/>
-							{value && <Text>Foto tomada</Text>}
-						</>
+						</View>
 					)}
 				/>
+				{errors["social"] && <Text style={{ color: "red", alignSelf: "center" }}>{errors["social"].message}</Text>}
 
-				<CustomButton style={{ marginTop: 30, backgroundColor: Colors.green }} title="Enviar Formulario" onPress={handleSubmit(onSubmit)} />
+				<>
+					{isPhotoValid ? (
+						<CustomButton title="Siguiente" onPress={handleSubmit(onSubmit)} style={{ marginTop: 30 }} />
+					) : (
+						<CustomButton
+							style={{ backgroundColor: Colors.white, marginTop: 30 }}
+							textStyle={styles.customButtonText}
+							title="Siguiente"
+							onPress={handleSubmit(onSubmit)}
+						/>
+					)}
+				</>
 
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
@@ -112,5 +135,12 @@ export default Social
 const styles = StyleSheet.create({
 	customButtonText: {
 		color: Colors.green,
+	},
+	takePhotoContainer: {
+		flexDirection: "row",
+		padding: 5,
+		marginTop: 25,
+		justifyContent: "space-between",
+		alignItems: "center",
 	},
 })

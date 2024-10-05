@@ -11,11 +11,11 @@ import NotFoundPage from "./NotFound"
 import NewSeniorsPage from "./dashboard/SeniorsNew"
 import AdministratorPage from "./dashboard/Administrators"
 import ProfessionalsPage from "./dashboard/Professionals"
+import ResetPasswordPage from "./auth/ResetPassword"
 import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
-import ResetPasswordPage from "./auth/ResetPassword"
 
 interface RouteProps {
 	condition: boolean
@@ -53,12 +53,15 @@ const Router: React.FC = () => {
 				<Route path="/perfil" element={<ProfilePage />} />
 				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
 				<Route path="/dashboard/profesionales" element={<ProfessionalsPage />} />
-				<Route path="/dashboard/adultos-mayores" element={<SeniorsPage />} />
-				<Route path="/dashboard/adultos-mayores/nuevos" element={<NewSeniorsPage />} />
+				<Route path="/dashboard/personas-mayores" element={<SeniorsPage />} />
+				<Route path="/dashboard/personas-mayores/nuevos" element={<NewSeniorsPage />} />
+				<Route
+					path="/dashboard/personas-mayores/solicitud-de-registro"
+					element={<SeniorRegisterRequestPage />}
+				/>
 				<Route path="/dashboard/eventos" element={<EventsPage />} />
 				<Route path="/dashboard/servicios" element={<ServicesPage />} />
 				<Route path="/dashboard/centros-de-atencion" element={<CentersPage />} />
-				<Route path="/dashboard/ver-seniors" element={<SeniorRegisterRequestPage />} />
 			</Route>
 
 			<Route path="*" element={<NotFoundPage />} />

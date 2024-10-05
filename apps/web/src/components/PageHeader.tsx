@@ -1,16 +1,21 @@
+import React from "react"
+import SearchBar from "./SearchBar"
+
 import { Show } from "./ui/Show"
 import { Breadcrumb } from "flowbite-react"
 import { useNavigate } from "react-router-dom"
 import { HiHome, HiUserAdd } from "react-icons/hi"
-import React, { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 interface PageHeaderProps {
 	pageTitle: string
 	addFunction?: () => void
-	setData?: () => void
+	searchKeys?: string[]
+	data?: any[]
+	setData?: Dispatch<SetStateAction<any[]>>
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, setData }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, searchKeys, data, setData }) => {
 	const [breadcrumbItems, setBreadcrumbItems] = useState<string[]>([])
 	const navigate = useNavigate()
 
@@ -46,14 +51,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, setData
 					</Breadcrumb>
 				</div>
 
-				<Show when={addFunction !== undefined && setData !== undefined}>
-					<div className="flex flex-row gap-4 w-2/6 items-center justify-center">
-						<input
-							className="w-3/4 h-10 rounded-lg border border-neutral-300 px-4"
-							type="text"
-							placeholder="Buscar..."
-							onChange={setData}
-						/>
+				<div className="flex flex-row gap-4 w-2/6 items-center justify-center">
+					{data && setData && searchKeys && <SearchBar data={data} setData={setData} keys={searchKeys} />}
+
+					<Show when={addFunction != undefined}>
 						<button
 							className="bg-green-600 text-neutral-50 font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
 							onClick={() => addFunction && addFunction()}
@@ -61,8 +62,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, setData
 							Nuevo
 							<HiUserAdd className="text-neutral-50 text-lg" />
 						</button>
-					</div>
-				</Show>
+					</Show>
+				</div>
 			</div>
 
 			<hr className="my-1" />

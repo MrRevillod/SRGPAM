@@ -89,6 +89,8 @@ const Form: React.FC<FormProps> = ({
 				message.error(error.response.data.message)
 
 				if (error.response.status === 409) {
+					console.log(error.response.data.values.conflicts)
+
 					error.response.data.values.conflicts.forEach((element: string) => {
 						setError(element, {
 							type: "manual",

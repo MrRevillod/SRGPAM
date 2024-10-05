@@ -1,28 +1,42 @@
 import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, TextInput } from "react-native"
+import { View, Text, StyleSheet } from "react-native"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"
 import { commonProps } from "../../utils/types"
-import { Controller, useForm } from "react-hook-form"
+import { Controller } from "react-hook-form"
+import Feather from "@expo/vector-icons/Feather"
 
-const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
+const DNI = ({ navigation, route, control, errors, setValue, getValues, trigger }: commonProps) => {
 	const [isCapturingFront, setIsCapturingFront] = useState<boolean>(true)
+	const [arePhotosValid, setPhotosValid] = useState<boolean>(false)
 
 	useEffect(() => {
 		if (route.params?.photoUri) {
 			if (isCapturingFront) {
-				console.log("Front photo set:", route.params.photoUri)
 				setValue("dni_a", route.params.photoUri)
 			} else {
-				console.log("Back photo set:", route.params.photoUri)
 				setValue("dni_b", route.params.photoUri)
 			}
 		}
 	}, [route.params?.photoUri])
 
+	useEffect(() => {
+		const photos = getValues(["dni_a", "dni_b"])
+		if (photos[0] && photos[1]) {
+			setPhotosValid(true)
+		}
+	}, [getValues(["dni_a", "dni_b"])])
+
 	const openCamera = (type: "front" | "back") => {
 		navigation.navigate("Camera", { from: "DNI" })
+	}
+
+	const validatePhotosAndNavigate = async () => {
+		const isValid = await trigger(["dni_a", "dni_b"])
+		if (isValid) {
+			navigation.navigate("Social")
+		}
 	}
 
 	return (
@@ -37,45 +51,56 @@ const DNI = ({ navigation, route, control, errors, setValue }: commonProps) => {
 					control={control}
 					name="dni_a"
 					render={({ field: { value } }) => (
-						<>
+						<View style={styles.takePhotoContainer}>
+							<View style={{ width: "10%" }}>
+								{value ? <Feather name="check-square" size={30} color="green" /> : <Feather name="square" size={30} color="black" />}
+							</View>
 							<CustomButton
-								style={{ marginTop: 30 }}
+								style={{ width: "85%" }}
 								title={value ? "Re-tomar Foto Frontal" : "Tomar Foto Frontal"}
 								onPress={() => {
 									setIsCapturingFront(true)
 									openCamera("front")
 								}}
 							/>
-							{value && <Text>Foto frontal tomada</Text>}
-						</>
+						</View>
 					)}
 				/>
+				{errors["dni_a"] && <Text style={{ color: "red", alignSelf: "center" }}>{errors["dni_a"].message}</Text>}
 
 				<Controller
 					control={control}
 					name="dni_b"
 					render={({ field: { value } }) => (
-						<>
+						<View style={styles.takePhotoContainer}>
+							<View style={{ width: "10%" }}>
+								{value ? <Feather name="check-square" size={30} color="green" /> : <Feather name="square" size={30} color="black" />}
+							</View>
 							<CustomButton
-								style={{ marginTop: 30 }}
+								style={{ width: "85%" }}
 								title={value ? "Re-tomar Foto Trasera" : "Tomar Foto Trasera"}
 								onPress={() => {
 									setIsCapturingFront(false)
 									openCamera("back")
 								}}
 							/>
-							{value && <Text>Foto trasera tomada</Text>}
-						</>
+						</View>
 					)}
 				/>
+				{errors["dni_b"] && <Text style={{ color: "red", alignSelf: "center" }}>{errors["dni_b"].message}</Text>}
 
-				<CustomButton
-					textStyle={styles.customButtonText}
-					title="Siguiente"
-					onPress={() => navigation.navigate("Social")}
-					style={{ backgroundColor: Colors.white }}
-				/>
-
+				<>
+					{arePhotosValid ? (
+						<CustomButton title="Siguiente" onPress={validatePhotosAndNavigate} style={{ marginTop: 30 }} />
+					) : (
+						<CustomButton
+							style={{ backgroundColor: Colors.white, marginTop: 30 }}
+							textStyle={styles.customButtonText}
+							title="Siguiente"
+							onPress={validatePhotosAndNavigate}
+						/>
+					)}
+				</>
 				<CustomButton
 					style={{ backgroundColor: Colors.white }}
 					textStyle={styles.customButtonText}
@@ -95,5 +120,12 @@ const styles = StyleSheet.create({
 	},
 	customButtonText: {
 		color: Colors.green,
+	},
+	takePhotoContainer: {
+		flexDirection: "row",
+		padding: 5,
+		marginTop: 25,
+		justifyContent: "space-between",
+		alignItems: "center",
 	},
 })
