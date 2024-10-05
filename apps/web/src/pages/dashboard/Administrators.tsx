@@ -1,15 +1,15 @@
-import React, { useState, useEffect, Fragment } from "react"
-import { api } from "../../lib/axios"
-import { Administrator } from "../../lib/types"
-import { AdministratorColumns } from "../../lib/columns"
-
-import { useModal } from "../../hooks/modal"
-
+import React from "react"
 import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
 import ConfirmDelete from "../../components/ConfirmDelete"
 import UpdateAdministrator from "../../components/forms/update/Administrator"
 import CreateAdministrator from "../../components/forms/create/Administrator"
+
+import { api } from "../../lib/axios"
+import { useModal } from "../../hooks/modal"
+import { Administrator } from "../../lib/types"
+import { AdministratorColumns } from "../../lib/columns"
+import { useState, useEffect, Fragment } from "react"
 
 const AdministratorsPage: React.FC = () => {
 	const [data, setData] = useState<Administrator[]>([])

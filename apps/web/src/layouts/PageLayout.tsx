@@ -6,7 +6,7 @@ import { Dispatch, ReactNode, SetStateAction } from "react"
 interface PageLayoutProps {
 	pageTitle: string
 	addFunction?: () => void
-	searchKeys: string[]
+	searchKeys?: string[]
 	data?: any[]
 	setData?: Dispatch<SetStateAction<any[]>>
 	children: ReactNode

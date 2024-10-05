@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(true)
 
 		try {
-			const response = await api.post("/auth/refresh")
+			const response = await api.get("/auth/refresh")
 			setRole(response.data.values.role)
 			setIsAuthenticated(true)
 		} catch (error) {
