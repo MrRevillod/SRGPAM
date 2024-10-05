@@ -1,9 +1,9 @@
 import { Event } from "@prisma/client"
 
 export interface ServerToClientEvents {
-	newEvent: (event: any) => void
-	deletedEvent: (event: any) => void
-    updatedEvent: (event: any) => void    
+	newEvent: (event: Event) => void
+	deletedEvent: (event: Event) => void
+    updatedEvent: (event: Event) => void    
 }
 
 

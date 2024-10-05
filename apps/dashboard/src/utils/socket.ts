@@ -6,36 +6,47 @@ interface Client {
 	userId: string
 }
 
-// Arreglo para almacenar los clientes conectados
-const clients: Client[] = []
+// Diccionario para almacenar los clientes conectados
+const clients: Record<string, Client> = {}
 
-// Función para agregar un cliente al arreglo
+// Función para agregar un cliente al diccionario
 export const addClient = (client: Client): void => {
-	clients.push(client)
+	clients[client.userId] = client
 }
 
 // Función para remover un cliente cuando se desconecta
 export const removeClient = (socketId: string): void => {
-	const index = clients.findIndex((client) => client.socketId === socketId)
-	if (index !== -1) clients.splice(index, 1)
+	// Buscar el cliente por socketId y eliminarlo si se encuentra
+	for (const userId in clients) {
+		if (clients[userId].socketId === socketId) {
+			delete clients[userId]
+			break
+		}
+	}
 }
 
 // Función para encontrar un cliente por userId
 export const getClientByUserId = (userId: string): Client | undefined => {
-	return clients.find((client) => client.userId === userId)
+	return clients[userId]
 }
 
-// Exportar el arreglo de clientes por si es necesario en otro lugar
-export const getClients = (): Client[] => clients
+// Exportar el diccionario de clientes por si es necesario en otro lugar
+export const getClients = (): Record<string, Client> => clients
 
 export const initSocket = (io: Server) => {
 	io.on("connection", (socket: Socket) => {
 		const role = socket.handshake.query.userRole as UserRole
-		const userId = socket.handshake.query.userType as string
+		const userId = socket.handshake.query.userId as string
 
+		// Asociar al cliente con su rol (grupo)
 		socket.join(role)
+
+		// Agregar el cliente al diccionario
 		addClient({ socketId: socket.id, userId })
 
-		console.log("new client!")
+		// Eliminar el cliente cuando se desconecta
+		socket.on("disconnect", () => {
+			removeClient(socket.id)
+		})
 	})
 }

@@ -2,8 +2,8 @@ import { prisma } from "@repo/database"
 import { Request, Response, NextFunction } from "express"
 import { io } from ".."
 
-import { Prisma } from "@prisma/client"
 import { canAddEvent } from "../utils/events"
+import { AppError } from "@repo/lib"
 
 // Controlador para obtener todos los administradores de la base de datos
 // se excluye el campo password de la respuesta
@@ -45,10 +45,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		})
 
 		if (!professional) {
-			return res.status(409).json({
-				message: "Professional no encontrado",
-				type: "error",
-			})
+			throw new AppError(400, "Profesional no encontrado")
 		}
 
 		const service = await prisma.service.findUnique({
@@ -56,10 +53,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		})
 
 		if (!service) {
-			return res.status(409).json({
-				message: "Servicio no encontrado",
-				type: "error",
-			})
+			throw new AppError(400, "Servicio no enconrado")
 		}
 
 		if (seniorId) {
@@ -68,10 +62,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 
 			if (!senior) {
-				return res.status(409).json({
-					message: "Adulto mayor no encontrado",
-					type: "error",
-				})
+				throw new AppError(400, "Adulto mayor no encontrado")
 			}
 		}
 
@@ -81,24 +72,25 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			})
 
 			if (!center) {
-				return res.status(409).json({
-					message: "Centro no encontrado",
-					type: "error",
-				})
+				throw new AppError(400, "Centro no encontrado")
 			}
 		}
-		const eventSelect: Prisma.EventSelect = {
-			startsAt: true,
-			endsAt: true,
-		}
+		// const eventSelect: Prisma.EventSelect = {
+		// 	startsAt: true,
+		// 	endsAt: true,
+		// }
 
 		const events = await prisma.event.findMany({
 			where: { professionalId: professionalId },
-			select: eventSelect,
 		})
 
-		if (canAddEvent(events, { startsAt, endsAt })) {
-			await prisma.event.create({
+		if (
+			canAddEvent(events, {
+				startsAt: new Date(startsAt),
+				endsAt: new Date(endsAt),
+			})
+		) {
+			const event = await prisma.event.create({
 				data: {
 					startsAt,
 					endsAt,
@@ -109,14 +101,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				},
 			})
 
-			io.emit("newEvent", {
-				startsAt,
-				endsAt,
-				professionalId,
-				serviceId,
-				centerId,
-				seniorId,
-			})
+			io.emit("newEvent", event)
 			return res.status(200).json({
 				message: "Creación exitosa",
 				type: "success",
@@ -142,21 +127,15 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		})
 
 		if (!professional) {
-			return res.status(409).json({
-				message: "Professional no encontrado",
-				type: "error",
-			})
+			throw new AppError(400, "Profesional no encontrado")
 		}
 
 		const service = await prisma.service.findUnique({
-			where: { id: serviceId },
+			where: { id: parseInt(serviceId) },
 		})
 
 		if (!service) {
-			return res.status(409).json({
-				message: "Servicio no encontrado",
-				type: "error",
-			})
+			throw new AppError(400, "Servicio no encontrado")
 		}
 
 		if (seniorId) {
@@ -165,37 +144,32 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			})
 
 			if (!senior) {
-				return res.status(409).json({
-					message: "Adulto mayor no encontrado",
-					type: "error",
-				})
+				throw new AppError(400, "Adulto mayor no encontrado")
 			}
 		}
 
 		if (centerId) {
 			const center = await prisma.center.findUnique({
-				where: { id: centerId },
+				where: { id: parseInt(centerId) },
 			})
 
 			if (!center) {
-				return res.status(409).json({
-					message: "Centro no encontrado",
-					type: "error",
-				})
+				throw new AppError(400, "Centro no encontrado")
 			}
 		}
-
-		const eventSelect: Prisma.EventSelect = {
-			startsAt: true,
-			endsAt: true,
-		}
-
 		const events = await prisma.event.findMany({
-			where: { id: professionalId },
-			select: eventSelect,
+            where: {
+                professionalId: professionalId ,
+                id: {
+                    not: parseInt(req.params.id),  // Excluir el evento con el `id` específico
+                },
+            },
 		})
 
-		if (canAddEvent(events, { startsAt, endsAt })) {
+		if (canAddEvent(events, {
+            startsAt: new Date(startsAt),
+            endsAt: new Date(endsAt),
+        })) {
 			const event = await prisma.event.update({
 				where: { id: parseInt(req.params.id) },
 				data: {
@@ -206,17 +180,6 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 					centerId: centerId ? parseInt(serviceId) : null,
 					seniorId: seniorId || null,
 					assistance: assistance || false,
-				},
-				select: {
-					seniorId: true,
-					professionalId: true,
-					serviceId: true,
-					centerId: true,
-					startsAt: true,
-					endsAt: true,
-					assistance: true,
-					createdAt: true,
-					updatedAt: true,
 				},
 			})
 
@@ -241,12 +204,9 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 // Controlador para eliminar un administrador por su id
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await prisma.event.delete({ where: { id: parseInt(req.params.id) } })
+		const event = await prisma.event.delete({ where: { id: parseInt(req.params.id) } })
 
-		io.emit("deletedEvent", {
-			id: parseInt(req.params.id),
-		})
-
+		io.emit("deletedEvent", event)
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
