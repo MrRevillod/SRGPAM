@@ -1,15 +1,20 @@
 import { Event } from "@prisma/client"
+import { AppError } from "@repo/lib";
 
 export const canAddEvent = (events: Event[], newEvent: { startsAt: Date; endsAt: Date }): boolean => {
 	// Ordenar los eventos por la fecha de inicio
-	events.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
-
-
+    events.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
+    
 	// Revisar si el nuevo evento se superpone con los eventos existentes
 	for (let i = 0; i < events.length; i++) {
 		const event = events[i]
 
 		// Si el nuevo evento termina antes de que el evento actual comience, no hay superposición
+        if (newEvent.endsAt <= newEvent.startsAt) {
+            throw new AppError(400,"Rango de tiempo invalido")
+        }
+
+
 		if (newEvent.endsAt <= event.startsAt) {
 			continue
 		}
@@ -19,6 +24,7 @@ export const canAddEvent = (events: Event[], newEvent: { startsAt: Date; endsAt:
 			continue
 		}
 
+        console.log(newEvent,event)
 		// Si cae aquí, entonces hay superposición
 		return false
 	}
