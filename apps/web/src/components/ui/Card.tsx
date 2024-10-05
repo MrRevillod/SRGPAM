@@ -1,16 +1,25 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Dropdown } from "flowbite-react"
+import axios from "axios"
+import { useImage } from "../../hooks/image"
 
 interface Props {
 	title: string
 	description: string
-	imageSrc?: string
+	imageSrcUrl?: string
 	other?: string
 	onDelete: () => void | Promise<void>
 	onUpdate: () => void | Promise<void>
 }
 
-const Card: React.FC<Props> = ({ title, description, imageSrc, other, onUpdate, onDelete }) => {
+const Card: React.FC<Props> = ({ title, description, imageSrcUrl, other, onUpdate, onDelete }) => {
+	const [imageSrc, setImageSrc] = useState<string | null>(null)
+
+	useEffect(() => {
+		if (imageSrcUrl) {
+			useImage(imageSrcUrl, setImageSrc)
+		}
+	}, [imageSrcUrl])
 	return (
 		<div className="w-full border rounded-lg overflow-hidden shadow-lg flex">
 			<img

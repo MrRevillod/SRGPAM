@@ -70,6 +70,7 @@ const ServicesPage: React.FC = () => {
 							key={service.id}
 							title={service.name}
 							description={service.description}
+							imageSrcUrl={`http://localhost/api/storage/public/services/${service.id}.webp`}
 						/>
 					))}
 				</div>

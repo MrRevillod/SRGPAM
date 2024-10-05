@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CentersSchemas } from "../../../lib/schemas"
 import { Center, UpdateEntityFormProps } from "../../../lib/types"
+import InputFile from "../../ui/InputFile"
 
 const UpdateCenter: React.FC<UpdateEntityFormProps<Center>> = ({ visible, entity, onCancel, onOk, data, setData }) => {
 	const formContext = useForm({
@@ -57,11 +58,10 @@ const UpdateCenter: React.FC<UpdateEntityFormProps<Center>> = ({ visible, entity
 				defaultValue={entity?.phone}
 				{...register("phone")}
 			/>
-			<input
-				type="file"
+			<InputFile
+				label="Imagen"
 				{...register("image")}
-				className="border p-2"
-				accept="image/jpeg,image/png,image/jpg,image/webp"
+				error={errors.image ? errors.image.message?.toString() : ""}
 			/>
 		</Form>
 	)
