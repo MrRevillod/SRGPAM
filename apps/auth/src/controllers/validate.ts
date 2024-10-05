@@ -6,10 +6,11 @@ import { AppError, JsonResponse, signJsonwebtoken, verifyJsonwebtoken, getServer
 
 export const validateSession = (req: Request, res: Response, next: NextFunction) => {
 	const user = req.getExtension("user")
+	const role = req.getExtension("role")
 
 	const response: JsonResponse<any> = {
 		type: "success",
-		values: { user },
+		values: { user, role },
 		message: "Usuario autenticado",
 	}
 

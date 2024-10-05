@@ -1,5 +1,5 @@
 import { prisma } from "@repo/database"
-import { AppError, findUser, UserRole } from "@repo/lib"
+import { AppError, findUser, getServerTokens, httpRequest, UserRole } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 import { SomeZodObject, ZodEffects, ZodObject } from "zod"
 
@@ -49,22 +49,57 @@ export const validateSchema = (schema: SomeZodObject | ZodEffects<ZodObject<any,
 // - Que ocurre si la id del Profesional esta relacionada con multiples eventos? si yo solo estoy recibiendo la id del usuario, como se que evento le pertenece?
 // - Si el usuario no tiene eventos relacionados, como se procede? se lanza un error? se le permite pasar?
 
-export const eventOwner = async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.params.id) throw new AppError(400, "Petición inválida")
-	try {
-		if (await findUser({ id: req.params.id }, "ADMIN")) next()
-	} catch (error) {
-		next(error)
-	}
-}
+// export const eventOwner = async (req: Request, res: Response, next: NextFunction) => {
+// 	if (!req.params.id) throw new AppError(400, "Petición inválida")
+// 	try {
+// 		if (await findUser({ id: req.params.id }, "ADMIN")) next()
+// 	} catch (error) {
+// 		next(error)
+// 	}
+// }
 
 // Para el caso de los usuarios, se procede de la misma manera que con los eventos, se valida si la id existe, si el usuario es ADMIN y
 // si no se procede a buscar en la base de datos,
 
-export const userOwner = async (req: Request, res: Response, next: NextFunction) => {
-	if (!req.params.id) throw new AppError(400, "Petición inválida")
+export const seniorOwn = async (role: string, req: Request, res: Response, next: NextFunction) => {
+	const tokens = getServerTokens(req.headers, req.cookies)
+
 	try {
-		if (await findUser({ id: req.params.id }, "ADMIN")) next()
+		const response = await httpRequest({
+			service: "AUTH",
+			endpoint: "/validate-auth",
+			headers: {
+				Authorization: `Bearer ${tokens?.access || null}`,
+			},
+		})
+
+		if (response.type === "error") {
+			throw new AppError(response.status || 500, response.message)
+		}
+
+		const responseRole = (response.values as { role?: string })?.role || null
+		const responseUserId = (response.values as { user?: { id: string } })?.user?.id || null
+
+		const user = req.getExtension("user") as { id: string } | undefined
+
+		if (!user) {
+			throw new AppError(400, "El usuario solicitado no existe")
+		}
+		const userId = user?.id || null
+
+		if (responseRole === "ADMIN") {
+			return next()
+		}
+
+		if (responseRole !== role) {
+			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+		}
+
+		if (responseUserId !== userId) {
+			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+		}
+
+		next()
 	} catch (error) {
 		next(error)
 	}
