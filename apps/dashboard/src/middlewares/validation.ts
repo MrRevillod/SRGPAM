@@ -37,31 +37,10 @@ export const validateSchema = (schema: SomeZodObject | ZodEffects<ZodObject<any,
 	}
 }
 
-// Notas @aliwenn: Segun lo que entendi, decidi dividir en dos el middleware, uno para checkear eventos y el otro para checkear usuarios
-// en primera instancia, si la id no existe, se lanza un error de peticion invalida
-// luego, busco la id del usuario con el rol ADMIN con la funcion del @lib, si existe, dejo el admin pasar
-// si esa validacion no se toma en cuenta entonces busco en EVENTOS si la id proporcionada le pertenece a un PROFESIONAL o SENIOR
-// a mi criterio no es necesario validar que tipo de usuario es, ya que solo se me solicita validar pertenencia del evento a un usuario
-// por ende si el usuario esta en el evento, esto quiere decir que le pertenece y por consecuencia puede pasar al siguiente middleware o controller
-// segun el endpoint en el que se encuentre el middleware
-
-// Problemas que se me vienen a la mente:
-// - Que ocurre si la id del Profesional esta relacionada con multiples eventos? si yo solo estoy recibiendo la id del usuario, como se que evento le pertenece?
-// - Si el usuario no tiene eventos relacionados, como se procede? se lanza un error? se le permite pasar?
-
-// export const eventOwner = async (req: Request, res: Response, next: NextFunction) => {
-// 	if (!req.params.id) throw new AppError(400, "Petición inválida")
-// 	try {
-// 		if (await findUser({ id: req.params.id }, "ADMIN")) next()
-// 	} catch (error) {
-// 		next(error)
-// 	}
-// }
-
-// Para el caso de los usuarios, se procede de la misma manera que con los eventos, se valida si la id existe, si el usuario es ADMIN y
-// si no se procede a buscar en la base de datos,
-
-export const seniorOwn = async (role: string, req: Request, res: Response, next: NextFunction) => {
+// se obtienen los tokens, se realiza una request al AUTH para validar la sesion,
+// esta devuelve tanto el user como el rol, si es ADMIN se permite el acceso, sino
+// se compara el id del usuario en la sesion con el id del usuario en la URL
+export const userOwnerValidation = async (req: Request, res: Response, next: NextFunction) => {
 	const tokens = getServerTokens(req.headers, req.cookies)
 
 	try {
@@ -91,14 +70,55 @@ export const seniorOwn = async (role: string, req: Request, res: Response, next:
 			return next()
 		}
 
-		if (responseRole !== role) {
-			throw new AppError(403, "No tienes permisos para acceder a este recurso")
-		}
-
 		if (responseUserId !== userId) {
 			throw new AppError(403, "No tienes permisos para acceder a este recurso")
 		}
+		next()
+	} catch (error) {
+		next(error)
+	}
+}
 
+// Para el evento es parecido al anterior pero aca se busca la id del evento y luego se compara
+// si las claves foraneas del profesional o del senior son iguales a la id del usuario en la sesion
+export const eventOwnerValidation = async (req: Request, res: Response, next: NextFunction) => {
+	const tokens = getServerTokens(req.headers, req.cookies)
+	if (!req.params.id) throw new AppError(400, "Petición inválida")
+	const eventId = req.params.id
+
+	try {
+		const event = await prisma.event.findUnique({
+			where: {
+				id: parseInt(eventId, 10),
+			},
+		})
+
+		if (!event) {
+			throw new AppError(400, "El evento solicitado no existe")
+		}
+
+		const response = await httpRequest({
+			service: "AUTH",
+			endpoint: "/validate-auth",
+			headers: {
+				Authorization: `Bearer ${tokens?.access || null}`,
+			},
+		})
+
+		if (response.type === "error") {
+			throw new AppError(response.status || 500, response.message)
+		}
+
+		const responseRole = (response.values as { role?: string })?.role || null
+		const responseUserId = (response.values as { user?: { id: string } })?.user?.id || null
+
+		if (responseRole === "ADMIN") {
+			return next()
+		}
+
+		if (!event || (event.professionalId !== responseUserId && event.seniorId !== responseUserId)) {
+			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+		}
 		next()
 	} catch (error) {
 		next(error)
