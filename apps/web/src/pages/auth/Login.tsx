@@ -15,10 +15,9 @@ const LoginPage: React.FC = () => {
 		resolver: zodResolver(LoginFormSchema),
 	})
 
-	const { login, error, role } = useAuth()
+	const { login, error, role,isAuthenticated } = useAuth()
 
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
-		console.log(formData.role)
 		await login(formData)
 		if (isAuthenticated) {
 			const roles = {
@@ -54,7 +53,7 @@ const LoginPage: React.FC = () => {
 						<Input
 							label="Contraseña"
 							type="password"
-							value={"!Admin2024Password"}
+							defaultValue={"!Admin2024Password"}
 							{...register("password")}
 							placeholder="●●●●●●●●●●"
 							error={errors.password ? errors.password.message?.toString() : ""}

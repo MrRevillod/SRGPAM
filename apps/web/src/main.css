@@ -69,3 +69,40 @@ body {
 	padding-top: 0rem;
 	padding-bottom: 0rem;
 }
+
+/* CSS global o específico del componente */
+.fc {
+    max-height: 100%;
+    overflow-x: auto;
+    overflow-y: scroll;
+  }
+.fc-view-harness{
+    max-height: 300px;
+    overflow-y: scroll;
+    
+}
+
+  @media (max-width: 768px) {
+    .fc-toolbar {
+      display: block;
+      text-align: center;
+    }
+    
+    .fc-header-toolbar .fc-left, 
+    .fc-header-toolbar .fc-right {
+      float: none;
+      margin-bottom: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .fc-toolbar-title {
+      font-size: 1.2em;
+    }
+    
+    .fc-header-toolbar .fc-button {
+      margin: 0 5px;
+      font-size: 0.8em;
+    }
+  }
+  

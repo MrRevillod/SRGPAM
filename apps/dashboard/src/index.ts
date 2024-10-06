@@ -26,7 +26,10 @@ export const createServer_ = (): express.Express => {
 	app.use(morgan("dev"))
 	app.use(express.urlencoded({ extended: true }))
 	app.use(express.json())
-	app.use(cors())
+    app.use(cors({
+        origin: 'http://localhost:8000', // Cambia esto por el origen del cliente
+        credentials: true // Permitir credenciales (cookies, headers, etc.)
+      }));
 	app.use(cookieParser())
 
 	app.use(extensions)
