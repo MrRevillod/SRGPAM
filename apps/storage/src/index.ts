@@ -6,6 +6,7 @@ import morgan from "morgan"
 import express from "express"
 import router from "./router"
 
+import { RequestHandler } from "express"
 import { log, services, errorHandler, constants, AppError } from "@repo/lib"
 
 // Sistema de archivos de el microservicio de almacenamiento
@@ -14,9 +15,9 @@ import { log, services, errorHandler, constants, AppError } from "@repo/lib"
 
 // -- /seniors
 // ---- /id
-// ------ dni-a.jpg
-// ------ dni-b.jpg
-// ------ social.jpg
+// ------ dni-a.jpg -> Protegida
+// ------ dni-b.jpg -> Protegida
+// ------ social.jpg -> Protegida
 // ------ profile.jpg
 
 // -- /users
@@ -31,6 +32,13 @@ import { log, services, errorHandler, constants, AppError } from "@repo/lib"
 
 // Las imagenes son transformadas a formato webp con calidad 80
 // Un upload de una imagen con el mismo nombre sobreescribe la anterior
+
+const verifyStorageKey: RequestHandler = (req, res, next) => {
+	if (req.headers["x-storage-key"] !== constants.STORAGE_KEY) {
+		next(new AppError(403, "No tiene permisos para acceder al servicio"))
+	}
+	next()
+}
 
 const initFileSystem = (): void => {
 	// __dirname => directorio actual
@@ -59,17 +67,37 @@ export const createServer = (): express.Express => {
 	app.use(express.urlencoded({ extended: true }))
 	app.use(cors())
 
-	app.use((req, res, next) => {
-		if (req.headers["x-storage-key"] !== constants.STORAGE_KEY) {
-			next(new AppError(403, "No tiene permisos para acceder al servicio"))
-		}
-		next()
+	// ----------------- Rutas privadas ------------------
+	// /api/storage/upload
+	// /api/storage/delete
+	// /api/storage/public/seniors/id/social.webp
+	// /api/storage/public/seniors/id/dni-a.webp
+	// /api/storage/public/seniors/id/dni-b.webp
+	// ---------------------------------------------------
+
+	// ----------------- Rutas públicas ------------------
+	// /api/storage/public/* ![seniors] /*.webp
+	// ---------------------------------------------------
+
+	const seniorRouter = express.Router()
+
+	seniorRouter.get("/:id/social.webp", verifyStorageKey, (req, res) => {
+		res.sendFile(path.join(__dirname, "../public/seniors", req.params.id, "social.webp"))
+	})
+	seniorRouter.get("/:id/dni-a.webp", verifyStorageKey, (req, res) => {
+		res.sendFile(path.join(__dirname, "../public/seniors", req.params.id, "dni-a.webp"))
+	})
+	seniorRouter.get("/:id/dni-b.webp", verifyStorageKey, (req, res) => {
+		res.sendFile(path.join(__dirname, "../public/seniors", req.params.id, "dni-b.webp"))
 	})
 
-	app.use("/api/storage/", router)
-	app.use("/api/storage/public", express.static(path.join(__dirname, "../public")))
+	app.use("/api/storage/public/seniors", seniorRouter)
+	app.use("/api/storage/public/", express.static(path.join(__dirname, "../public")))
+
+	app.use("/api/storage/", verifyStorageKey, router)
 
 	app.use(errorHandler)
+
 	return app
 }
 

@@ -2,87 +2,56 @@ import React from "react"
 import Form from "../Form"
 
 import { Input } from "../../ui/Input"
-import { useForm } from "react-hook-form"
+import { Modal } from "../../Modal"
+import { FormProvider, useForm } from "react-hook-form"
+import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AdministratorSchemas } from "../../../lib/schemas"
-import { Administrator, UpdateEntityFormProps } from "../../../lib/types"
+import { Administrator, FormProps } from "../../../lib/types"
 
-const UpdateAdministrator: React.FC<UpdateEntityFormProps<Administrator>> = ({
-	visible,
-	entity,
-	onCancel,
-	onOk,
-	data,
-	setData,
-}) => {
-	const formContext = useForm({
+const UpdateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData }) => {
+	const { selectedData } = useModal()
+
+	const methods = useForm({
 		resolver: zodResolver(AdministratorSchemas.Update),
 	})
 
-	const {
-		reset,
-		register,
-		formState: { errors },
-	} = formContext
+	const { reset } = methods
 
 	useEffect(() => {
-		if (entity) {
+		if (selectedData) {
 			reset({
-				name: entity.name,
-				email: entity.email,
-				password: "",
-				confirmPassword: "",
+				name: selectedData.name,
+				email: selectedData.email,
 			})
 		}
-	}, [entity])
+	}, [selectedData])
 
 	return (
-		<Form
-			modalTitle={`Editar la información de ${entity?.name}`}
-			entityName="administrador"
-			onOk={onOk}
-			data={data}
-			setData={setData}
-			visible={visible}
-			onCancel={onCancel}
-			apiEndpoint={`/dashboard/administrators/${entity?.id}`}
-			formContext={formContext as any}
-			method="PATCH"
-		>
-			<Input
-				label="Nombre"
-				type="text"
-				placeholder="Nombre"
-				error={errors.name ? errors.name.message?.toString() : ""}
-				defaultValue={entity?.name}
-				{...register("name")}
-			/>
-			<Input
-				label="Correo Electrónico"
-				type="email"
-				placeholder="Correo Electrónico"
-				error={errors.email ? errors.email.message?.toString() : ""}
-				defaultValue={entity?.email}
-				{...register("email")}
-			/>
-			<Input
-				label="PIN"
-				type="password"
-				placeholder="••••"
-				islogin="false"
-				error={errors.password ? errors.password.message?.toString() : ""}
-				{...register("password")}
-			/>
-			<Input
-				label="Confirmar PIN"
-				type="password"
-				placeholder="••••"
-				islogin="false"
-				error={errors.confirmPassword ? errors.confirmPassword.message?.toString() : ""}
-				{...register("confirmPassword")}
-			/>
-		</Form>
+		<Modal type="Edit" title={`Editar la información de ${selectedData?.name}`}>
+			<FormProvider {...methods}>
+				<Form
+					method="PATCH"
+					data={data}
+					setData={setData}
+					entityName="administrador"
+					apiEndpoint={`/dashboard/administrators/${selectedData?.id}`}
+				>
+					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
+					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
+
+					<Input name="password" label="PIN" type="password" placeholder="••••" islogin="false" />
+					<Input
+						name="confirmPassword"
+						label="Confirmar PIN"
+						type="password"
+						placeholder="••••"
+						islogin="false"
+					/>
+				</Form>
+			</FormProvider>
+		</Modal>
 	)
 }
 

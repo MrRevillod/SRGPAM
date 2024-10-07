@@ -2,6 +2,7 @@ import React from "react"
 import SearchBar from "./SearchBar"
 
 import { Show } from "./ui/Show"
+import { useModal } from "../context/ModalContext"
 import { Breadcrumb } from "flowbite-react"
 import { useNavigate } from "react-router-dom"
 import { HiHome, HiUserAdd } from "react-icons/hi"
@@ -9,13 +10,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 interface PageHeaderProps {
 	pageTitle: string
-	addFunction?: () => void
+	create?: boolean
 	searchKeys?: string[]
 	data?: any[]
 	setData?: Dispatch<SetStateAction<any[]>>
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, searchKeys, data, setData }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, data, setData }) => {
 	const [breadcrumbItems, setBreadcrumbItems] = useState<string[]>([])
 	const navigate = useNavigate()
 
@@ -36,6 +37,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, searchK
 			.join(" ")
 	}
 
+	const { showModal } = useModal()
+
 	return (
 		<section className="flex flex-col gap-4 w-full">
 			<div className="flex flex-row w-full">
@@ -54,10 +57,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, addFunction, searchK
 				<div className="flex flex-row gap-4 w-2/6 items-center justify-center">
 					{data && setData && searchKeys && <SearchBar data={data} setData={setData} keys={searchKeys} />}
 
-					<Show when={addFunction != undefined}>
+					<Show when={create != undefined}>
 						<button
 							className="bg-green-600 text-neutral-50 font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
-							onClick={() => addFunction && addFunction()}
+							onClick={() => create && showModal("Create", null)}
 						>
 							Nuevo
 							<HiUserAdd className="text-neutral-50 text-lg" />

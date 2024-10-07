@@ -11,6 +11,8 @@ const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123"
 const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD || "pro123"
 const DEFAULT_PROFILE_PICTURE = "https://i.pinimg.com/originals/58/51/2e/58512eb4e598b5ea4e2414e3c115bef9.jpg"
 
+const DEV_DEFAULT_DEVELOPER_PASSWORD = process.env.DEV_DEFAULT_DEVELOPER_PASSWORD || "dev"
+
 const generateRUT = (): string => {
 	const numero: string = Math.floor(Math.random() * 100000000)
 		.toString()
@@ -60,18 +62,16 @@ const uploadImage = async (url: string, name: string, uploadPath: string) => {
 }
 
 const seed = async () => {
-	if (process.argv[2] && process.argv[2] === "drop") {
-		await prisma.$transaction([
-			prisma.event.deleteMany(),
-			prisma.professional.deleteMany(),
-			prisma.center.deleteMany(),
-			prisma.service.deleteMany(),
-			prisma.senior.deleteMany(),
-			prisma.administrator.deleteMany(),
-		])
+	await prisma.$transaction([
+		prisma.event.deleteMany(),
+		prisma.professional.deleteMany(),
+		prisma.center.deleteMany(),
+		prisma.service.deleteMany(),
+		prisma.senior.deleteMany(),
+		prisma.administrator.deleteMany(),
+	])
 
-		console.log("All records dropped.")
-	}
+	console.log("All records dropped.")
 
 	await uploadImage(DEFAULT_PROFILE_PICTURE, "default-profile", "/upload?path=%2Fusers")
 
@@ -79,6 +79,16 @@ const seed = async () => {
 
 	const services = data.services
 	const centers = data.centers
+
+	await prisma.administrator.createMany({
+		data: [
+			{ id: generateRUT(), email: "tc@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Tomás Curihual" },
+			{ id: generateRUT(), email: "be@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Benjamín Espinoza" },
+			{ id: generateRUT(), email: "lr@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Luciano Revillod" },
+			{ id: generateRUT(), email: "cr@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Carlos Riquelme" },
+			{ id: generateRUT(), email: "cs@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Cristóbal Sandoval" },
+		],
+	})
 
 	for (let i = 1; i <= 25; i++) {
 		const rand = Math.floor(Math.random() * 1000)
@@ -138,7 +148,7 @@ const seed = async () => {
 					id: i,
 					name: randomService.name,
 					title: randomService.title,
-					description: faker.lorem.paragraph(),
+					description: faker.lorem.sentence(25),
 				},
 				update: {},
 			})
@@ -188,6 +198,45 @@ const seed = async () => {
 			console.error(`Error en la iteración ${i}:`, error)
 		}
 	}
+	await prisma.professional.createMany({
+		data: [
+			{
+				id: generateRUT(),
+				email: "tc@dev.pro.com",
+				password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10),
+				name: "Tomás Curihual",
+				serviceId: 1,
+			},
+			{
+				id: generateRUT(),
+				email: "be@dev.pro.com",
+				password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10),
+				name: "Benjamín Espinoza",
+				serviceId: 2,
+			},
+			{
+				id: generateRUT(),
+				email: "lr@dev.pro.com",
+				password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10),
+				name: "Luciano Revillod",
+				serviceId: 3,
+			},
+			{
+				id: generateRUT(),
+				email: "cr@dev.pro.com",
+				password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10),
+				name: "Carlos Riquelme",
+				serviceId: 4,
+			},
+			{
+				id: generateRUT(),
+				email: "cs@dev.pro.com",
+				password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10),
+				name: "Cristóbal Sandoval",
+				serviceId: 5,
+			},
+		],
+	})
 }
 
 seed()

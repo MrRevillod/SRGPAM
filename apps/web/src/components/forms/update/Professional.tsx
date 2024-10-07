@@ -1,21 +1,20 @@
 import React from "react"
 import Form from "../Form"
 
-import { Modal } from "../../Modal"
 import { Input } from "../../ui/Input"
+import { Modal } from "../../Modal"
 import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
-import { DatePicker } from "../../ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SeniorSchemas } from "../../../lib/schemas"
-import { Senior, FormProps } from "../../../lib/types"
+import { ProfessionalSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
+import { FormProps, Professional } from "../../../lib/types"
 
-const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
+const UpdateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }) => {
 	const { selectedData } = useModal()
 
 	const methods = useForm({
-		resolver: zodResolver(SeniorSchemas.Update),
+		resolver: zodResolver(ProfessionalSchemas.Update),
 	})
 
 	const { reset } = methods
@@ -25,10 +24,6 @@ const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
 			reset({
 				name: selectedData.name,
 				email: selectedData.email,
-				address: selectedData.address,
-				birthDate: new Date(selectedData.birthDate),
-				password: "",
-				confirmPassword: "",
 			})
 		}
 	}, [selectedData])
@@ -37,16 +32,15 @@ const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
 		<Modal type="Edit" title={`Editar la información de ${selectedData?.name}`}>
 			<FormProvider {...methods}>
 				<Form
-					entityName="persona mayor"
+					method="PATCH"
 					data={data}
 					setData={setData}
-					apiEndpoint={`/dashboard/seniors/${selectedData?.id}`}
-					method="PATCH"
+					entityName="profesional"
+					apiEndpoint={`/dashboard/profesional/${selectedData?.id}`}
 				>
 					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
-					<Input name="address" label="Dirección" type="text" placeholder="Dirección" />
-					<DatePicker name="birthDate" label="Fecha de nacimiento" />
+
 					<Input name="password" label="PIN" type="password" placeholder="••••" islogin="false" />
 					<Input
 						name="confirmPassword"
@@ -61,4 +55,4 @@ const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
 	)
 }
 
-export default UpdateSenior
+export default UpdateProfessional

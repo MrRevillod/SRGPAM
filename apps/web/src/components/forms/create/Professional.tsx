@@ -4,21 +4,21 @@ import Form from "../Form"
 import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AdministratorSchemas } from "../../../lib/schemas"
+import { ProfessionalSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
-import { FormProps, Administrator } from "../../../lib/types"
+import { FormProps, Professional } from "../../../lib/types"
 
-const CreateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData }) => {
-	const methods = useForm({ resolver: zodResolver(AdministratorSchemas.Create) })
+const CreateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }) => {
+	const methods = useForm({ resolver: zodResolver(ProfessionalSchemas.Create) })
 
 	return (
-		<Modal type="Create" title="Añadir nuevo administrador al sistema">
+		<Modal type="Create" title="Añadir nuevo profesional al sistema">
 			<FormProvider {...methods}>
 				<Form
-					entityName="administrador"
+					entityName="profesional"
 					data={data}
 					setData={setData}
-					apiEndpoint="/dashboard/administrators/"
+					apiEndpoint="/dashboard/professional/"
 					method="POST"
 				>
 					<Input name="id" label="Rut (sin puntos ni guión)" type="text" placeholder="123456789" />
@@ -30,4 +30,4 @@ const CreateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData
 	)
 }
 
-export default CreateAdministrator
+export default CreateProfessional

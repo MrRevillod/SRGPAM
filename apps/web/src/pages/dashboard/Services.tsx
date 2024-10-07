@@ -3,26 +3,30 @@ import PageLayout from "../../layouts/PageLayout"
 import FlowbiteCard from "../../components/ui/Card"
 import CreateService from "../../components/forms/create/Service"
 import UpdateService from "../../components/forms/update/Service"
-import ConfirmDelete from "../../components/ConfirmDelete"
+import ConfirmDelete from "../../components/ConfirmAction"
 
 import { api } from "../../lib/axios"
 import { Service } from "../../lib/types"
-import { useModal } from "../../hooks/modal"
+import { useModal } from "../../context/ModalContext"
 import { Pagination } from "antd"
-import { useState, useEffect } from "react"
+import { usePagination } from "../../hooks/usePagination"
+import { useEffect, useState } from "react"
 
 const ServicesPage: React.FC = () => {
 	const [data, setData] = useState<Service[]>([])
-	const [originalData, setOriginalData] = useState<Service[]>([])
 	const [loading, setLoading] = useState(true)
-	const [currentPage, setCurrentPage] = useState(1)
-	const [pageSize, setPageSize] = useState(6)
+
+	const { showModal } = useModal()
+
+	const { paginatedData, currentPage, pageSize, total, onPageChange } = usePagination({
+		data,
+		defaultPageSize: 6,
+	})
 
 	const fetchServices = async () => {
 		try {
 			const response = await api.get("/dashboard/services/")
 			setData(response.data.values.services)
-			setOriginalData(response.data.values.services)
 		} catch (err) {
 			console.log(err)
 			console.error("Error al obtener los datos de servicios")
@@ -44,33 +48,18 @@ const ServicesPage: React.FC = () => {
 		}
 	}
 
-	const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-
-	const onPageChange = (page: number, size: number) => {
-		setCurrentPage(page)
-		setPageSize(size)
-	}
-
-	const { isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData } = useModal()
-
 	return (
-		<PageLayout
-			pageTitle="Servicios"
-			addFunction={() => showModal("Create", null)}
-			setData={setData}
-			data={originalData}
-			searchKeys={["name"]}
-		>
+		<PageLayout pageTitle="Servicios" create={true} setData={setData} data={data} searchKeys={["name"]}>
 			<section className="flex flex-col w-full h-full gap-8">
 				<div className="grid grid-cols-3 gap-8 h-full">
 					{paginatedData.map((service) => (
 						<FlowbiteCard
-							onDelete={() => showModal("Delete", service)}
+							onDelete={() => showModal("Confirm", service)}
 							onUpdate={() => showModal("Edit", service)}
 							key={service.id}
 							title={service.name}
 							description={service.description}
-							imageSrcUrl={`http://localhost/api/storage/public/services/${service.id}.webp`}
+							imageSrcUrl={`${import.meta.env.VITE_API_URL}/storage/public/services/${service.id}.webp`}
 						/>
 					))}
 				</div>
@@ -80,39 +69,20 @@ const ServicesPage: React.FC = () => {
 					pageSizeOptions={["6", "12", "24", "48"]}
 					current={currentPage}
 					pageSize={pageSize}
-					total={data.length}
+					total={total}
 					onChange={onPageChange}
 					size="default"
 					align="end"
 				/>
 			</section>
 
-			<CreateService
-				visible={isModalOpen && modalType === "Create"}
-				onCancel={handleCancel}
-				onOk={handleOk}
-				setData={setData}
-				data={data}
-			/>
-
-			<UpdateService
-				visible={isModalOpen && modalType === "Edit"}
-				entity={selectedData}
-				onCancel={handleCancel}
-				onOk={handleOk}
-				data={data}
-				setData={setData}
-			/>
-
+			<CreateService data={data} setData={setData} />
+			<UpdateService data={data} setData={setData} />
 			<ConfirmDelete
-				executeAction={handleDelete}
-				text="Servicio"
-				visible={isModalOpen && modalType === "Delete"}
-				onCancel={handleCancel}
-				onOk={handleOk}
+				text="¿Estás seguro(a) de que deseas eliminar este servicio?"
 				data={data}
 				setData={setData}
-				selectedElement={selectedData}
+				executeAction={(element) => handleDelete(element)}
 			/>
 		</PageLayout>
 	)

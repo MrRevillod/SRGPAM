@@ -1,12 +1,12 @@
 import React from "react"
 import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
-import ConfirmDelete from "../../components/ConfirmDelete"
+import ConfirmAction from "../../components/ConfirmAction"
 import UpdateAdministrator from "../../components/forms/update/Administrator"
 import CreateAdministrator from "../../components/forms/create/Administrator"
 
 import { api } from "../../lib/axios"
-import { useModal } from "../../hooks/modal"
+import { useModal } from "../../context/ModalContext"
 import { Administrator } from "../../lib/types"
 import { AdministratorColumns } from "../../lib/columns"
 import { useState, useEffect, Fragment } from "react"
@@ -33,58 +33,39 @@ const AdministratorsPage: React.FC = () => {
 		fetchAdministrators()
 	}, [])
 
-	const handleDelete = async (element: any) => {
+	const handleDelete = async (administrator: any) => {
 		try {
-			const response = await api.delete(`/dashboard/administrators/${element.id}`)
+			const response = await api.delete(`/dashboard/administrators/${administrator.id}`)
 			return response
 		} catch (error) {
 			console.error("Error en el delete:", error)
 		}
 	}
 
-	const { isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData } = useModal()
+	const { showModal } = useModal()
 
 	return (
 		<PageLayout
 			pageTitle="Administradores"
-			addFunction={() => showModal("Create", null)}
+			create={true}
 			data={originalData}
 			setData={setData}
 			searchKeys={["id", "name", "email"]}
 		>
-			<Fragment>
-				<DataTable<Administrator>
-					data={data}
-					columnsConfig={AdministratorColumns}
-					onEdit={(person) => showModal("Edit", person)}
-					onDelete={(person) => showModal("Delete", person)}
-				/>
-				<UpdateAdministrator
-					visible={isModalOpen && modalType === "Edit"}
-					entity={selectedData}
-					onCancel={handleCancel}
-					onOk={handleOk}
-					data={data}
-					setData={setData}
-				/>
-				<CreateAdministrator
-					visible={isModalOpen && modalType === "Create"}
-					onCancel={handleCancel}
-					onOk={handleOk}
-					setData={setData}
-					data={data}
-				/>
-				<ConfirmDelete
-					executeAction={(element) => handleDelete(element)}
-					text="Administrador"
-					visible={isModalOpen && modalType === "Delete"}
-					onCancel={handleCancel}
-					onOk={handleOk}
-					data={data}
-					setData={setData}
-					selectedElement={selectedData}
-				/>
-			</Fragment>
+			<DataTable<Administrator>
+				data={data}
+				columnsConfig={AdministratorColumns}
+				onEdit={(element) => showModal("Edit", element)}
+				onDelete={(element) => showModal("Confirm", element)}
+			/>
+			<CreateAdministrator data={data} setData={setData} />
+			<UpdateAdministrator data={data} setData={setData} />
+			<ConfirmAction
+				text="¿Estás seguro(a) de que deseas eliminar este usuario?"
+				data={data}
+				setData={setData}
+				executeAction={(element) => handleDelete(element)}
+			/>
 		</PageLayout>
 	)
 }

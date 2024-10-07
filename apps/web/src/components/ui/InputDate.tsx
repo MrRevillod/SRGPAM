@@ -3,7 +3,7 @@ import ReactDatePicker from "react-datepicker"
 
 import { es } from "date-fns/locale/es"
 import { registerLocale } from "react-datepicker"
-import { Control, Controller } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form"
 
 registerLocale("es", es)
 
@@ -12,16 +12,19 @@ import "react-datepicker/dist/react-datepicker.css"
 interface DatePickerProps {
 	label: string
 	name: string
-	control: Control
-	error?: string
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ name, label, control, error }) => {
+export const DatePicker: React.FC<DatePickerProps> = ({ name, label }) => {
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext()
+
 	return (
 		<div className="flex flex-col gap-3 w-full">
 			<div className="flex flex-row gap-2 items-center justify-between">
 				<label className="font-semibold">{label}</label>
-				{error && <div className="text-red-600 text-sm">{error}</div>}
+				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
 			</div>
 			<Controller
 				control={control}
@@ -40,5 +43,3 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, label, control, error }) 
 		</div>
 	)
 }
-
-export default DatePicker

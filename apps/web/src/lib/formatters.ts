@@ -1,3 +1,5 @@
+import { LoginVariant } from "./types"
+
 export const formatRut = (rut: string) => {
 	return rut.replace(/(\d{1,3})(\d{3})(\d{3})(\w{1})/, "$1.$2.$3-$4")
 }
@@ -24,4 +26,8 @@ export const tableColumnsFormatters = {
 	updatedAt: formatDate,
 	createdAt: formatDate,
 	validated: formatBoolean,
+}
+
+export const formatRole = (role: LoginVariant) => {
+	return role === "ADMIN" ? "Administrador" : "Profesional"
 }

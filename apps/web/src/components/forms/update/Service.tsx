@@ -2,79 +2,56 @@ import React from "react"
 import Form from "../Form"
 
 import { Input } from "../../ui/Input"
-import { useForm } from "react-hook-form"
+import { FormProvider, useForm } from "react-hook-form"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ServiceSchemas } from "../../../lib/schemas"
-import { Service, UpdateEntityFormProps } from "../../../lib/types"
-import InputFile from "../../ui/InputFile"
+import { Service, FormProps } from "../../../lib/types"
+import { InputFile } from "../../ui/InputFile"
+import { useModal } from "../../../context/ModalContext"
+import { Modal } from "../../Modal"
 
-const UpdateService: React.FC<UpdateEntityFormProps<Service>> = (props) => {
-	const { visible, onCancel, onOk, data, setData, entity } = props
+const UpdateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
+	const { selectedData } = useModal()
 
-	const formContext = useForm({
+	const methods = useForm({
 		resolver: zodResolver(ServiceSchemas.Update),
 	})
 
-	const {
-		register,
-		formState: { errors },
-		reset,
-	} = formContext
+	const { reset } = methods
 
 	useEffect(() => {
-		if (entity) {
+		if (selectedData) {
 			reset({
-				name: entity.name,
-				title: entity.title,
-				description: entity.description,
+				name: selectedData.name,
+				title: selectedData.title,
+				description: selectedData.description,
 			})
 		}
-	}, [entity])
+	}, [selectedData])
 
 	return (
-		<Form
-			modalTitle={`Actualizar la información de ${entity?.name}`}
-			entityName="servicio"
-			onOk={onOk}
-			data={data}
-			setData={setData}
-			visible={visible}
-			onCancel={onCancel}
-			apiEndpoint={`/dashboard/services/${entity?.id}`}
-			formContext={formContext as any}
-			method="PATCH"
-		>
-			<Input
-				label="Nombre"
-				type="text"
-				placeholder="Nombre del servicio"
-				error={errors.name ? errors.name.message?.toString() : ""}
-				defaultValue={entity?.name}
-				{...register("name")}
-			/>
-			<Input
-				label="Servicio"
-				type="text"
-				placeholder="Título del servicio"
-				error={errors.title ? errors.title.message?.toString() : ""}
-				defaultValue={entity?.title}
-				{...register("title")}
-			/>
-			<Input
-				label="Descripción"
-				type="text"
-				placeholder="Descripción del Servicio"
-				error={errors.description ? errors.description.message?.toString() : ""}
-				defaultValue={entity?.description}
-				{...register("description")}
-			/>
-			<InputFile
-				label="Imagen"
-				{...register("image")}
-				error={errors.image ? errors.image.message?.toString() : ""}
-			/>
-		</Form>
+		<Modal type="Edit" title={`Editar la información de ${selectedData?.name}`}>
+			<FormProvider {...methods}>
+				<Form
+					entityName="servicio"
+					data={data}
+					setData={setData}
+					apiEndpoint={`/dashboard/services/${selectedData?.id}`}
+					method="PATCH"
+				>
+					<Input name="name" label="Nombre" type="text" placeholder="Psicología" />
+					<Input name="title" label="Servicio" type="text" placeholder="Psicólogo(a)" />
+					<Input
+						name="description"
+						label="Descripción"
+						type="text"
+						placeholder="¿En qué consiste el servicio?"
+					/>
+					<InputFile name="image" label="Imagen" />
+				</Form>
+			</FormProvider>
+		</Modal>
 	)
 }
 
