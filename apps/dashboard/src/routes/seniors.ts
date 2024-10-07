@@ -2,11 +2,11 @@ import * as controllers from "../controllers/seniors"
 
 import { Router } from "express"
 import { validateRole } from "../middlewares/authentication"
-import { filesValidation } from "../middlewares/file"
-import { validateSchema, validateUserId } from "../middlewares/validation"
-import { seniorsRegisterMobileImages, singleImageupload } from "../config"
-
 import { SeniorSchemas } from "@repo/lib"
+import { filesValidation, fileValidation } from "../middlewares/file"
+import { seniorsRegisterMobileImages, singleImageUpload } from "../config"
+import { userOwnerValidation, validateSchema, validateUserId } from "../middlewares/validation"
+
 const { DashboardRegister, MobileRegister, Update } = SeniorSchemas
 
 const router: Router = Router()
@@ -19,11 +19,11 @@ router.get("/", validateRole("ADMIN"), controllers.getAll)
 // Crear un adulto mayor prechequeado
 router.post("/pre-checked", validateRole("ADMIN"), validateSchema(DashboardRegister), controllers.create)
 
-// Actualizar un adulto mayor por id -- !TODO: Requiere middleware de pertenencia
-router.patch("/:id", singleImageupload, validateUserId("SENIOR"), validateSchema(Update), controllers.updateById)
+// Actualizar un adulto mayor por id
+router.patch("/:id",singleImageupload, validateUserId("SENIOR"), userOwnerValidation, validateSchema(Update), controllers.updateById)
 
 // Eliminar un adulto mayor por id -- !TODO: Requiere middleware de pertenencia
-router.delete("/:id", validateUserId("SENIOR"), controllers.deleteById)
+router.delete("/:id", validateUserId("SENIOR"), userOwnerValidation, controllers.deleteById)
 
 // -- Endpoints adicionales
 

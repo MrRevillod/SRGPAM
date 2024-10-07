@@ -13,6 +13,7 @@ export const storeTokens = async (accessToken: string, refreshToken: string) => 
 export const getAccessToken = async (): Promise<string | null> => {
 	try {
 		const token = await AsyncStorage.getItem("accessToken")
+		console.log(token)
 		return token || null
 	} catch (error) {
 		console.error("Error al obtener el access token", error)
