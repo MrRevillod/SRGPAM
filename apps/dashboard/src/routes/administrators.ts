@@ -2,7 +2,7 @@ import * as administrators from "../controllers/administrators"
 
 import { Router } from "express"
 import { AdministratorSchemas } from "@repo/lib"
-import { validateSchema, validateUserId } from "../middlewares/validation"
+import { userOwnerValidation, validateSchema, validateUserId } from "../middlewares/validation"
 
 const { Create, Update } = AdministratorSchemas
 
@@ -17,9 +17,9 @@ router.get("/", administrators.getAll)
 router.post("/", validateSchema(Create), administrators.create)
 
 // Actualizar un administrador por id -- !TODO: Requiere middleware de pertenencia
-router.patch("/:id", validateUserId("ADMIN"), validateSchema(Update), administrators.updateById)
+router.patch("/:id", validateUserId("ADMIN"), userOwnerValidation, validateSchema(Update), administrators.updateById)
 
 // Eliminar un administrador por id -- !TODO: Requiere middleware de pertenencia
-router.delete("/:id", validateUserId("ADMIN"), administrators.deleteById)
+router.delete("/:id", validateUserId("ADMIN"), userOwnerValidation, administrators.deleteById)
 
 export default router
