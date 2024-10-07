@@ -1,7 +1,7 @@
-import React, { useState, forwardRef } from "react"
+import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { Show } from "./Show"
-import { FieldError } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 
 type InputType = "text" | "password" | "email" | "number" | "select" | "file"
 
@@ -9,20 +9,23 @@ interface InputProps {
 	label: string
 	type: InputType
 	placeholder?: string
-	error?: string | FieldError
 	name: string
 	islogin?: string | boolean
-	value?: string | number
-	defaultValue?: string | number
 	options?: { value: string; label: string }[]
+	defaultValue?: string
 	readOnly?: boolean
 }
 
-export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps>((props, ref) => {
-	const { label, type, placeholder, error, name, islogin = false, defaultValue, options, readOnly } = props
+export const Input: React.FC<InputProps> = (props) => {
+	const { label, type, placeholder, name, islogin = false, options, defaultValue, readOnly } = props
 
-	const classes = `border-1 ${error ? "border-red-400" : "border-neutral-500"} rounded-lg 
-        p-2 focus:outline-none  focus:ring-blue-500 focus:border-blue-500 w-full 
+	const {
+		register,
+		formState: { errors },
+	} = useFormContext()
+
+	const classes = `border-1 ${errors[name] ? "border-red-400" : "border-neutral-500"} rounded-lg 
+        p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full 
         pl-4 placeholder-neutral-400 text-neutral-950 mb-1
     `
 
@@ -31,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 	return (
 		<div className="flex flex-col gap-3 w-full">
 			<Show when={label === "Contraseña" && type === "password"}>
-				<div className="flex justify-between w-full items-center mt-2">
+				<div className="flex justify-between w-full items-center">
 					<label htmlFor={name} className="font-semibold text-neutral-950">
 						{label}
 					</label>
@@ -50,18 +53,13 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 			<Show when={label !== "Contraseña" || type !== "password" || !islogin}>
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<label className="font-semibold">{label}</label>
-					{error && <div className="text-red-600 text-sm">{error.toString()}</div>}
+					{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
 				</div>
 			</Show>
 
 			<div className="relative flex flex-row justify-center">
 				{type === "select" ? (
-					<select
-						ref={ref as React.Ref<HTMLSelectElement>}
-						className={classes}
-						{...props}
-						defaultValue={defaultValue}
-					>
+					<select className={classes} {...register(name)} defaultValue={defaultValue || ""}>
 						<option value="">Seleccione una opción</option>
 						{options?.map((option) => (
 							<option key={option.value} value={option.value}>
@@ -71,18 +69,14 @@ export const Input = forwardRef<HTMLInputElement | HTMLSelectElement, InputProps
 					</select>
 				) : (
 					<input
-						ref={ref as React.Ref<HTMLInputElement>}
 						className={classes}
 						placeholder={placeholder}
-						{...props}
+						{...register(name)}
 						type={inputType}
-						defaultValue={defaultValue}
 						readOnly={readOnly ? true : false}
 					/>
 				)}
 			</div>
 		</div>
 	)
-})
-
-Input.displayName = "Input"
+}

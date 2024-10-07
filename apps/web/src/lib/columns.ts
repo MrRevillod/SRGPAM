@@ -25,4 +25,10 @@ export const AdministratorColumns: TableColumnType<Partial<Administrator>> = [
 	{ title: "Actualizado", dataIndex: "updatedAt", key: "updatedAt" },
 ]
 
-export const ProfessionalColumns: TableColumnType<Partial<Professional>> = AdministratorColumns
+export const ProfessionalColumns: TableColumnType<Partial<Professional>> = [
+	{ title: "RUT", dataIndex: "id", key: "id" },
+	{ title: "Nombre", dataIndex: "name", key: "name" },
+	{ title: "Correo Electrónico", dataIndex: "email", key: "email" },
+	{ title: "Profesión", dataIndex: ["service", "name"], key: "service.name" },
+	{ title: "Creado", dataIndex: "createdAt", key: "createdAt" },
+]

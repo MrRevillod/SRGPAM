@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { Dropdown } from "flowbite-react"
-import axios from "axios"
-import { useImage } from "../../hooks/image"
 
 interface Props {
 	title: string
@@ -13,20 +11,9 @@ interface Props {
 }
 
 const Card: React.FC<Props> = ({ title, description, imageSrcUrl, other, onUpdate, onDelete }) => {
-	const [imageSrc, setImageSrc] = useState<string | null>(null)
-
-	useEffect(() => {
-		if (imageSrcUrl) {
-			useImage(imageSrcUrl, setImageSrc)
-		}
-	}, [imageSrcUrl])
 	return (
 		<div className="w-full border rounded-lg overflow-hidden shadow-lg flex">
-			<img
-				className="w-4/12 h-full object-cover"
-				src={imageSrc ? imageSrc : "https://flowbite-react.com/images/blog/image-4.jpg"}
-				alt={title}
-			/>
+			<img className="w-4/12 h-full object-cover" src={imageSrcUrl} alt={title} />
 			<div className="py-8 pl-8 pr-12 w-8/12 flex flex-col justify-between">
 				<div className="flex flex-col items-start gap-6">
 					<div className="flex flex-row justify-between items-center w-full">

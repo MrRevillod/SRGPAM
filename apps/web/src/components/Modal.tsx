@@ -1,21 +1,27 @@
-import React, { useState } from "react"
-import { Button, Modal } from "antd"
+import React from "react"
+
+import { Modal as AntDModal } from "antd"
+import { ModalType, useModal } from "../context/ModalContext"
 
 interface ModalsProps {
 	title: string
-	isVisible: boolean
-	onOk: () => void
-	onCancel: () => void
-	footer?: React.ReactNode[]
+	type: ModalType
 	children: React.ReactNode
 }
 
-const Modals: React.FC<ModalsProps> = ({ title, isVisible, onOk, onCancel, footer, children }) => {
+export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
+	const { isModalOpen, handleOk, handleCancel, modalType } = useModal()
+
 	return (
-		<Modal title={title} open={isVisible} onOk={onOk} onCancel={onCancel} footer={footer}>
+		<AntDModal
+			title={title}
+			open={isModalOpen && modalType === type}
+			onOk={handleOk}
+			onCancel={handleCancel}
+			closable={true}
+			footer={[]}
+		>
 			{children}
-		</Modal>
+		</AntDModal>
 	)
 }
-
-export default Modals

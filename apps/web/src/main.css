@@ -34,7 +34,8 @@ body {
 	height: 100vh;
 	background:
 		linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-		/* Oscurecimiento */ url("/seniors.jpg");
+		/* Oscurecimiento */
+		url("/seniors.jpg");
 	/* Imagen de fondo */
 	background-size: cover;
 	background-position: center;
@@ -45,7 +46,8 @@ body {
 	height: calc(100vh - 5rem);
 	background:
 		linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-		/* Oscurecimiento */ url("/seniors.jpg");
+		/* Oscurecimiento */
+		url("/seniors.jpg");
 	/* Imagen de fondo */
 	background-size: cover;
 	background-position: center;
@@ -68,4 +70,54 @@ body {
 .ant-table-cell {
 	padding-top: 0rem;
 	padding-bottom: 0rem;
+}
+
+
+
+.profile-image-container {
+	position: relative;
+	display: inline-block;
+}
+
+.image-wrapper {
+	position: relative;
+	width: 120px;
+	/* Ajusta el tamaño de la imagen según tus necesidades */
+	height: 120px;
+	border-radius: 50%;
+	overflow: hidden;
+	/* Esto asegura que el borde de la imagen sea circular */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	/* Agrega una sombra suave */
+}
+
+.profile-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+	/* Hace la imagen completamente circular */
+}
+
+.edit-button {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	background-color: rgba(0, 0, 0, 0.6);
+	/* Fondo oscuro translúcido */
+	color: white;
+	padding: 6px;
+	border-radius: 50%;
+	cursor: pointer;
+	display: none;
+	transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+	background-color: rgba(0, 0, 0, 0.8);
+	/* Cambia el color del fondo al hacer hover */
+}
+
+.image-wrapper:hover .edit-button {
+	display: block;
 }

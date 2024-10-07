@@ -3,7 +3,7 @@ import PageLayout from "../../layouts/PageLayout"
 
 const EventsPage: React.FC = () => {
 	return (
-		<PageLayout pageTitle="Eventos" addFunction={() => {}} setData={() => {}}>
+		<PageLayout pageTitle="Eventos" create={true} setData={() => {}}>
 			<></>
 		</PageLayout>
 	)

@@ -1,3 +1,4 @@
+import { GetProp, UploadProps } from "antd"
 import { Dispatch, SetStateAction } from "react"
 
 export type BaseDataType = {
@@ -21,7 +22,9 @@ interface IUser {
 }
 
 export interface Administrator extends IUser {}
-export interface Professional extends IUser {}
+export interface Professional extends IUser {
+	service: Partial<Service>
+}
 
 export type Service = {
 	id: number
@@ -58,21 +61,15 @@ export type PasswordFields = {
 	confirmPassword: string
 }
 
-export type TableColumnType<T> = Array<{ title: string; dataIndex: keyof T; key: string }>
+export type TableColumnType<T> = Array<{
+	title: string
+	dataIndex: keyof T | string[]
+	key: string
+}>
 
-export type CreateEntityFormProps<T> = {
-	visible: boolean
-	onCancel: () => void
-	onOk: () => void
+export type FormProps<T> = {
 	data: T[]
 	setData: Dispatch<SetStateAction<T[]>>
 }
 
-export type UpdateEntityFormProps<T> = {
-	visible: boolean
-	entity: T | null
-	onCancel: () => void
-	onOk: () => void
-	data: T[]
-	setData: Dispatch<SetStateAction<T[]>>
-}
+export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]

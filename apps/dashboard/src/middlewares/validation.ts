@@ -1,4 +1,3 @@
-import { prisma } from "@repo/database"
 import { AppError, findUser, UserRole } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 import { SomeZodObject, ZodEffects, ZodObject } from "zod"
@@ -11,6 +10,9 @@ export const validateUserId = (role: UserRole) => async (req: Request, res: Resp
 	try {
 		const user = await findUser({ id: req.params.id }, role)
 		if (!user) throw new AppError(400, "El usuario solicitado no existe")
+
+		// La extensión "user" se utiliza en los controladores para
+		// acceder al usuario que se está modificando o consultando
 
 		req.setExtension("user", user)
 
@@ -26,8 +28,6 @@ export const validateUserId = (role: UserRole) => async (req: Request, res: Resp
 export const validateSchema = (schema: SomeZodObject | ZodEffects<ZodObject<any, any>>) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			console.table(req.body)
-
 			schema.parse(req.body)
 			next()
 		} catch (error: any) {
