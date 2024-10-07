@@ -101,7 +101,9 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				},
 			})
 
-			io.emit("newEvent", event)
+			//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
+			//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+
 			return res.status(200).json({
 				message: "Creación exitosa",
 				type: "success",

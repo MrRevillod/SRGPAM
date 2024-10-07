@@ -7,15 +7,18 @@ import { BrowserRouter } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 
 import "./main.css"
+import { SocketProvider } from "./context/SocketContext"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
 root.render(
 	<AuthProvider>
-		<BrowserRouter>
-			<AppLayout>
-				<Router />
-			</AppLayout>
-		</BrowserRouter>
-	</AuthProvider>
+		<SocketProvider>
+			<BrowserRouter>
+				<AppLayout>
+					<Router />
+				</AppLayout>
+			</BrowserRouter>
+		</SocketProvider>
+	</AuthProvider>,
 )
