@@ -3,8 +3,8 @@ import * as controllers from "../controllers/seniors"
 import { Router } from "express"
 import { validateRole } from "../middlewares/authentication"
 import { SeniorSchemas } from "@repo/lib"
-import { filesValidation, fileValidation } from "../middlewares/file"
-import { seniorsRegisterMobileImages, singleImageUpload } from "../config"
+import { filesValidation } from "../middlewares/file"
+import { seniorsRegisterMobileImages, singleImageupload } from "../config"
 import { userOwnerValidation, validateSchema, validateUserId } from "../middlewares/validation"
 
 const { DashboardRegister, MobileRegister, Update } = SeniorSchemas
@@ -20,9 +20,9 @@ router.get("/", validateRole("ADMIN"), controllers.getAll)
 router.post("/pre-checked", validateRole("ADMIN"), validateSchema(DashboardRegister), controllers.create)
 
 // Actualizar un adulto mayor por id
-router.patch("/:id",singleImageupload, validateUserId("SENIOR"), userOwnerValidation, validateSchema(Update), controllers.updateById)
+router.patch("/:id", singleImageupload, validateUserId("SENIOR"), userOwnerValidation, validateSchema(Update), controllers.updateById)
 
-// Eliminar un adulto mayor por id -- !TODO: Requiere middleware de pertenencia
+// Eliminar un adulto mayor por id
 router.delete("/:id", validateUserId("SENIOR"), userOwnerValidation, controllers.deleteById)
 
 // -- Endpoints adicionales

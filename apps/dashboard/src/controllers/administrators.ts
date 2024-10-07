@@ -1,9 +1,9 @@
 import { hash } from "bcrypt"
+import { Prisma } from "@prisma/client"
 import { prisma } from "@repo/database"
+import { AppError, constants } from "@repo/lib"
 import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
-import { Administrator, Prisma } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
-import { AppError, constants, httpRequest, ServerTokens } from "@repo/lib"
 
 // Controlador para obtener todos los administradores de la base de datos
 // se excluye el campo password de la respuesta
@@ -75,14 +75,20 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 // Controlador para Actualizar un administrador por su id
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	const id = req.params.id
-	const user = req.getExtension("user") as Administrator
 
 	try {
+		const adminExist = await prisma.administrator.findUnique({ where: { id } })
+
+		if (!adminExist) {
+			throw new AppError(400, "El administrador solicitado no existe")
+		}
+
 		const { name, email, password } = req.body
+		const updatedPassword = password ? await hash(password, 10) : adminExist.password
 
 		const administrator = await prisma.administrator.update({
 			where: { id: id },
-			data: { name, email, password: password ? await hash(password, 10) : user.password },
+			data: { name, email, password: updatedPassword },
 			select: {
 				id: true,
 				name: true,
@@ -95,12 +101,6 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		const response = { updated: administrator, image: null }
 
 		if (req.file) {
-			// Extension "tokens" es un objeto de tipo ServerTokens
-			// que contiene los tokens de acceso y/o refresco del usuario
-			// que realiza la petición http
-
-			const tokens = req.getExtension("tokens") as ServerTokens
-
 			const storageResponse = await uploadProfilePicture({
 				file: req.file,
 				filename: req.params.id,
@@ -129,10 +129,15 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 	const id = req.params.id
 
 	try {
-		await prisma.administrator.delete({ where: { id } })
-		const endpint = `/delete?path=%2Fusers%2F${id}`
+		const adminExist = await prisma.administrator.findUnique({ where: { id } })
 
-		const storageResponse = await deleteProfilePicture(endpint)
+		if (!adminExist) {
+			throw new AppError(400, "El administrador solicitado no existe")
+		}
+
+		await prisma.administrator.delete({ where: { id } })
+
+		const storageResponse = await deleteProfilePicture(`/delete?path=%2Fusers%2F${id}`)
 
 		if (storageResponse.type === "error") {
 			throw new AppError(storageResponse.status || 500, storageResponse.message)

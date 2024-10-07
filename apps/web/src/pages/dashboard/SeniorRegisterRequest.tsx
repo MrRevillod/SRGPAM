@@ -40,14 +40,10 @@ const SeniorRegisterRequestPage: React.FC = () => {
 
 	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 		try {
-			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
-			await api.patch(`/dashboard/seniors/${senior.id}`, {
+			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`, {
 				name: data.name,
-				email: data.email,
 				address: data.address,
 				birthDate: data.birthDate,
-				password: "",
-				confirmPassword: "",
 			})
 
 			message.success("Solicitud aceptada")

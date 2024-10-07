@@ -1,5 +1,5 @@
 import { prisma } from "@repo/database"
-import { bufferToBlob, fileToFormData } from "../utils/files"
+import { fileToFormData } from "../utils/files"
 import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 

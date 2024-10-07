@@ -1,8 +1,7 @@
-
 import { prisma } from "@repo/database"
 import { Request, Response, NextFunction } from "express"
 import { SomeZodObject, ZodEffects, ZodObject } from "zod"
-import { AppError, findUser, getServerTokens, httpRequest, UserRole } from "@repo/lib"
+import { AppError, findUser, getServerTokens, httpRequest, User, UserRole, AuthResponse } from "@repo/lib"
 
 // Middleware de validación de ID de usuario
 // Valida si el ID de usuario en la URL de la petición es válido (existe en la base de datos)
@@ -16,7 +15,7 @@ export const validateUserId = (role: UserRole) => async (req: Request, res: Resp
 		// La extensión "user" se utiliza en los controladores para
 		// acceder al usuario que se está modificando o consultando
 
-		req.setExtension("user", user)
+		req.setExtension("requestedUser", user)
 
 		next()
 	} catch (error) {
@@ -46,7 +45,7 @@ export const userOwnerValidation = async (req: Request, res: Response, next: Nex
 	const tokens = getServerTokens(req.headers, req.cookies)
 
 	try {
-		const response = await httpRequest({
+		const response = await httpRequest<AuthResponse>({
 			service: "AUTH",
 			endpoint: "/validate-auth",
 			headers: {
@@ -58,23 +57,21 @@ export const userOwnerValidation = async (req: Request, res: Response, next: Nex
 			throw new AppError(response.status || 500, response.message)
 		}
 
-		const responseRole = (response.values as { role?: string })?.role || null
-		const responseUserId = (response.values as { user?: { id: string } })?.user?.id || null
+		const responseRole = response.values.role
+		const responseUserId = response.values.user.id
 
-		const user = req.getExtension("user") as { id: string } | undefined
+		const requestedUser = req.getExtension("requestedUser") as User | undefined
 
-		if (!user) {
+		if (!requestedUser) {
 			throw new AppError(400, "El usuario solicitado no existe")
 		}
-		const userId = user?.id || null
 
-		if (responseRole === "ADMIN") {
-			return next()
+		if (responseRole === "ADMIN") return next()
+
+		if (responseUserId !== requestedUser.id) {
+			throw new AppError(401, "No tienes permisos para acceder a este recurso")
 		}
 
-		if (responseUserId !== userId) {
-			throw new AppError(403, "No tienes permisos para acceder a este recurso")
-		}
 		next()
 	} catch (error) {
 		next(error)
@@ -99,7 +96,7 @@ export const eventOwnerValidation = async (req: Request, res: Response, next: Ne
 			throw new AppError(400, "El evento solicitado no existe")
 		}
 
-		const response = await httpRequest({
+		const response = await httpRequest<AuthResponse>({
 			service: "AUTH",
 			endpoint: "/validate-auth",
 			headers: {
@@ -111,15 +108,15 @@ export const eventOwnerValidation = async (req: Request, res: Response, next: Ne
 			throw new AppError(response.status || 500, response.message)
 		}
 
-		const responseRole = (response.values as { role?: string })?.role || null
-		const responseUserId = (response.values as { user?: { id: string } })?.user?.id || null
+		const responseRole = response.values.role
+		const responseUserId = response.values.user.id
 
 		if (responseRole === "ADMIN") {
 			return next()
 		}
 
 		if (!event || (event.professionalId !== responseUserId && event.seniorId !== responseUserId)) {
-			throw new AppError(403, "No tienes permisos para acceder a este recurso")
+			throw new AppError(401, "No tienes permisos para acceder a este recurso")
 		}
 		next()
 	} catch (error) {

@@ -55,9 +55,6 @@ export const deleteProfilePicture = async (endpoint: string): Promise<ApiRespons
 			service: "STORAGE",
 			endpoint: endpoint,
 			method: "DELETE",
-			headers: {
-				"x-storage-key": constants.STORAGE_KEY,
-			},
 		})
 
 		return response as JsonResponse<Record<string, any>>

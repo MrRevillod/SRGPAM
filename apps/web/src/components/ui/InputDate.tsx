@@ -8,6 +8,7 @@ import { Controller, useFormContext } from "react-hook-form"
 registerLocale("es", es)
 
 import "react-datepicker/dist/react-datepicker.css"
+import "../../main.css"
 
 interface DatePickerProps {
 	label: string
@@ -37,6 +38,49 @@ export const DatePicker: React.FC<DatePickerProps> = ({ name, label }) => {
 						selected={value as any}
 						maxDate={new Date()}
 						locale="es"
+						showMonthDropdown
+						showYearDropdown
+						dropdownMode="select"
+						renderCustomHeader={({ date, changeYear, changeMonth }) => (
+							<div className="custom-header">
+								<select
+									className="dropdown year-dropdown"
+									value={date.getFullYear()}
+									onChange={({ target: { value } }) => changeYear(Number(value))}
+								>
+									{Array.from({ length: 100 }, (_, i) => i + 1920).map((year) => (
+										<option key={year} value={year}>
+											{year}
+										</option>
+									))}
+								</select>
+
+								<select
+									className="dropdown month-dropdown"
+									value={date.getMonth()}
+									onChange={({ target: { value } }) => changeMonth(Number(value))}
+								>
+									{[
+										"January",
+										"February",
+										"March",
+										"April",
+										"May",
+										"June",
+										"July",
+										"August",
+										"September",
+										"October",
+										"November",
+										"December",
+									].map((month, index) => (
+										<option key={index} value={index}>
+											{month}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
 					/>
 				)}
 			/>

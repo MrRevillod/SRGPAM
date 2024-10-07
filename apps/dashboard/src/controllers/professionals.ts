@@ -88,15 +88,16 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 // Controlador para Actualizar un profesional por su id
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
-	const user = req.getExtension("user") as Professional
+	const user = req.getExtension("requestedUser") as Professional
 	const id = req.params.id
 
 	try {
 		const { name, email, password } = req.body
+		const updatedPassword = password ? await hash(password, 10) : user.password
 
 		const professional = await prisma.professional.update({
 			where: { id },
-			data: { name, email, password: password ? await hash(password, 10) : user.password },
+			data: { name, email, password: updatedPassword },
 			select: {
 				id: true,
 				name: true,
@@ -114,25 +115,6 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		const response = { updated: professional, image: null }
 
 		if (req.file) {
-			// Remover depues de integrar middleware de pertenenencia
-
-			const tokens = getServerTokens(req.headers, req.cookies)
-
-			const authResponse = await httpRequest({
-				service: "AUTH",
-				endpoint: "/validate-auth",
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${tokens?.access || null}`,
-				},
-			})
-
-			if (authResponse.type === "error") {
-				throw new AppError(authResponse.status || 500, authResponse.message)
-			}
-
-			// --------------------
-
 			const storageResponse = await uploadProfilePicture({
 				file: req.file,
 				filename: req.params.id,
@@ -156,34 +138,11 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 	}
 }
 
-// Controlador para eliminar un profesional por su id !FALTA CORREGIR PERTENENCIA
+// Controlador para eliminar un profesional por su id
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
-	// Extension "tokens" es un objeto de tipo ServerTokens
-	// que contiene los tokens de acceso y/o refresco del usuario
-	// que realiza la petición http
-
 	const id = req.params.id
 
 	try {
-		// Remover depues de integrar middleware de pertenenencia
-
-		const tokens = getServerTokens(req.headers, req.cookies)
-
-		const authResponse = await httpRequest({
-			service: "AUTH",
-			endpoint: "/validate-auth",
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${tokens?.access || null}`,
-			},
-		})
-
-		if (authResponse.type === "error") {
-			throw new AppError(authResponse.status || 500, authResponse.message)
-		}
-
-		// --------------------
-
 		await prisma.event.updateMany({
 			where: { professionalId: req.params.id },
 			data: { professionalId: null },

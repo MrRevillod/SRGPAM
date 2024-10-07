@@ -75,6 +75,8 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 	const validated = req.query.validate === "true"
 
 	try {
+		const { name, address, birthDate } = req.body
+
 		// Se verifica si el adulto mayor existe
 		if (!(await prisma.senior.findUnique({ where: { id } }))) {
 			throw new AppError(400, "Adulto mayor no encontrado")
@@ -84,24 +86,20 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 		// Esto significa que el adulto mayor ya puede acceder a la aplicación
 
 		if (validated) {
-			await prisma.senior.update({ where: { id }, data: { validated } })
+			await prisma.senior.update({
+				where: { id },
+				data: { name, address, birthDate, validated },
+			})
+
 			return res.status(200).json({ message: "La solicitud ha sido aceptada", type: "success" })
 		} else {
 			// Si la solicitud es rechazada, se eliminan los archivos enviados
 			// y se elimina el adulto mayor de la base de datos
 
-			// La extensión "tokens" es un objeto de tipo ServerTokens
-			// que contiene los tokens de acceso y/o refresco del usuario que realiza la petición http
-
-			const tokens = req.getExtension("tokens") as ServerTokens
-
 			const storageResponse = await httpRequest({
 				service: "STORAGE",
 				endpoint: `/delete?path=%2Fseniors%2F${id}`,
 				method: "DELETE",
-				headers: {
-					Authorization: `Bearer ${tokens?.access || null}`,
-				},
 			})
 
 			if (storageResponse.type === "error") {
@@ -200,16 +198,17 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
-	const reqUser = req.getExtension("user") as Senior
+	const requestedUser = req.getExtension("requestedUser") as Senior
 	try {
 		const { name, email, password, address, birthDate } = req.body
+		const updatedPassword = password ? await hash(password, 10) : requestedUser.password
 
 		const senior = await prisma.senior.update({
 			where: { id: req.params.id },
 			data: {
 				name,
 				email,
-				password: password ? await hash(password, 10) : reqUser.password,
+				password: updatedPassword,
 				address,
 				birthDate: new Date(birthDate),
 			},
@@ -229,25 +228,6 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		const response = { updated: senior, image: null }
 
 		if (req.file) {
-			// Remover depues de integrar middleware de pertenenencia
-
-			const tokens = getServerTokens(req.headers, req.cookies)
-
-			const authResponse = await httpRequest({
-				service: "AUTH",
-				endpoint: "/validate-auth",
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${tokens?.access || null}`,
-				},
-			})
-
-			if (authResponse.type === "error") {
-				throw new AppError(authResponse.status || 500, authResponse.message)
-			}
-
-			// --------------------
-
 			const storageResponse = await uploadProfilePicture({
 				file: req.file,
 				filename: req.params.id,
@@ -315,7 +295,6 @@ export const newSeniors = async (req: Request, res: Response, next: NextFunction
 	}
 }
 
-// TODO: MANEJO DE ERRORES
 export const checkUnique = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { rut, email } = req.body

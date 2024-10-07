@@ -22,6 +22,91 @@ html {
 	zoom: 100%;
 }
 
+/* .react-datepicker__navigation--previous,
+.react-datepicker__navigation--next {
+	display: none;
+} */
+
+
+
+/* Date picker  */
+
+/* Estilos del contenedor de la cabecera personalizada */
+.custom-header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px;
+	background-color: #f0f4f8;
+	border-radius: 8px;
+}
+
+/* Dropdown estilizado */
+.dropdown {
+	font-size: 14px;
+	padding: 8px;
+	margin: 0 5px;
+	border-radius: 5px;
+	background-color: #ffffff;
+	border: 1px solid #dcdcdc;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+	transition: border-color 0.3s ease;
+}
+
+.dropdown:focus {
+	border-color: #007bff;
+	outline: none;
+}
+
+.year-dropdown,
+.month-dropdown {
+	width: 100px;
+}
+
+/* Dropdown específico de año */
+.year-dropdown {
+	width: 80px;
+}
+
+/* Ajustes de los días del calendario */
+.react-datepicker__day {
+	font-weight: bold;
+	font-size: 14px;
+	color: #2c3e50;
+	border-radius: 50%;
+	transition: background-color 0.2s ease;
+}
+
+/* Día seleccionado */
+.react-datepicker__day--selected {
+	background-color: #007bff;
+	color: white;
+}
+
+/* Día en hover */
+.react-datepicker__day:hover {
+	background-color: #f0f4f8;
+	color: #007bff;
+}
+
+/* Estilo de los días fuera del mes actual */
+.react-datepicker__day--outside-month {
+	color: #dcdcdc;
+}
+
+/* Ajustes para hover y foco */
+.react-datepicker__day--keyboard-selected {
+	background-color: #0056b3;
+	color: white;
+}
+
+/* Ajuste para el pop-up del calendario */
+.react-datepicker__popper {
+	z-index: 10;
+}
+
+/* */
+
 body {
 	margin: 0;
 }

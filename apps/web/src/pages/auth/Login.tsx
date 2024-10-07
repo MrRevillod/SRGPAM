@@ -15,8 +15,6 @@ const LoginPage: React.FC = () => {
 	const { login, error, role } = useAuth()
 
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
-		console.log("formData", formData)
-
 		await login(formData)
 	}
 
