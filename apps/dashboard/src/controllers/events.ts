@@ -227,12 +227,30 @@ export const reserveEvent = async (req: Request, res: Response, next: NextFuncti
 
 		const senior = req.getExtension("user") as Senior
 		console.log("User from request:", senior)
+
 		const event = await prisma.event.findUnique({
 			where: { id: Number(id) },
 		})
 
 		if (!event) {
 			throw new AppError(404, "Evento no encontrado")
+		}
+
+		const twoMonthsAgo = new Date()
+		twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
+
+		const previousReservation = await prisma.event.findFirst({
+			where: {
+				seniorId: senior.id,
+				serviceId: event.serviceId,
+				updatedAt: {
+					gte: twoMonthsAgo,
+				},
+			},
+		})
+
+		if (previousReservation) {
+			throw new AppError(409, "Ya reservaste este servicio en los ultimos 2 meses")
 		}
 
 		if (event.seniorId) {
