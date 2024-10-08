@@ -16,6 +16,8 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 			accessHeaderToken = authHeader.split("Bearer ")[1].split(",")[0].trim()
 		}
 		const accessToken = accessCookie || accessHeaderToken
+
+		console.log("TOKEN FROM AUTH", accessToken)
 		if (!accessToken) throw new AppError(401, "No tienes autorización para acceder a este recurso")
 
 		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
@@ -58,6 +60,8 @@ export const authenticationByRole = async (req: Request, res: Response, next: Ne
 		if (currentUserRole !== requiredRole) {
 			throw new AppError(401, "No tienes permisos para acceder a este recurso")
 		}
+
+		console.log("PASO MW DE ROLE")
 
 		next()
 	} catch (error) {

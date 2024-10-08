@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database"
 import { Request, Response, NextFunction } from "express"
 import { io } from ".."
-
+import { Prisma, Senior } from "@prisma/client"
 import { canAddEvent } from "../utils/events"
 import { AppError } from "@repo/lib"
 
@@ -158,18 +158,20 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			}
 		}
 		const events = await prisma.event.findMany({
-            where: {
-                professionalId: professionalId ,
-                id: {
-                    not: parseInt(req.params.id),  // Excluir el evento con el `id` específico
-                },
-            },
+			where: {
+				professionalId: professionalId,
+				id: {
+					not: parseInt(req.params.id), // Excluir el evento con el `id` específico
+				},
+			},
 		})
 
-		if (canAddEvent(events, {
-            startsAt: new Date(startsAt),
-            endsAt: new Date(endsAt),
-        })) {
+		if (
+			canAddEvent(events, {
+				startsAt: new Date(startsAt),
+				endsAt: new Date(endsAt),
+			})
+		) {
 			const event = await prisma.event.update({
 				where: { id: parseInt(req.params.id) },
 				data: {
@@ -211,6 +213,43 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			message: "Eliminación exitosa",
 			type: "success",
 			values: { deletedId: req.params.id },
+		})
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const reserveEvent = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		console.log("CONTROLADOR")
+
+		const { id } = req.params
+
+		const senior = req.getExtension("user") as Senior
+		console.log("User from request:", senior)
+		const event = await prisma.event.findUnique({
+			where: { id: Number(id) },
+		})
+
+		if (!event) {
+			throw new AppError(404, "Evento no encontrado")
+		}
+
+		if (event.seniorId) {
+			throw new AppError(409, "Este evento ya está reservado")
+		}
+
+		const updatedEvent = await prisma.event.update({
+			where: { id: Number(id) },
+			data: {
+				seniorId: senior.id,
+			},
+		})
+		console.log()
+		return res.status(200).json({
+			message: "Evento reservado con éxito",
+			values: updatedEvent,
+			//values: null,
 		})
 	} catch (error) {
 		next(error)

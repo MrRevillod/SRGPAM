@@ -187,7 +187,7 @@ const seed = async () => {
 					startsAt: randomStartDate,
 					endsAt: randomEndDate,
 					assistance: true,
-					seniorId: SeniorRUT,
+					seniorId: null,
 					professionalId: ProfessionalRUT,
 					serviceId: i,
 					centerId: i,
