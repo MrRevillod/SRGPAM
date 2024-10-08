@@ -30,7 +30,7 @@ export const createServer_ = (): express.Express => {
 	app.use(cookieParser())
 
 	app.use(extensions)
-  
+
 	app.use("/api/dashboard/centers", centerRouter)
 	app.use("/api/dashboard/seniors", seniorsRouter)
 	app.use("/api/dashboard/services", serviceRouter)
@@ -45,15 +45,15 @@ export const createServer_ = (): express.Express => {
 	return app
 }
 
-const server = createServer_()
+const server = createServer()
 
 const http = createServer(server)
 
 export const io = new Server<ServerToClientEvents>(http, {
-    cors: {
-        origin: "*",
-        methods: ["GET","POST"],
-    }
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"],
+	},
 })
 
 initSocket(io)

@@ -37,7 +37,6 @@ export const makeAuthenticatedRequest = async (
 
 export const checkUniqueField = async (field: string, getValues: any, trigger: any, setError: any): Promise<boolean | undefined> => {
 	try {
-		console.log(field)
 		const fieldValue = getValues(field)
 		const isValid = await trigger(field)
 		if (isValid) {
