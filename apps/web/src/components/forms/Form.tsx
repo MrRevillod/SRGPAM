@@ -30,14 +30,15 @@ const Form: React.FC<FormProps> = ({
 	children,
 	method,
 }) => {
-	const { handleSubmit, setError, reset } = formContext
+	const { handleSubmit, setError, reset, getValues } = formContext
 
 	const handleCancel = () => {
 		reset()
 		onCancel()
 	}
 
-	const onSubmit: SubmitHandler<FieldValues> = async (form) => {
+    const onSubmit: SubmitHandler<FieldValues> = async (form) => {
+        console.log(getValues())
 		let formData = new FormData()
 
 		if (form.birthDate) {
@@ -84,7 +85,8 @@ const Form: React.FC<FormProps> = ({
 			message.success(res.data.message)
 			reset()
 			onOk()
-		} catch (error: any) {
+        } catch (error: any) {
+            
 			if (error.response) {
 				message.error(error.response.data.message)
 
@@ -107,13 +109,14 @@ const Form: React.FC<FormProps> = ({
 	}
 
 	return (
-		<Modal title={modalTitle} open={visible} onCancel={handleCancel} footer={[]}>
+		<Modal title={modalTitle} open={visible}  onClose={handleCancel} onCancel={handleCancel} footer={[]}>
 			<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit)}>
 				{children}
 				<div className="flex flex-row gap-4 w-full justify-end -mb-6">
 					<button
 						onClick={handleCancel}
 						className="border-1 border-red-700 text-red-700 font-semibold px-6 py-2 rounded-lg"
+                        type={"reset"}
 					>
 						Cancelar
 					</button>

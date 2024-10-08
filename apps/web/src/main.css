@@ -106,3 +106,7 @@ body {
     }
   }
   
+  .input-date{
+    border-radius: 10px;
+    width: 100%;
+  }

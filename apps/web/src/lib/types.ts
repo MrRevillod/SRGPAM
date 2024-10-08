@@ -76,3 +76,19 @@ export type UpdateEntityFormProps<T> = {
 	data: T[]
 	setData: Dispatch<SetStateAction<T[]>>
 }
+
+export type Event = {
+	id: string // Equivalente de Int en Prisma
+	startsAt: string // DateTime en Prisma es Date en TypeScript
+	endsAt: string
+	assistance: boolean // Boolean en Prisma es boolean en TS
+
+	createdAt: Date
+	updatedAt: Date
+
+	seniorId?: string | null // Campos opcionales en Prisma se traducen a `| null` o con `?`
+	professionalId: string
+	centerId?: number | null
+	serviceId?: number | null
+}
+

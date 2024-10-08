@@ -222,3 +222,32 @@ export const CentersSchemas = {
 	}),
 }
 export const ProfessionalSchemas = AdministratorSchemas
+
+const dateTimeSchema = z.number().refine((value) => {
+    const date = new Date(value);
+    return !isNaN(date.getTime())
+}, {
+	message: "La fecha de ingresada no es válida",
+})
+
+export const EventSchemas = {
+	Create: z
+		.object({
+			startsAt: dateTimeSchema,
+			endsAt: dateTimeSchema,
+			professionalId: rutSchema,
+			serviceId: z.number(),
+			seniorId: z.optional(rutSchema),
+			centerId: z.optional(z.string()),
+		})
+        ,
+	Update: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		assistance: z.optional(z.boolean()),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
+}
