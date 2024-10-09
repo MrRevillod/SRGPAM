@@ -41,14 +41,8 @@ const UpdateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }
 					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
 
-					<Input name="password" label="PIN" type="password" placeholder="••••" islogin="false" />
-					<Input
-						name="confirmPassword"
-						label="Confirmar PIN"
-						type="password"
-						placeholder="••••"
-						islogin="false"
-					/>
+					<Input name="password" label="Contraseña" type="password" placeholder="••••" />
+					<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••" />
 				</Form>
 			</FormProvider>
 		</Modal>

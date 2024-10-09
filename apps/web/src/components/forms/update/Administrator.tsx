@@ -3,11 +3,11 @@ import Form from "../Form"
 
 import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
-import { FormProvider, useForm } from "react-hook-form"
 import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AdministratorSchemas } from "../../../lib/schemas"
+import { FormProvider, useForm } from "react-hook-form"
 import { Administrator, FormProps } from "../../../lib/types"
 
 const UpdateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData }) => {
@@ -41,14 +41,8 @@ const UpdateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData
 					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
 
-					<Input name="password" label="PIN" type="password" placeholder="••••" islogin="false" />
-					<Input
-						name="confirmPassword"
-						label="Confirmar PIN"
-						type="password"
-						placeholder="••••"
-						islogin="false"
-					/>
+					<Input name="password" label="Contraseña" type="password" placeholder="••••" />
+					<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••" />
 				</Form>
 			</FormProvider>
 		</Modal>

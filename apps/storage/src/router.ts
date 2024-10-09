@@ -40,11 +40,11 @@ router.post("/upload", upload.array("files"), async (req, res, next) => {
 
 		await Promise.all(uploadPromises)
 
-		return res.status(200).json({
+		const image = files.length === 1 ? `${services.STORAGE.url}/public/${query.path}/${files[0].originalname.split(".")[0]}.webp` : null
+
+		return res.status(201).json({
 			message: "Files uploaded",
-			values: {
-				image: files.length === 1 ? `${services.STORAGE.url}/public/${query.path}/${files[0].originalname}.webp` : null,
-			},
+			values: { image },
 		})
 	} catch (error: any) {
 		next(error)

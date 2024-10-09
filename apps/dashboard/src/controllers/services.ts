@@ -95,7 +95,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Servicio actualizado exitosamente",
 			type: "success",
-			values: service,
+			values: { updated: service },
 		})
 	} catch (error) {
 		next(error)

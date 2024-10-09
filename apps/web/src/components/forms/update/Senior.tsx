@@ -47,14 +47,8 @@ const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
 					<Input name="address" label="Dirección" type="text" placeholder="Dirección" />
 					<DatePicker name="birthDate" label="Fecha de nacimiento" />
-					<Input name="password" label="PIN" type="password" placeholder="••••" islogin="false" />
-					<Input
-						name="confirmPassword"
-						label="Confirmar PIN"
-						type="password"
-						placeholder="••••"
-						islogin="false"
-					/>
+					<Input name="password" label="PIN" type="password" placeholder="••••" />
+					<Input name="confirmPassword" label="Confirmar PIN" type="password" placeholder="••••" />
 				</Form>
 			</FormProvider>
 		</Modal>

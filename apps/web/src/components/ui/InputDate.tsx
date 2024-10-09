@@ -42,48 +42,65 @@ export const DatePicker: React.FC<DatePickerProps> = ({ name, label }) => {
 						showYearDropdown
 						dropdownMode="select"
 						renderCustomHeader={({ date, changeYear, changeMonth }) => (
-							<div className="custom-header">
-								<select
-									className="dropdown year-dropdown"
-									value={date.getFullYear()}
-									onChange={({ target: { value } }) => changeYear(Number(value))}
-								>
-									{Array.from({ length: 100 }, (_, i) => i + 1920).map((year) => (
-										<option key={year} value={year}>
-											{year}
-										</option>
-									))}
-								</select>
-
-								<select
-									className="dropdown month-dropdown"
-									value={date.getMonth()}
-									onChange={({ target: { value } }) => changeMonth(Number(value))}
-								>
-									{[
-										"January",
-										"February",
-										"March",
-										"April",
-										"May",
-										"June",
-										"July",
-										"August",
-										"September",
-										"October",
-										"November",
-										"December",
-									].map((month, index) => (
-										<option key={index} value={index}>
-											{month}
-										</option>
-									))}
-								</select>
-							</div>
+							<CustomHeader date={date} changeYear={changeYear} changeMonth={changeMonth} />
 						)}
 					/>
 				)}
 			/>
+		</div>
+	)
+}
+
+const CustomHeader = ({
+	date,
+	changeYear,
+	changeMonth,
+}: {
+	date: Date
+	changeYear: Function
+	changeMonth: Function
+}) => {
+	const currentYear = new Date().getFullYear()
+	const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
+
+	return (
+		<div className="custom-header">
+			<select
+				className="dropdown year-dropdown"
+				value={date.getFullYear()}
+				onChange={({ target: { value } }) => changeYear(Number(value))}
+			>
+				{years.map((year) => (
+					<option key={year} value={year}>
+						{year}
+					</option>
+				))}
+			</select>
+
+			<select
+				className="dropdown month-dropdown"
+				value={date.getMonth()}
+				onChange={({ target: { value } }) => changeMonth(Number(value))}
+			>
+				{[
+					"Enero",
+					"Febrero",
+					"Marzo",
+					"Abril",
+					"Mayo",
+					"Junio",
+					"Julio",
+					"Agosto",
+					"Septiembre",
+					"Octubre",
+					"Noviembre",
+					"Diciembre",
+				].map((month, index) => (
+					<option key={index} value={index}>
+						{month}
+					</option>
+				))}
+			</select>
 		</div>
 	)
 }
