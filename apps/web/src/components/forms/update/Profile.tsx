@@ -86,14 +86,8 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, se
 				<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 				<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
 
-				<Input name="password" label="Contraseña" type="password" placeholder="••••••••" islogin="false" />
-				<Input
-					name="confirmPassword"
-					label="Confirmar contraseña"
-					type="password"
-					placeholder="••••••••"
-					islogin="false"
-				/>
+				<Input name="password" label="Contraseña" type="password" placeholder="••••••••" />
+				<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••••••" />
 
 				<ImageEditor imageLabel="Imagen de perfil" setImageFile={setImageFile} />
 

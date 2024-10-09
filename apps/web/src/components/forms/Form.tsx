@@ -68,6 +68,8 @@ const Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, chi
 				return
 			}
 
+			console.log(error)
+
 			message.error("Error. Intente nuevamente.")
 		}
 	}

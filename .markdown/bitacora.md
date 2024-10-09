@@ -12,4 +12,6 @@
 
 - [] Mejorar filtros de prisma (select)
 - [] Quizás cambiar a una arquitectura basada en entidades ()
-- [] Cuando un admin esté revisando una solicitud, esta debe desaparecer de la lista de solicitudes, ó distribuir entre los admins
+- [] Cuando un admin esté revisando una solicitud, esta debe desaparecer de la lista de
+  solicitudes, ó distribuir entre los admins
+- [] Requerimiento de reserva de horas por umbral de tiempo
