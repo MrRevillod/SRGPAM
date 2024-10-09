@@ -2,7 +2,7 @@ import React from "react"
 import Loading from "../components/Loading"
 import HomePage from "./Home"
 import LoginPage from "./auth/Login"
-import EventsPage from "./dashboard/Events"
+// import EventsPage from "./dashboard/Events"
 import CentersPage from "./dashboard/Centers"
 import SeniorsPage from "./dashboard/Seniors"
 import ProfilePage from "./Profile"
@@ -59,7 +59,7 @@ const Router: React.FC = () => {
 					path="/dashboard/personas-mayores/solicitud-de-registro"
 					element={<SeniorRegisterRequestPage />}
 				/>
-				<Route path="/dashboard/eventos" element={<EventsPage />} />
+				{/* <Route path="/dashboard/eventos" element={<EventsPage />} /> */}
 				<Route path="/dashboard/servicios" element={<ServicesPage />} />
 				<Route path="/dashboard/centros-de-atencion" element={<CentersPage />} />
 			</Route>
