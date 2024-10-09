@@ -66,8 +66,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 	}
 }
 
-// !TODO: Implementar la actualización de la imagen del centro
-// !TODO: Implementar validación de existencia de nombre de centro
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
@@ -97,7 +95,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Centro actualizado exitosamente",
 			type: "success",
-			values: center,
+			values: { updated: center },
 		})
 	} catch (error) {
 		next(error)

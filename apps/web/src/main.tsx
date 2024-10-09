@@ -3,8 +3,10 @@ import Router from "./pages/router"
 import ReactDOM from "react-dom/client"
 import AppLayout from "./layouts/AppLayout"
 
-import { BrowserRouter } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
+import { ModalProvider } from "./context/ModalContext"
+import { BrowserRouter } from "react-router-dom"
+import { ThemeProvider } from "./context/ThemeContext"
 
 import "./main.css"
 import { SocketProvider } from "./context/SocketContext"
@@ -12,13 +14,17 @@ import { SocketProvider } from "./context/SocketContext"
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
 root.render(
-	<AuthProvider>
-		<SocketProvider>
-			<BrowserRouter>
-				<AppLayout>
-					<Router />
-				</AppLayout>
-			</BrowserRouter>
-		</SocketProvider>
-	</AuthProvider>,
+	<ThemeProvider>
+		<AuthProvider>
+      <SocketProvider>
+			  <ModalProvider>
+				  <BrowserRouter>
+					  <AppLayout>
+						  <Router />
+					  </AppLayout>
+				  </BrowserRouter>
+			  </ModalProvider>
+      </SocketProvider
+		</AuthProvider>
+	</ThemeProvider>
 )

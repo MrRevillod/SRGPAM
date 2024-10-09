@@ -1,30 +1,29 @@
-import React, { forwardRef } from "react"
+import React from "react"
 import { FileInput } from "flowbite-react"
+import { useFormContext } from "react-hook-form"
 
 interface InputFileProps {
 	label: string
-	error?: string
+	name: string
 }
 
-const InputFile: React.FC<InputFileProps> = forwardRef<HTMLInputElement, InputFileProps>((props, ref) => {
-	const { label, error } = props
+export const InputFile: React.FC<InputFileProps> = ({ label, name }) => {
+	const {
+		register,
+		formState: { errors },
+	} = useFormContext()
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
 			<div className="flex flex-row gap-2 items-center justify-between">
 				<label className="font-semibold">{label}</label>
-				{error && <div className="text-red-600 text-sm">{error}</div>}
+				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
 			</div>
 			<FileInput
-				ref={ref}
 				accept="image/jpeg,image/png,image/jpg,image/webp"
-				className={`${error ? "border-red-400" : "border-neutral-500"} rounded-lg border-1`}
-				{...props}
+				className={`${errors[name] ? "border-red-400" : "border-neutral-500"} rounded-lg border-1`}
+				{...register(name)}
 			/>
 		</div>
 	)
-})
-
-InputFile.displayName = "InputFile"
-
-export default InputFile
+}

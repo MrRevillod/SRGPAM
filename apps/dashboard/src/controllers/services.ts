@@ -1,5 +1,5 @@
 import { prisma } from "@repo/database"
-import { bufferToBlob, fileToFormData } from "../utils/files"
+import { fileToFormData } from "../utils/files"
 import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
 
@@ -36,11 +36,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		})
 
 		if (serviceExists) {
-			return res.status(409).json({
-				message: "El servicio con ese nombre ya existe",
-				type: "error",
-				values: { conflicts: ["name"] },
-			})
+			throw new AppError(409, "El servicio con ese nombre ya existe", { conflicts: ["name"] })
 		}
 
 		const service = await prisma.service.create({
@@ -99,7 +95,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Servicio actualizado exitosamente",
 			type: "success",
-			values: service,
+			values: { updated: service },
 		})
 	} catch (error) {
 		next(error)
@@ -138,7 +134,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 		return res.status(200).json({
 			message: "Eliminación exitosa",
 			type: "success",
-			values: null,
+			values: { deletedId: id },
 		})
 	} catch (error) {
 		next(error)

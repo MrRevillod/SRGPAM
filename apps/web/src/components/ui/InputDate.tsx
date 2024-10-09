@@ -3,25 +3,29 @@ import ReactDatePicker from "react-datepicker"
 
 import { es } from "date-fns/locale/es"
 import { registerLocale } from "react-datepicker"
-import { Control, Controller } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form"
 
 registerLocale("es", es)
 
 import "react-datepicker/dist/react-datepicker.css"
+import "../../main.css"
 
 interface DatePickerProps {
 	label: string
 	name: string
-	control: Control
-	error?: string
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ name, label, control, error }) => {
+export const DatePicker: React.FC<DatePickerProps> = ({ name, label }) => {
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext()
+
 	return (
 		<div className="flex flex-col gap-3 w-full">
 			<div className="flex flex-row gap-2 items-center justify-between">
 				<label className="font-semibold">{label}</label>
-				{error && <div className="text-red-600 text-sm">{error}</div>}
+				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
 			</div>
 			<Controller
 				control={control}
@@ -34,6 +38,12 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, label, control, error }) 
 						selected={value as any}
 						maxDate={new Date()}
 						locale="es"
+						showMonthDropdown
+						showYearDropdown
+						dropdownMode="select"
+						renderCustomHeader={({ date, changeYear, changeMonth }) => (
+							<CustomHeader date={date} changeYear={changeYear} changeMonth={changeMonth} />
+						)}
 					/>
 				)}
 			/>
@@ -41,4 +51,56 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, label, control, error }) 
 	)
 }
 
-export default DatePicker
+const CustomHeader = ({
+	date,
+	changeYear,
+	changeMonth,
+}: {
+	date: Date
+	changeYear: Function
+	changeMonth: Function
+}) => {
+	const currentYear = new Date().getFullYear()
+	const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
+
+	return (
+		<div className="custom-header">
+			<select
+				className="dropdown year-dropdown"
+				value={date.getFullYear()}
+				onChange={({ target: { value } }) => changeYear(Number(value))}
+			>
+				{years.map((year) => (
+					<option key={year} value={year}>
+						{year}
+					</option>
+				))}
+			</select>
+
+			<select
+				className="dropdown month-dropdown"
+				value={date.getMonth()}
+				onChange={({ target: { value } }) => changeMonth(Number(value))}
+			>
+				{[
+					"Enero",
+					"Febrero",
+					"Marzo",
+					"Abril",
+					"Mayo",
+					"Junio",
+					"Julio",
+					"Agosto",
+					"Septiembre",
+					"Octubre",
+					"Noviembre",
+					"Diciembre",
+				].map((month, index) => (
+					<option key={index} value={index}>
+						{month}
+					</option>
+				))}
+			</select>
+		</div>
+	)
+}

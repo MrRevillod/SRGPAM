@@ -16,5 +16,13 @@ export type JsonResponse<T> = {
 	values: T
 }
 
+type Dict = Record<string, any>
+
+export type ApiResponse = JsonResponse<Dict>
+export type AuthResponse = {
+	role: UserRole
+	user: User
+}
+
 export type User = Administrator | Senior | Professional
 export type UserRole = "ADMIN" | "PROFESSIONAL" | "SENIOR"

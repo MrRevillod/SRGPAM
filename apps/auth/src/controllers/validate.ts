@@ -43,6 +43,12 @@ export const refreshController = async (req: Request, res: Response, next: NextF
 			path: "/",
 		})
 
+		res.set({
+			"Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+			Pragma: "no-cache",
+			Expires: "0",
+		})
+
 		return res.status(200).json({
 			message: "Token de acceso actualizado",
 			type: "success",

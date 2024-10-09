@@ -1,10 +1,11 @@
 import axios from "axios"
 
-// Instancia de axios con la configuración base para hacer peticiones al servidor
+export const API_URL = import.meta.env.VITE_API_URL as string
+
 // baseURL: URL base de la API (definida en el archivo .env)
 // withCredentials: true para enviar las cookies en las peticiones
 export const api = axios.create({
-	baseURL: import.meta.env.VITE_API_URL as string,
+	baseURL: API_URL,
 	withCredentials: true,
 })
 
@@ -42,17 +43,25 @@ api.interceptors.response.use(
 			// 4. Intentamos refrescar el token de acceso haciendo una petición
 			//    al endpoint /auth/refresh (GET) - Requiere el token de refresco en las cookies
 
-			return api.get("/auth/refresh").then((res) => {
-				if (res.status === 200) {
-					// 5. Si la petición es exitosa, reintentamos la petición original
-					// y retornamos la respuesta del servidor, así el usuario no se da cuenta
-					// de que su token de acceso fue refrescado y su sesión sigue activa
+			return api
+				.get("/auth/refresh", {
+					headers: {
+						"Cache-Control": "no-cache",
+						Pragma: "no-cache",
+						Expires: "0",
+					},
+				})
+				.then((res) => {
+					if (res.status === 200) {
+						// 5. Si la petición es exitosa, reintentamos la petición original
+						// y retornamos la respuesta del servidor, así el usuario no se da cuenta
+						// de que su token de acceso fue refrescado y su sesión sigue activa
 
-					return api(originalRequest)
-				}
+						return api(originalRequest)
+					}
 
-				return Promise.reject(error)
-			})
+					return Promise.reject(error)
+				})
 		}
 
 		return Promise.reject(error)

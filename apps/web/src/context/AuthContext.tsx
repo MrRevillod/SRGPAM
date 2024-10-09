@@ -1,5 +1,7 @@
 import React from "react"
+
 import { api } from "../lib/axios"
+import { Dispatch, SetStateAction } from "react"
 import { LoginFormData, LoginVariant, User } from "../lib/types"
 import { createContext, ReactNode, useEffect, useState } from "react"
 
@@ -12,6 +14,7 @@ interface AuthContextType {
 	login: (credentials: LoginFormData) => Promise<void>
 	logout: () => Promise<void>
 	refreshToken: () => Promise<void>
+	setUser: Dispatch<SetStateAction<User | null>>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -27,7 +30,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(true)
 
 		try {
-			const response = await api.post("/auth/login?variant=ADMIN", credentials)
+			const response = await api.post(`/auth/login?variant=${credentials.role}`, {
+				email: credentials.email,
+				password: credentials.password,
+			})
 			setUser(response.data.values.user)
 			setIsAuthenticated(true)
 			setError(null)
@@ -93,7 +99,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	}, [])
 
 	return (
-		<AuthContext.Provider value={{ role, user, login, error, logout, refreshToken, loading, isAuthenticated }}>
+		<AuthContext.Provider
+			value={{ role, user, setUser, login, error, logout, refreshToken, loading, isAuthenticated }}
+		>
 			{children}
 		</AuthContext.Provider>
 	)

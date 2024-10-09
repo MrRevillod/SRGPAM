@@ -1,6 +1,6 @@
 import React from "react"
 import { Table, Space } from "antd"
-import { FiEdit, FiDelete, FiEye } from "react-icons/fi"
+import { AiFillEdit, AiFillDelete, AiFillEye } from "react-icons/ai"
 import { BaseDataType, TableColumnType } from "../lib/types"
 import { tableColumnsFormatters } from "../lib/formatters"
 
@@ -37,18 +37,18 @@ const DataTable = <T extends BaseDataType>({ data, columnsConfig, onView, onEdit
 				render={(_, record: T) => (
 					<Space size="large">
 						{onEdit && (
-							<a onClick={() => onEdit && onEdit(record)}>
-								<FiEdit className="text-green-700 text-md font-light h-6 w-6" />
+							<a title="Editar" onClick={() => onEdit && onEdit(record)}>
+								<AiFillEdit className="text-green-600 text-md font-light h-6 w-6" />
 							</a>
 						)}
 						{onDelete && (
-							<a onClick={() => onDelete && onDelete(record)}>
-								<FiDelete className="text-red-700 text-md font-light h-6 w-6" />
+							<a title="Eliminar" onClick={() => onDelete && onDelete(record)}>
+								<AiFillDelete className="text-red-700 text-md font-light h-6 w-6" />
 							</a>
 						)}
 						{onView && (
-							<a onClick={() => onView(record)}>
-								<FiEye className="text-blue-500 text-md font-light h-6 w-6" />
+							<a title="Ver" onClick={() => onView(record)}>
+								<AiFillEye className="text-blue-500 text-md font-light h-6 w-6" />
 							</a>
 						)}
 					</Space>
