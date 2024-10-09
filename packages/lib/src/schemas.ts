@@ -55,7 +55,12 @@ const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), 
 	message: "La fecha de nacimiento ingresada no es válida",
 })
 
-const dateTimeSchema = z.string().datetime()
+const dateTimeSchema = z.number().refine((value) => {
+    const date = new Date(value);
+    return !isNaN(date.getTime())
+}, {
+	message: "La fecha de ingr  esada no es válida",
+})
 
 export type SchemasKeys =
 	| keyof typeof SeniorSchemas
@@ -171,23 +176,27 @@ export const AdministratorSchemas = {
 }
 
 export const EventSchemas = {
-	Create: z.object({
-		startsAt: dateTimeSchema,
-		endsAt: dateTimeSchema,
-		professionalId: rutSchema,
-		serviceId: z.string(),
-		seniorId: z.optional(rutSchema),
-		centerId: z.optional(z.string()),
-	}),
+	Create: z
+		.object({
+			startsAt: dateTimeSchema,
+			endsAt: dateTimeSchema,
+			professionalId: rutSchema,
+			serviceId: z.number(),
+			seniorId: z.optional(rutSchema),
+			centerId: z.optional(z.string()),
+		})
+,
+
 	Update: z.object({
 		startsAt: dateTimeSchema,
 		endsAt: dateTimeSchema,
 		professionalId: rutSchema,
-		serviceId: z.string(),
+		serviceId: z.number(),
 		assistance: z.optional(z.boolean()),
 		seniorId: z.optional(rutSchema),
 		centerId: z.optional(z.string()),
 	}),
 }
+
 
 export const ProfessionalSchemas = AdministratorSchemas

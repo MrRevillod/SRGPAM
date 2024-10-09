@@ -9,19 +9,22 @@ import { BrowserRouter } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
 
 import "./main.css"
+import { SocketProvider } from "./context/SocketContext"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
 root.render(
 	<ThemeProvider>
 		<AuthProvider>
-			<ModalProvider>
-				<BrowserRouter>
-					<AppLayout>
-						<Router />
-					</AppLayout>
-				</BrowserRouter>
-			</ModalProvider>
+      <SocketProvider>
+			  <ModalProvider>
+				  <BrowserRouter>
+					  <AppLayout>
+						  <Router />
+					  </AppLayout>
+				  </BrowserRouter>
+			  </ModalProvider>
+      </SocketProvider
 		</AuthProvider>
-	</ThemeProvider>,
+	</ThemeProvider>
 )

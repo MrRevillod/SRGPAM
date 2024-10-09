@@ -92,8 +92,8 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		) {
 			const event = await prisma.event.create({
 				data: {
-					startsAt,
-					endsAt,
+                    startsAt: new Date(startsAt),
+                    endsAt: new Date(endsAt),
 					professionalId,
 					serviceId: parseInt(serviceId),
 					seniorId: seniorId || null,
@@ -101,7 +101,9 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				},
 			})
 
-			io.emit("newEvent", event)
+			//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
+			//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+
 			return res.status(200).json({
 				message: "Creación exitosa",
 				type: "success",
@@ -175,8 +177,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			const event = await prisma.event.update({
 				where: { id: parseInt(req.params.id) },
 				data: {
-					startsAt,
-					endsAt,
+                    startsAt: new Date(startsAt),
+                    endsAt: new Date(endsAt),
 					professionalId,
 					serviceId: parseInt(serviceId),
 					centerId: centerId ? parseInt(serviceId) : null,
