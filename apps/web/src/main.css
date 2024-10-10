@@ -163,7 +163,7 @@ body {
     overflow-y: scroll;
   }
 .fc-view-harness{
-    max-height: 300px;
+    max-height: 100%;
     overflow-y: scroll;
     
 }

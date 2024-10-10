@@ -19,6 +19,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				professionalId: true,
 				serviceId: true,
 				centerId: true,
+				service: {
+					select: {
+						name: true,
+						color: true,
+					},
+				},
 			},
 		})
 
@@ -192,7 +198,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			return res.status(200).json({
 				message: "Actualización exitosa",
 				type: "success",
-				values: { event },
+				values: { updated: event },
 			})
 		} else {
 			return res.status(409).json({

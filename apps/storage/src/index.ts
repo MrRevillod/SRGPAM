@@ -65,7 +65,12 @@ export const createServer = (): express.Express => {
 	app.use(morgan("dev"))
 	app.use(express.json())
 	app.use(express.urlencoded({ extended: true }))
-	app.use(cors())
+	app.use(
+		cors({
+			origin: "*", // Cambia esto por el origen del cliente
+			credentials: true, // Permitir credenciales (cookies, headers, etc.)
+		}),
+	)
 
 	// ----------------- Rutas privadas ------------------
 	// /api/storage/upload

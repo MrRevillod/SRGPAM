@@ -33,7 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await api.post(`/auth/login?variant=${credentials.role}`, {
 				email: credentials.email,
 				password: credentials.password,
-			})
+            })
+            console.log(response)
 			setUser(response.data.values.user)
 			setIsAuthenticated(true)
 			setError(null)

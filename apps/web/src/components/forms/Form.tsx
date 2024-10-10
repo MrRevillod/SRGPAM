@@ -21,7 +21,7 @@ const Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, chi
 	const { handleSubmit, reset } = useFormContext()
 
 	const onCancel = () => {
-		handleCancel()
+        handleCancel()
 	}
 
 	const onSubmit: SubmitHandler<FieldValues> = async (form) => {

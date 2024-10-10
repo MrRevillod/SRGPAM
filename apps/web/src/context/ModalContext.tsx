@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react"
+import { useFormContext } from "react-hook-form"
 
 export type ModalType = "Create" | "Edit" | "Confirm"
 
@@ -9,6 +10,7 @@ interface ModalContextProps {
 	showModal: (type: ModalType, data: any) => void
 	handleOk: () => void
 	handleCancel: () => void
+	handleClose: () => void
 	modalType: Nullable<ModalType>
 	selectedData: any
 	setSelectedData: Dispatch<SetStateAction<any>>
@@ -29,17 +31,23 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 	const handleOk = () => {
 		setSelectedData(null)
-		setIsModalOpen(false)
+        setIsModalOpen(false)
 	}
 
 	const handleCancel = () => {
 		setSelectedData(null)
 		setIsModalOpen(false)
-	}
+    }
+    
+    const handleClose = () => {
+        setSelectedData(null)
+        setIsModalOpen(false)
+        
+    }
 
 	return (
 		<ModalContext.Provider
-			value={{ setSelectedData, isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData }}
+			value={{ setSelectedData, isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData,handleClose }}
 		>
 			{children}
 		</ModalContext.Provider>
