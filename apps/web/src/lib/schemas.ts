@@ -34,6 +34,7 @@ export const SeniorSchemas = {
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Los PIN ingresados no coinciden",
+			path: ["confirmPassword"],
 		}),
 
 	Validate: z.object({
@@ -61,6 +62,7 @@ export const AdministratorSchemas = {
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
+			path: ["confirmPassword"],
 		}),
 }
 
