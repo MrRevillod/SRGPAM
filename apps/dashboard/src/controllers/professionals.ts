@@ -22,14 +22,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(200).json({
-			message: "Profesionales obtenidos correctamente",
-			type: "success",
-			values: {
-				professionals,
-				len: professionals.length,
-			},
-		})
+		return res.status(200).json({ values: professionals })
 	} catch (error) {
 		next(error)
 	}
@@ -76,11 +69,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(201).json({
-			message: "Creación exitosa",
-			type: "success",
-			values: professional,
-		})
+		return res.status(201).json({ values: professional })
 	} catch (error) {
 		next(error)
 	}
@@ -88,11 +77,18 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 // Controlador para Actualizar un profesional por su id
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
-	const user = req.getExtension("requestedUser") as Professional
 	const id = req.params.id
+	const user = req.getExtension("requestedUser") as Professional
+
+	const { name, email, password } = req.body
 
 	try {
-		const { name, email, password } = req.body
+		const userExists = await prisma.professional.findFirst({ where: { email } })
+
+		if (userExists && userExists.id !== id) {
+			throw new AppError(409, "El profesional ya existe", { conflicts: ["email"] })
+		}
+
 		const updatedPassword = password ? await hash(password, 10) : user.password
 
 		const professional = await prisma.professional.update({
@@ -128,11 +124,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			response.image = storageResponse.values.image
 		}
 
-		return res.status(200).json({
-			message: "Actualización exitosa",
-			type: "success",
-			values: response,
-		})
+		return res.status(200).json({ values: response })
 	} catch (error) {
 		next(error)
 	}
@@ -148,20 +140,14 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			data: { professionalId: null },
 		})
 
-		await prisma.professional.delete({ where: { id: req.params.id } })
-		const endpint = `/delete?path=%2Fusers%2F${id}`
-
-		const storageResponse = await deleteProfilePicture(endpint)
+		const deleted = await prisma.professional.delete({ where: { id: req.params.id } })
+		const storageResponse = await deleteProfilePicture(`/delete?path=%2Fusers%2F${id}`)
 
 		if (storageResponse.type === "error") {
 			throw new AppError(500, "Error al eliminar la imagen del profesional")
 		}
 
-		return res.status(200).json({
-			message: "Eliminación exitosa",
-			type: "success",
-			values: { deletedId: id },
-		})
+		return res.status(200).json({ values: deleted })
 	} catch (error) {
 		next(error)
 	}

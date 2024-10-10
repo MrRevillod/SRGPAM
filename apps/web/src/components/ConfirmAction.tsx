@@ -1,31 +1,43 @@
-import React, { Dispatch, SetStateAction } from "react"
-import { message } from "antd"
-import { Modal } from "./Modal"
-import { useModal } from "../context/ModalContext"
-import { Button } from "./ui/Button"
+import React from "react"
 
-interface ConfirmActionProps {
+import { Modal } from "./Modal"
+import { Button } from "./ui/Button"
+import { message } from "antd"
+import { useModal } from "../context/ModalContext"
+import { useState } from "react"
+import { ApiAction, BaseDataType } from "../lib/types"
+import { Dispatch, SetStateAction } from "react"
+
+interface ConfirmActionProps<T> {
 	text: string
-	executeAction: (element: any) => any | Promise<any>
-	data?: any[]
-	setData?: Dispatch<SetStateAction<any[]>>
+	data?: T | T[]
+	setData?: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
+	executeAction: ApiAction
 }
 
-const ConfirmDelete: React.FC<ConfirmActionProps> = ({ text, executeAction, setData, data }) => {
+const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, executeAction }: ConfirmActionProps<T>) => {
+	const [loading, setLoading] = useState<boolean>(false)
+
 	const { handleOk, handleCancel, selectedData } = useModal()
 
 	const handleConfirm = async () => {
+		setLoading(true)
+
 		try {
-			const response = await executeAction(selectedData)
+			const { data: response } = await executeAction(selectedData)
 
-			if (!response || response?.data.type === "error") {
-				throw new Error("Error al eliminar el registro")
-			}
+			setLoading(false)
 
-			const deletedId = response?.data.values.deletedId
+			if (loading) message.loading("Cargando...")
+
+			const deleted = response.values
 
 			if (data && setData) {
-				setData(data.filter((element: any) => element.id !== deletedId))
+				if (Array.isArray(data)) {
+					;(setData as Dispatch<SetStateAction<T[]>>)(data.filter((element) => element.id !== deleted.id))
+				} else {
+					;(setData as Dispatch<SetStateAction<T | null>>)(null)
+				}
 			}
 
 			message.success("Hecho")

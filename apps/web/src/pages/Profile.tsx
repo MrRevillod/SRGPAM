@@ -56,11 +56,7 @@ const ProfilePage: React.FC = () => {
 
 				{showUpdateForm && (
 					<div className="flex flex-col justify-center items-center">
-						<UpdateProfile
-							imageSrc={imageSrc}
-							setImageSrc={setImageSrc}
-							setShowUpdateForm={setShowUpdateForm}
-						/>
+						<UpdateProfile setImageSrc={setImageSrc} setShowUpdateForm={setShowUpdateForm} />
 					</div>
 				)}
 			</div>

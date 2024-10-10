@@ -5,7 +5,7 @@ import { Show } from "./ui/Show"
 import { useModal } from "../context/ModalContext"
 import { Breadcrumb } from "flowbite-react"
 import { useNavigate } from "react-router-dom"
-import { HiHome, HiUserAdd } from "react-icons/hi"
+import { AiOutlinePlus, AiFillHome } from "react-icons/ai"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 interface PageHeaderProps {
@@ -45,7 +45,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 				<div className="flex flex-col gap-4 w-4/6">
 					<h1 className="text-2xl font-bold">{pageTitle}</h1>
 					<Breadcrumb aria-label="Default breadcrumb example" className="text-neutral-500">
-						<Breadcrumb.Item href="/" icon={HiHome} />
+						<Breadcrumb.Item href="/" icon={AiFillHome} />
 						{breadcrumbItems.map((item, index) => (
 							<Breadcrumb.Item key={index} href="#" onClick={() => navigateTo(item)}>
 								{capitalize(item)}
@@ -63,7 +63,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 							onClick={() => create && showModal("Create", null)}
 						>
 							Nuevo
-							<HiUserAdd className="text-neutral-50 text-lg" />
+							<AiOutlinePlus className="text-neutral-50 text-lg" />
 						</button>
 					</Show>
 				</div>

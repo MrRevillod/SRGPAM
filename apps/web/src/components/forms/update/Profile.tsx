@@ -1,25 +1,24 @@
-import React, { useState } from "react"
+import React from "react"
 
 import { api } from "../../../lib/axios"
 import { Input } from "../../ui/Input"
 import { Button } from "../../ui/Button"
 import { useAuth } from "../../../context/AuthContext"
-import { message, UploadFile } from "antd"
-import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LoginVariant, User } from "../../../lib/types"
-import { buildRequestBody, handleConflicts } from "../../../lib/form"
-import { AdministratorSchemas } from "../../../lib/schemas"
-import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { ImageEditor } from "../../ImageCrop"
+import { LoginVariant, User } from "../../../lib/types"
+import { useEffect, useState } from "react"
+import { message, UploadFile } from "antd"
+import { AdministratorSchemas } from "../../../lib/schemas"
+import { buildRequestBody, handleFormError } from "../../../lib/form"
+import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
 
 interface UpdateProfileProps {
-	imageSrc: string
 	setImageSrc: React.Dispatch<React.SetStateAction<string>>
 	setShowUpdateForm: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, setShowUpdateForm }) => {
+const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdateForm }) => {
 	const { user, setUser, role } = useAuth()
 	const [imageFile, setImageFile] = useState<UploadFile | null>(null)
 
@@ -27,7 +26,7 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, se
 		resolver: zodResolver(AdministratorSchemas.Update),
 	})
 
-	const { reset, handleSubmit } = methods
+	const { reset, handleSubmit, setError } = methods
 
 	const handleReset = () => {
 		reset({ name: user?.name, email: user?.email, password: "", confirmPassword: "" })
@@ -64,10 +63,7 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, se
 
 			handleReset()
 		} catch (error: any) {
-			if (error.response.status === 409) {
-				message.error(error.response.data.message)
-				handleConflicts("perfíl", error.response.data.values.conflicts)
-			}
+			handleFormError(error, setError)
 		}
 	}
 

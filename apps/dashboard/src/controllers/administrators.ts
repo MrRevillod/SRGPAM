@@ -1,9 +1,9 @@
 import { hash } from "bcrypt"
-import { Prisma } from "@prisma/client"
+import { Administrator, Prisma } from "@prisma/client"
 import { prisma } from "@repo/database"
 import { AppError, constants } from "@repo/lib"
-import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
 import { Request, Response, NextFunction } from "express"
+import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
 
 // Controlador para obtener todos los administradores de la base de datos
 // se excluye el campo password de la respuesta
@@ -20,10 +20,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(200).json({
-			type: "success",
-			values: { administrators, len: administrators.length },
-		})
+		return res.status(200).json({ values: administrators })
 	} catch (error) {
 		next(error)
 	}
@@ -62,11 +59,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			data: { id, name, email, password: defaulAdminPassword },
 		})
 
-		return res.status(201).json({
-			message: "Creación exitosa",
-			type: "success",
-			values: administrator,
-		})
+		return res.status(201).json({ values: administrator })
 	} catch (error) {
 		next(error)
 	}
@@ -75,19 +68,21 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 // Controlador para Actualizar un administrador por su id
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	const id = req.params.id
+	const user = req.getExtension("requestedUser") as Administrator
+
+	const { name, email, password } = req.body
 
 	try {
-		const adminExist = await prisma.administrator.findUnique({ where: { id } })
+		const userExists = await prisma.administrator.findFirst({ where: { email } })
 
-		if (!adminExist) {
-			throw new AppError(400, "El administrador solicitado no existe")
+		if (userExists && userExists.id !== id) {
+			throw new AppError(409, "El administrador ya existe", { conflicts: ["email"] })
 		}
 
-		const { name, email, password } = req.body
-		const updatedPassword = password ? await hash(password, 10) : adminExist.password
+		const updatedPassword = password ? await hash(password, 10) : user.password
 
 		const administrator = await prisma.administrator.update({
-			where: { id: id },
+			where: { id },
 			data: { name, email, password: updatedPassword },
 			select: {
 				id: true,
@@ -114,11 +109,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			response.image = storageResponse.values.image
 		}
 
-		return res.status(200).json({
-			message: "Actualización exitosa",
-			type: "success",
-			values: response,
-		})
+		return res.status(200).json({ values: response })
 	} catch (error) {
 		next(error)
 	}
@@ -135,19 +126,14 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(400, "El administrador solicitado no existe")
 		}
 
-		await prisma.administrator.delete({ where: { id } })
-
+		const { password, ...deleted } = await prisma.administrator.delete({ where: { id } })
 		const storageResponse = await deleteProfilePicture(`/delete?path=%2Fusers%2F${id}`)
 
 		if (storageResponse.type === "error") {
 			throw new AppError(storageResponse.status || 500, storageResponse.message)
 		}
 
-		return res.status(200).json({
-			message: "Eliminación exitosa",
-			type: "success",
-			values: { deletedId: id },
-		})
+		return res.status(200).json({ values: deleted })
 	} catch (error) {
 		next(error)
 	}

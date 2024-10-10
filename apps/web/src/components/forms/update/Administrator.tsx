@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AdministratorSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
 import { Administrator, FormProps } from "../../../lib/types"
+import { updateAdministrator } from "../../../lib/actions"
 
 const UpdateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData }) => {
 	const { selectedData } = useModal()
@@ -31,16 +32,9 @@ const UpdateAdministrator: React.FC<FormProps<Administrator>> = ({ data, setData
 	return (
 		<Modal type="Edit" title={`Editar la información de ${selectedData?.name}`}>
 			<FormProvider {...methods}>
-				<Form
-					method="PATCH"
-					data={data}
-					setData={setData}
-					entityName="administrador"
-					apiEndpoint={`/dashboard/administrators/${selectedData?.id}`}
-				>
+				<Form data={data} setData={setData} action={updateAdministrator}>
 					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
-
 					<Input name="password" label="Contraseña" type="password" placeholder="••••" />
 					<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••" />
 				</Form>

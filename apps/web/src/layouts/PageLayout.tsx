@@ -1,14 +1,14 @@
-import React, { Fragment } from "react"
+import React from "react"
 import PageHeader from "../components/PageHeader"
 
-import { Dispatch, ReactNode, SetStateAction } from "react"
 import { Helmet } from "react-helmet"
+import { Fragment, Dispatch, ReactNode, SetStateAction } from "react"
 
 interface PageLayoutProps {
 	pageTitle: string
 	create?: boolean
 	searchKeys?: string[]
-	data?: any[]
+	data?: any[] | null
 	setData?: Dispatch<SetStateAction<any[]>>
 	children: ReactNode
 }
@@ -24,7 +24,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ pageTitle, create, data, search
 					pageTitle={pageTitle}
 					create={create}
 					searchKeys={searchKeys}
-					data={data}
+					data={data || []}
 					setData={setData}
 				/>
 				<section className="w-full">{children}</section>
