@@ -5,8 +5,11 @@ import { ConfigProvider } from "antd"
 import { useEffect, createContext, useContext, useState, ReactNode } from "react"
 
 const PRIMARY_GREEN = "#046c4e" as const
-const PRIMARY_DARK = "#1a202c" as const
-const PRIMARY_LIGHT = "#FFF" as const
+
+const BG_PRIMARY_DARK = "#1a202c" as const
+const BG_SECONDARY_DARK = "#2d3748" as const
+
+const BG_PRIMARY_LIGHT = "#FFF" as const
 
 const TEXT_DARK = "#2d3748" as const
 const TEXT_LIGHT = "#f7fafc" as const
@@ -25,14 +28,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 		setIsDarkMode((prev) => !prev)
 	}
 
-	const antDToken: ThemeConfig = {
-		token: {
-			colorPrimary: PRIMARY_GREEN,
-			colorBgBase: isDarkMode ? PRIMARY_DARK : PRIMARY_LIGHT,
-			colorTextBase: isDarkMode ? TEXT_LIGHT : TEXT_DARK,
-		},
-	}
-
 	useEffect(() => {
 		const body = document.body
 		if (isDarkMode) {
@@ -42,11 +37,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 		}
 	}, [isDarkMode])
 
-	return (
-		<ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-			<ConfigProvider theme={antDToken}>{children}</ConfigProvider>
-		</ThemeContext.Provider>
-	)
+	return <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = () => {
