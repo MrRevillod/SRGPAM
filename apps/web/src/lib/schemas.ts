@@ -22,7 +22,6 @@ export const SeniorSchemas = {
 		address: rules.addressSchema,
 		birthDate: rules.birthDateSchema,
 	}),
-
 	Update: z
 		.object({
 			name: rules.nameSchema,
@@ -37,13 +36,15 @@ export const SeniorSchemas = {
 			path: ["confirmPassword"],
 		}),
 
-	Validate: z.object({
-		rut: rules.rutSchema,
-		name: rules.nameSchema,
-		email: rules.emailSchema,
-		address: rules.addressSchema,
-		birthDate: rules.birthDateSchema,
-	}),
+	Validate: z
+		.object({
+			rut: rules.rutSchema,
+			name: rules.nameSchema,
+			email: rules.emailSchema,
+			address: rules.addressSchema,
+			birthDate: rules.birthDateSchema,
+		})
+		
 }
 
 export const AdministratorSchemas = {
@@ -105,6 +106,7 @@ const dateTimeSchema = z.number().refine(
 	},
 	{
 		message: "La fecha de ingresada no es válida",
+		path: ["startsAt", "endsAt"],
 	},
 )
 

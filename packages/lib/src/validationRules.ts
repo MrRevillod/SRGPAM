@@ -1,6 +1,31 @@
 import { z } from "zod"
-import { isValidRut } from "./authorization/rut"
 
+export const isValidRutFormat = (rut: string): boolean => {
+	const rutRegex = /^[0-9]+[0-9Kk]$/
+	return rutRegex.test(rut)
+}
+
+export const isValidRut = (rut: string): boolean => {
+	if (!isValidRutFormat(rut)) {
+		return false
+	}
+
+	const body = rut.slice(0, -1)
+	const verifier = rut.slice(-1).toUpperCase()
+
+	let sum = 0
+	let multiplier = 2
+
+	for (let i = body.length - 1; i >= 0; i--) {
+		sum += parseInt(body[i], 10) * multiplier
+		multiplier = multiplier === 7 ? 2 : multiplier + 1
+	}
+
+	const mod11 = 11 - (sum % 11)
+	const expectedVerifier = mod11 === 11 ? "0" : mod11 === 10 ? "K" : mod11.toString()
+
+	return verifier === expectedVerifier
+}
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 export const rutSchema = z.string().refine(isValidRut, {
@@ -51,10 +76,10 @@ export const nameSchema = z
 
 export const addressSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
 
-export const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), {
-	message: "La fecha de nacimiento ingresada no es válida",
+export const birthDateSchema = z.date({
+	invalid_type_error: "La fecha de nacimiento ingresada no es válida",
+	required_error: "La fecha de nacimiento es obligatoria ",
 })
-
 export const dateTimeSchema = z.number().refine(
 	(value) => {
 		const date = new Date(value)

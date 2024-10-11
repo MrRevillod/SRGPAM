@@ -72,8 +72,9 @@ export const descriptionSchema = z
 
 export const addressSchema = z.string().min(4, "La dirección debe tener al menos 4 caracteres")
 
-export const birthDateSchema = z.coerce.date({
-	message: "La fecha de nacimiento ingresada no es válida",
+export const birthDateSchema = z.date({
+	invalid_type_error: "La fecha de nacimiento ingresada no es válida",
+	required_error: "La fecha de nacimiento es obligatoria ",
 })
 
 export const nameServiceSchema = z
