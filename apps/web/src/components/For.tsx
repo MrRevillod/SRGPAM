@@ -2,12 +2,12 @@ import React from "react"
 
 import { Fragment } from "react"
 
-interface RenderProps<T> {
+interface ForProps<T> {
 	items: T[]
 	render: (item: T) => JSX.Element
 }
 
-export const Render = <T,>({ items, render }: RenderProps<T>) => {
+export const For = <T,>({ items, render }: ForProps<T>) => {
 	return (
 		<>
 			{items.map((item, index) => (

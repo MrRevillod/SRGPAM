@@ -1,6 +1,7 @@
 import axios from "axios"
 
 export const API_URL = import.meta.env.VITE_API_URL as string
+export const IMAGE_BASE_URL = `${API_URL}/storage/public`
 
 // baseURL: URL base de la API (definida en el archivo .env)
 // withCredentials: true para enviar las cookies en las peticiones
@@ -65,5 +66,5 @@ api.interceptors.response.use(
 		}
 
 		return Promise.reject(error)
-	}
+	},
 )

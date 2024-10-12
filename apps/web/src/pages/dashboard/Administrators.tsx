@@ -13,9 +13,6 @@ import { AdministratorColumns } from "../../lib/columns"
 import { deleteAdministrator, getAdministrators } from "../../lib/actions"
 
 const AdministratorsPage: React.FC = () => {
-	// Estado para almacenar los datos de los administradores
-	// en el componente, para poder actualizarlos en tiempo real
-
 	const [administrators, setAdministrators] = useState<Administrator[]>([])
 
 	const { error, loading, data } = useRequest<Administrator[]>({

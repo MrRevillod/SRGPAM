@@ -91,10 +91,20 @@ export type Event = {
 export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
 
 export type ApiError = string | string[] | null
-export type ApiAction = ({ id, query, body }: ActionProps) => Promise<AxiosResponse<any, any>>
 
-export interface ActionProps {
-	id?: string | null
-	query?: any
+export type QueryAction = ({ query }: QueryActionProps) => Promise<AxiosResponse<any, any>>
+export type MutateAction = ({ id, body }: MutateActionProps) => Promise<AxiosResponse<any, any>>
+
+export interface QueryActionProps {
+	query?: string
+}
+
+export interface MutateActionProps {
+	id?: string | number
 	body?: any
+}
+
+export type UpdateResponse<T> = {
+	updated: T
+	image: string
 }

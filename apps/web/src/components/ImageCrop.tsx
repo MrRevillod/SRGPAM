@@ -11,7 +11,7 @@ interface ImageEditorProps {
 	setImageFile: Dispatch<SetStateAction<UploadFile | null>>
 }
 
-export const ImageEditor: React.FC<ImageEditorProps> = ({ imageLabel, setImageFile }) => {
+export const ImageCrop: React.FC<ImageEditorProps> = ({ imageLabel, setImageFile }) => {
 	const [fileList, setFileList] = useState<UploadFile[]>([])
 
 	const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
@@ -39,15 +39,16 @@ export const ImageEditor: React.FC<ImageEditorProps> = ({ imageLabel, setImageFi
 				showUploadList={true}
 				listType="text"
 				accept=".jpg,.jpeg,.png,.webp"
-				style={{ width: "100%" }}
 			>
 				<div className="flex flex-col gap-2 w-full">
-					<p className="font-semibold text-neutral-950 text-base">{imageLabel}</p>
+					<p className="font-semibold text-dark dark:text-light text-base">{imageLabel}</p>
 
 					<div className="flex flex-row justify-center w-full rounded-lg cursor-pointer">
 						<div className="flex flex-col gap-1">
-							<p className="text-gray-500">Haga click para subir una imagen</p>
-							<p className="text-gray-500">Formatos permitidos: .jpg, .jpeg, .png .webp</p>
+							<p className="text-gray-dark dark:text-gray-light">Haga click para subir una imagen</p>
+							<p className="text-gray-dark dark:text-gray-light">
+								Formatos permitidos: .jpg, .jpeg, .png .webp
+							</p>
 						</div>
 					</div>
 				</div>

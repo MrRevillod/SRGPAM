@@ -1,33 +1,35 @@
-import { useState, useEffect } from "react"
-import { ApiAction, ApiError } from "../lib/types"
+import { useEffect, useState } from "react"
+import { ApiError, QueryAction } from "../lib/types"
 
 interface useRequestResult<T> {
 	data: T | null
 	loading: boolean
 	error: ApiError
-	config: any
+	status: number
 }
 
-interface useRequestProps<T> {
-	action: ApiAction
-	params?: T
+interface useRequestProps {
+	action: QueryAction
+	query?: string
 }
 
-export const useRequest = <T, P = any>({ action, params }: useRequestProps<P>): useRequestResult<T> => {
+export const useRequest = <T,>({ action, query }: useRequestProps): useRequestResult<T> => {
 	const [data, setData] = useState<T | null>(null)
-	const [config, setConfig] = useState<any>(null)
-	const [loading, setLoading] = useState<boolean>(true)
+	const [loading, setLoading] = useState<boolean>(false)
 	const [error, setError] = useState<ApiError>(null)
+	const [status, setStatus] = useState<number>(200)
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await action(params ?? {})
+				setLoading(true)
+				const response = await action({ query })
 				setData(response.data.values as T)
 				setError(null)
-				setConfig(response.config)
+				setStatus(response.status)
 			} catch (err: any) {
 				if (err.response?.data) {
+					setStatus(err.response?.status)
 					setError(err.response?.data?.message || "Error desconocido")
 				}
 			} finally {
@@ -36,7 +38,7 @@ export const useRequest = <T, P = any>({ action, params }: useRequestProps<P>): 
 		}
 
 		fetchData()
-	}, [action, params])
+	}, [action, query])
 
-	return { data, loading, error, config }
+	return { data, loading, error, status }
 }

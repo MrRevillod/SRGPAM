@@ -5,66 +5,50 @@ import CreateSenior from "../../components/forms/create/Senior"
 import UpdateSenior from "../../components/forms/update/Senior"
 import ConfirmAction from "../../components/ConfirmAction"
 
-import { api } from "../../lib/axios"
 import { Senior } from "../../lib/types"
-import { useModal } from "../../context/ModalContext"
+import { message } from "antd"
+import { useRequest } from "../../hooks/useRequest"
 import { SeniorsColumns } from "../../lib/columns"
 import { useState, useEffect } from "react"
+import { deleteSenior, getSeniors } from "../../lib/actions"
 
 const SeniorsPage: React.FC = () => {
-	const [data, setData] = useState<Senior[]>([])
-	const [originalData, setOriginalData] = useState<Senior[]>([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const [seniors, setSeniors] = useState<Senior[]>([])
 
-	const fetchSeniors = async () => {
-		try {
-			const response = await api.get("/dashboard/seniors")
-			setData(response.data.values.seniors)
-			setOriginalData(response.data.values.seniors)
-		} catch (err) {
-			setError("Error al obtener los datos de seniors")
-		} finally {
-			setLoading(false)
-		}
-	}
+	const { error, loading, data } = useRequest<Senior[]>({
+		action: getSeniors,
+	})
 
 	useEffect(() => {
-		fetchSeniors()
-	}, [])
+		if (data) setSeniors(data)
+	}, [data])
 
-	const handleDelete = async (element: any) => {
-		try {
-			const response = await api.delete(`/dashboard/seniors/${element.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
-	}
-
-	const { showModal } = useModal()
+	if (error) message.error("Error al cargar los datos")
 
 	return (
 		<PageLayout
 			pageTitle="Personas mayores"
-			create={true}
-			setData={setData}
-			data={originalData}
+			create
+			data={seniors}
+			setData={setSeniors}
 			searchKeys={["id", "name", "email"]}
 		>
 			<DataTable<Senior>
-				data={data}
+				data={seniors}
 				columnsConfig={SeniorsColumns}
-				onEdit={(element) => showModal("Edit", element)}
-				onDelete={(element) => showModal("Confirm", element)}
+				editable
+				deletable
+				loading={loading}
+				viewable={false}
 			/>
-			<CreateSenior data={data} setData={setData} />
-			<UpdateSenior data={data} setData={setData} />
+
+			<CreateSenior data={seniors} setData={setSeniors} />
+			<UpdateSenior data={seniors} setData={setSeniors} />
 			<ConfirmAction
 				text="¿Estás seguro(a) de que deseas eliminar esta persona mayor?"
-				data={data}
-				setData={setData}
-				executeAction={(element) => handleDelete(element)}
+				data={seniors}
+				setData={setSeniors}
+				executeAction={deleteSenior}
 			/>
 		</PageLayout>
 	)

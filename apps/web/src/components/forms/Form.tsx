@@ -23,16 +23,12 @@ const Form: React.FC<FormProps> = ({ data, setData, action, children }) => {
 	}
 
 	const onSubmit: SubmitHandler<FieldValues> = async (form) => {
-		console.log(form)
-
 		const { image, ...rest } = form
 
 		const body = buildRequestBody({
 			...rest,
 			image: form.image ? form.image[0] : undefined,
 		})
-
-		console.log(body)
 
 		try {
 			const res = await action({
@@ -66,7 +62,10 @@ const Form: React.FC<FormProps> = ({ data, setData, action, children }) => {
 	}
 
 	return (
-		<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit)}>
+		<form
+			className="flex flex-col gap-4 py-6 bg-light dark:bg-primary-dark rounded-lg"
+			onSubmit={handleSubmit(onSubmit)}
+		>
 			{children}
 			<div className="flex flex-row gap-4 w-full justify-end -mb-6">
 				<Button type="button" variant="secondary" onClick={onCancel}>

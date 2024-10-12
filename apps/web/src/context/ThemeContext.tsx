@@ -1,7 +1,6 @@
 import React from "react"
 
-import { ThemeConfig } from "antd"
-import { ConfigProvider } from "antd"
+import { ConfigProvider, ThemeConfig } from "antd"
 import { useEffect, createContext, useContext, useState, ReactNode } from "react"
 
 const PRIMARY_GREEN = "#046c4e" as const
@@ -22,10 +21,17 @@ interface ThemeContextProps {
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined)
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-	const [isDarkMode, setIsDarkMode] = useState(false)
+	const [isDarkMode, setIsDarkMode] = useState(() => {
+		const storedTheme = localStorage.getItem("isDarkMode")
+		return storedTheme ? JSON.parse(storedTheme) : false
+	})
 
 	const toggleTheme = () => {
-		setIsDarkMode((prev) => !prev)
+		setIsDarkMode((prev: boolean) => {
+			const newTheme = !prev
+			localStorage.setItem("isDarkMode", JSON.stringify(newTheme))
+			return newTheme
+		})
 	}
 
 	useEffect(() => {
@@ -37,7 +43,19 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 		}
 	}, [isDarkMode])
 
-	return <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>{children}</ThemeContext.Provider>
+	const tokens: ThemeConfig = {
+		token: {
+			colorPrimary: PRIMARY_GREEN,
+			colorBgBase: isDarkMode ? BG_PRIMARY_DARK : BG_PRIMARY_LIGHT,
+			colorTextBase: isDarkMode ? TEXT_LIGHT : TEXT_DARK,
+		},
+	}
+
+	return (
+		<ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+			<ConfigProvider theme={tokens}>{children}</ConfigProvider>
+		</ThemeContext.Provider>
+	)
 }
 
 export const useTheme = () => {

@@ -1,4 +1,7 @@
-import React, { useState, Dispatch, SetStateAction } from "react"
+import clsx from "clsx"
+import React from "react"
+
+import { useState, Dispatch, SetStateAction } from "react"
 
 interface Props {
 	data: any[]
@@ -21,9 +24,15 @@ const SearchBar: React.FC<Props> = ({ data, setData, keys }) => {
 		setData(filteredData)
 	}
 
+	const classes = clsx(
+		"border-gray dark:border-gray-medium",
+		"rounded-lg px-4 w-3/4 h-10 placeholder-grey",
+		"text-dark dark:text-light border-1 bg-light dark:bg-primary-dark",
+	)
+
 	return (
 		<input
-			className="w-3/4 h-10 rounded-lg border border-neutral-300 px-4"
+			className={classes}
 			type="text"
 			placeholder="Buscar..."
 			value={value}
