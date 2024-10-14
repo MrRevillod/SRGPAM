@@ -29,3 +29,14 @@ export type Senior = {
 export interface User extends Senior {
 	service: Partial<Senior>
 }
+
+export type AuthResponse = {
+	values: object
+	role: "Senior"
+	user: User
+}
+
+export type loginSeniorFormData = {
+	email: string
+	password: string
+}

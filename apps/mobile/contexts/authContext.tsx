@@ -1,13 +1,17 @@
+import { SERVER_URL } from "@/constants/colors"
 import { makeAuthenticatedRequest } from "@/utils/request"
-import { User } from "@/utils/types"
+import { storeTokens, storeUser } from "@/utils/storage"
+import { loginSeniorFormData, User } from "@/utils/types"
+import axios from "axios"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
+import { Alert } from "react-native"
 
 interface authContextProps {
 	isAuthenticated: boolean
 	user: User | null
 	role: "SENIOR" | null
 	loading: boolean
-	error: string | null
+	login: (credentials: loginSeniorFormData) => Promise<void>
 }
 
 const AuthContext = createContext<authContextProps | undefined>(undefined)
@@ -17,12 +21,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null)
 	const [role, setRole] = useState<"SENIOR" | null>(null)
 	const [loading, setLoading] = useState<boolean>(true)
-	const [error, setError] = useState<string | null>(null)
+
+	const login = async (credentials: loginSeniorFormData) => {
+		setLoading(true)
+
+		try {
+			const response = await axios.post(`${SERVER_URL}/api/auth/login-senior`, credentials)
+			const { message, values } = response.data
+			const { accessToken, refreshToken, publicUser } = values
+			storeTokens(accessToken, refreshToken)
+			setUser(publicUser)
+			setRole("SENIOR")
+			Alert.alert("Éxito", message)
+		} catch (error: any) {
+			error.response.data.message && Alert.alert("Error", error.response.data.message)
+		}
+
+		setLoading(false)
+	}
 
 	const checkAuth = async () => {
 		setLoading(true)
 		try {
-			const response = await makeAuthenticatedRequest("/auth/validate-auth", "GET")
+			const response = await makeAuthenticatedRequest(`${SERVER_URL}/api/auth/validate-auth`, "GET", false)
+
 			if (response) {
 				setIsAuthenticated(true)
 				setUser(response.data.values.user)
@@ -30,15 +52,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			}
 		} catch (error) {
 			setUser(null)
+			setRole(null)
 			setIsAuthenticated(false)
 		}
+		setLoading(false)
 	}
 
 	useEffect(() => {
 		checkAuth()
 	}, [])
 
-	return <AuthContext.Provider value={{ isAuthenticated, user, role, loading, error }}>{children}</AuthContext.Provider>
+	return <AuthContext.Provider value={{ isAuthenticated, user, role, loading, login }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = (): authContextProps => {
