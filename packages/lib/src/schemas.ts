@@ -40,7 +40,7 @@ const optionalPasswordSchema = z
 		{
 			message:
 				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial, o ser vacía",
-		},
+		}
 	)
 
 const nameSchema = z
@@ -55,12 +55,15 @@ const birthDateSchema = z.string().refine((value) => !isNaN(Date.parse(value)), 
 	message: "La fecha de nacimiento ingresada no es válida",
 })
 
-const dateTimeSchema = z.number().refine((value) => {
-    const date = new Date(value);
-    return !isNaN(date.getTime())
-}, {
-	message: "La fecha de ingr  esada no es válida",
-})
+const dateTimeSchema = z.number().refine(
+	(value) => {
+		const date = new Date(value)
+		return !isNaN(date.getTime())
+	},
+	{
+		message: "La fecha de ingr  esada no es válida",
+	}
+)
 
 export type SchemasKeys =
 	| keyof typeof SeniorSchemas
@@ -73,7 +76,7 @@ const nameServiceSchema = z
 	.max(50, "El nombre no debe tener más de 50 caracteres")
 	.regex(
 		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()"
 	)
 
 const titleServiceSchema = z
@@ -82,7 +85,7 @@ const titleServiceSchema = z
 	.max(50, "El título no debe tener más de 50 caracteres")
 	.regex(
 		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()"
 	)
 
 const nameCenterSchema = z
@@ -176,17 +179,14 @@ export const AdministratorSchemas = {
 }
 
 export const EventSchemas = {
-	Create: z
-		.object({
-			startsAt: dateTimeSchema,
-			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
-			serviceId: z.number(),
-			seniorId: z.optional(rutSchema),
-			centerId: z.optional(z.string()),
-		})
-,
-
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
 	Update: z.object({
 		startsAt: dateTimeSchema,
 		endsAt: dateTimeSchema,
@@ -197,6 +197,5 @@ export const EventSchemas = {
 		centerId: z.optional(z.string()),
 	}),
 }
-
 
 export const ProfessionalSchemas = AdministratorSchemas

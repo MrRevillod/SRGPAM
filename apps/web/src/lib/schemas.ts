@@ -47,6 +47,24 @@ const optionalPinSchema = z.string().refine((value) => value === "" || /^[0-9]{4
 	message: "El pin debe contener 4 dígitos numéricos",
 })
 
+const passwordSchema = z
+	.string()
+	.min(8, "La contraseña debe tener al menos 8 caracteres")
+	.regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
+	.regex(/[a-z]/, "La contraseña debe contener al menos una letra minúscula")
+	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
+	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
+
+export const getValidationSchema = (role: string) => {
+	if (role === "SENIOR") {
+		return pinSchema
+	} else if (role === "ADMIN" || role === "PROFESSIONAL") {
+		return passwordSchema
+	} else {
+		throw new Error("Rol no válido")
+	}
+}
+
 const optionalPasswordSchema = z
 	.string()
 	.refine(
@@ -218,24 +236,25 @@ export const CentersSchemas = {
 }
 export const ProfessionalSchemas = AdministratorSchemas
 
-const dateTimeSchema = z.number().refine((value) => {
-    const date = new Date(value);
-    return !isNaN(date.getTime())
-}, {
-	message: "La fecha de ingresada no es válida",
-})
+const dateTimeSchema = z.number().refine(
+	(value) => {
+		const date = new Date(value)
+		return !isNaN(date.getTime())
+	},
+	{
+		message: "La fecha de ingresada no es válida",
+	}
+)
 
 export const EventSchemas = {
-	Create: z
-		.object({
-			startsAt: dateTimeSchema,
-			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
-			serviceId: z.number(),
-			seniorId: z.optional(rutSchema),
-			centerId: z.optional(z.string()),
-		})
-        ,
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
 	Update: z.object({
 		startsAt: dateTimeSchema,
 		endsAt: dateTimeSchema,

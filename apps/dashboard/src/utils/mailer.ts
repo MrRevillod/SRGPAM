@@ -10,12 +10,12 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
-const sendMail = async (to: string, subject: string, text: string) => {
+const sendMail = async (to: string, subject: string, html: string) => {
 	const mailOptions = {
 		from: PROJECT_EMAIL_ADDRESS,
 		to,
 		subject,
-		text,
+		html,
 	}
 
 	try {
