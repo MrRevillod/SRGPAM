@@ -30,7 +30,7 @@ const ProfessionalsPage: React.FC = () => {
 		<PageLayout
 			pageTitle="Profesionales"
 			create={true}
-			data={professionals}
+			data={data}
 			setData={setProfessionals}
 			searchKeys={["id", "name", "email"]}
 		>
@@ -41,13 +41,15 @@ const ProfessionalsPage: React.FC = () => {
 				data={professionals}
 				columnsConfig={ProfessionalColumns}
 			/>
+
 			<CreateProfessional data={professionals} setData={setProfessionals} />
 			<UpdateProfessional data={professionals} setData={setProfessionals} />
-			<ConfirmAction
+
+			<ConfirmAction<Professional>
 				text="¿Estás seguro de que deseas eliminar este profesional?"
 				data={professionals}
 				setData={setProfessionals}
-				executeAction={deleteProfessional}
+				action={deleteProfessional}
 			/>
 		</PageLayout>
 	)

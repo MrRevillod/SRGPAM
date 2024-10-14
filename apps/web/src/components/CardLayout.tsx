@@ -7,12 +7,13 @@ interface Props<T> {
 	data: T[]
 	renderCard: (item: T) => JSX.Element
 	loading?: boolean
+	itemsPerPage?: number
 }
 
-export const CardLayout = <T extends any>({ data, renderCard, loading }: Props<T>) => {
+export const CardLayout = <T extends any>({ data, renderCard, loading, itemsPerPage }: Props<T>) => {
 	const { paginatedData, currentPage, pageSize, total, onPageChange } = usePagination({
 		data,
-		defaultPageSize: 6,
+		defaultPageSize: itemsPerPage || 6,
 	})
 
 	return (

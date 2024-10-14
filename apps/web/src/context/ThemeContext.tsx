@@ -10,8 +10,8 @@ const BG_SECONDARY_DARK = "#2d3748" as const
 
 const BG_PRIMARY_LIGHT = "#FFF" as const
 
-const TEXT_DARK = "#2d3748" as const
-const TEXT_LIGHT = "#f7fafc" as const
+const TEXT_DARK = "#000" as const
+const TEXT_LIGHT = "#FFF" as const
 
 interface ThemeContextProps {
 	isDarkMode: boolean

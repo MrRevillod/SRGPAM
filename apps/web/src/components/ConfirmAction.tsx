@@ -4,49 +4,52 @@ import { Modal } from "./Modal"
 import { Button } from "./ui/Button"
 import { message } from "antd"
 import { useModal } from "../context/ModalContext"
-import { useState } from "react"
-import { ApiAction, BaseDataType } from "../lib/types"
+import { useMutation } from "../hooks/useMutation"
 import { Dispatch, SetStateAction } from "react"
+import { MutateAction, BaseDataType, MutationResponse } from "../lib/types"
 
 interface ConfirmActionProps<T> {
 	text: string
-	data?: T | T[]
-	setData?: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
-	executeAction: ApiAction
+	data: T | T[]
+	setData: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
+	action: MutateAction
 }
 
-const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, executeAction }: ConfirmActionProps<T>) => {
-	const [loading, setLoading] = useState<boolean>(false)
-
+const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action }: ConfirmActionProps<T>) => {
 	const { handleOk, handleCancel, selectedData } = useModal()
 
+	const mutation = useMutation<MutationResponse<T>>({
+		mutateFn: action,
+	})
+
 	const handleConfirm = async () => {
-		setLoading(true)
+		await mutation.mutate({
+			params: { id: selectedData?.id || null },
+			onSuccess: (res) => {
+				const { modified: deleted } = res
 
-		try {
-			const { data: response } = await executeAction(selectedData)
-
-			setLoading(false)
-
-			if (loading) message.loading("Cargando...")
-
-			const deleted = response.values
-
-			if (data && setData) {
-				if (Array.isArray(data)) {
-					;(setData as Dispatch<SetStateAction<T[]>>)(data.filter((element) => element.id !== deleted.id))
-				} else {
-					;(setData as Dispatch<SetStateAction<T | null>>)(null)
+				if (!deleted) {
+					message.error("Error al guardar. Intente nuevamente o recargue la página.")
+					return
 				}
-			}
 
-			message.success("Hecho")
-			handleOk()
-		} catch (error) {
-			console.error("Error en el delete:", error)
-			message.error("Error al eliminar el registro")
-			handleCancel()
-		}
+				if (Array.isArray(data)) {
+					const setter = setData as Dispatch<SetStateAction<T[]>>
+					setter(data.filter((element) => element.id !== deleted.id))
+				} else {
+					const setter = setData as Dispatch<SetStateAction<T | null>>
+					setter(null)
+				}
+
+				message.success("Hecho")
+				handleOk()
+			},
+			onError: (error) => {
+				console.error("Error en el delete:", error)
+				message.error("Error al eliminar el registro")
+				handleCancel()
+			},
+		})
 	}
 
 	return (

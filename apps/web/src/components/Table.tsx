@@ -3,8 +3,8 @@ import React from "react"
 import { useModal } from "../context/ModalContext"
 import { Table, Space } from "antd"
 import { tableColumnsFormatters } from "../lib/formatters"
-import { AiFillEdit, AiFillDelete, AiFillEye } from "react-icons/ai"
 import { BaseDataType, TableColumnType } from "../lib/types"
+import { AiFillEdit, AiFillDelete, AiFillEye } from "react-icons/ai"
 
 interface TableProps<T> {
 	data: T[]

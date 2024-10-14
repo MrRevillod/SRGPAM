@@ -74,20 +74,10 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 			throw new AppError(400, "Adulto mayor no encontrado")
 		}
 
-		// Si la solicitud es aceptada, se actualiza el campo validated a true
-		// Esto significa que el adulto mayor ya puede acceder a la aplicación
+		// Si la solicitud es rechazada, se eliminan los archivos enviados
+		// y se elimina el adulto mayor de la base de datos
 
-		if (validated) {
-			await prisma.senior.update({
-				where: { id },
-				data: { name, address, birthDate, validated },
-			})
-
-			return res.status(200).json({ message: "La solicitud ha sido aceptada" })
-		} else {
-			// Si la solicitud es rechazada, se eliminan los archivos enviados
-			// y se elimina el adulto mayor de la base de datos
-
+		if (!validated) {
 			const storageResponse = await httpRequest({
 				service: "STORAGE",
 				endpoint: `/delete?path=%2Fseniors%2F${id}`,
@@ -101,6 +91,16 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 			await prisma.senior.delete({ where: { id } })
 			return res.status(200).json({ message: "La solicitud ha sido denegada" })
 		}
+
+		// Si la solicitud es aceptada, se actualiza el campo validated a true
+		// Esto significa que el adulto mayor ya puede acceder a la aplicación
+
+		await prisma.senior.update({
+			where: { id },
+			data: { name, address, birthDate, validated },
+		})
+
+		return res.status(200).json({ message: "La solicitud ha sido aceptada" })
 	} catch (error: unknown) {
 		next(error)
 	}
@@ -167,7 +167,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(201).json({ values: senior })
+		return res.status(201).json({ values: { modified: senior } })
 	} catch (error) {
 		next(error)
 	}
@@ -210,7 +210,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			},
 		})
 
-		const response = { updated: senior, image: null }
+		const response = { modified: senior, image: null }
 
 		if (req.file) {
 			const storageResponse = await uploadProfilePicture({
@@ -250,7 +250,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(storageResponse.status || 500, storageResponse.message)
 		}
 
-		return res.status(200).json({ values: senior })
+		return res.status(200).json({ values: { modified: senior } })
 	} catch (error) {
 		next(error)
 	}

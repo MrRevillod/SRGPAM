@@ -6,6 +6,7 @@ import ConfirmAction from "../../components/ConfirmAction"
 
 import { Card } from "../../components/ui/Card"
 import { Center } from "../../lib/types"
+import { message } from "antd"
 import { CardLayout } from "../../components/CardLayout"
 import { useRequest } from "../../hooks/useRequest"
 import { useEffect, useState } from "react"
@@ -21,6 +22,8 @@ const CentersPage: React.FC = () => {
 		if (data) setCenters(data)
 	}, [data])
 
+	if (error) message.error("Error al cargar los datos")
+
 	return (
 		<PageLayout
 			pageTitle="Centros de atención"
@@ -31,13 +34,15 @@ const CentersPage: React.FC = () => {
 		>
 			<CardLayout<Center>
 				data={centers}
+				loading={loading}
+				itemsPerPage={9}
 				renderCard={(center: Center) => (
 					<Card
 						key={center.id}
 						item={center}
 						title={center.name}
 						description={center.address}
-						other={center.phone}
+						other={`Teléfono: ${center.phone}`}
 						imageSrc={`/centers/${center.id}.webp`}
 						deletable
 						updatable
@@ -52,7 +57,7 @@ const CentersPage: React.FC = () => {
 				text="¿Estás seguro(a) de que deseas eliminar este centro de atención?"
 				data={centers}
 				setData={setCenters}
-				executeAction={deleteCenter}
+				action={deleteCenter}
 			/>
 		</PageLayout>
 	)

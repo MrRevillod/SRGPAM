@@ -11,6 +11,7 @@ import { useRequest } from "../../hooks/useRequest"
 import { SeniorsColumns } from "../../lib/columns"
 import { useState, useEffect } from "react"
 import { deleteSenior, getSeniors } from "../../lib/actions"
+import { useNavigate } from "react-router-dom"
 
 const SeniorsPage: React.FC = () => {
 	const [seniors, setSeniors] = useState<Senior[]>([])
@@ -29,7 +30,7 @@ const SeniorsPage: React.FC = () => {
 		<PageLayout
 			pageTitle="Personas mayores"
 			create
-			data={seniors}
+			data={data}
 			setData={setSeniors}
 			searchKeys={["id", "name", "email"]}
 		>
@@ -44,11 +45,12 @@ const SeniorsPage: React.FC = () => {
 
 			<CreateSenior data={seniors} setData={setSeniors} />
 			<UpdateSenior data={seniors} setData={setSeniors} />
-			<ConfirmAction
+
+			<ConfirmAction<Senior>
 				text="¿Estás seguro(a) de que deseas eliminar esta persona mayor?"
 				data={seniors}
 				setData={setSeniors}
-				executeAction={deleteSenior}
+				action={deleteSenior}
 			/>
 		</PageLayout>
 	)

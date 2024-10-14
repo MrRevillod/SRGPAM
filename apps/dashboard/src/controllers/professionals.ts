@@ -1,9 +1,9 @@
 import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
+import { AppError, constants } from "@repo/lib"
 import { Prisma, Professional } from "@prisma/client"
-import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
 import { Request, Response, NextFunction } from "express"
-import { AppError, constants, getServerTokens, httpRequest } from "@repo/lib"
+import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
 
 // Controlador para obtener todos los profesionales de la base de datos
 // se excluye el campo password de la respuesta
@@ -18,7 +18,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				serviceId: true,
 				updatedAt: true,
 				createdAt: true,
-				service: { select: { name: true } },
+				service: { select: { title: true } },
 			},
 		})
 
@@ -69,7 +69,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		return res.status(201).json({ values: professional })
+		return res.status(201).json({ values: { modified: professional } })
 	} catch (error) {
 		next(error)
 	}
@@ -108,7 +108,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			},
 		})
 
-		const response = { updated: professional, image: null }
+		const response = { modified: professional, image: null }
 
 		if (req.file) {
 			const storageResponse = await uploadProfilePicture({
@@ -147,7 +147,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(500, "Error al eliminar la imagen del profesional")
 		}
 
-		return res.status(200).json({ values: deleted })
+		return res.status(200).json({ values: { modified: deleted } })
 	} catch (error) {
 		next(error)
 	}

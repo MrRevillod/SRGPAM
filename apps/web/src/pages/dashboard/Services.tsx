@@ -26,7 +26,7 @@ const ServicesPage: React.FC = () => {
 	if (error) message.error("Error al cargar los datos")
 
 	return (
-		<PageLayout pageTitle="Servicios" create data={services} setData={setServices} searchKeys={["name"]}>
+		<PageLayout pageTitle="Servicios" create data={data} setData={setServices} searchKeys={["name"]}>
 			<CardLayout<Service>
 				data={services}
 				loading={loading}
@@ -45,11 +45,11 @@ const ServicesPage: React.FC = () => {
 
 			<CreateService data={services} setData={setServices} />
 			<UpdateService data={services} setData={setServices} />
-			<ConfirmDelete
+			<ConfirmDelete<Service>
 				text="¿Estás seguro(a) de que deseas eliminar este servicio?"
 				data={services}
 				setData={setServices}
-				executeAction={deleteService}
+				action={deleteService}
 			/>
 		</PageLayout>
 	)

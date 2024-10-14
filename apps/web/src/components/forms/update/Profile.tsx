@@ -3,15 +3,15 @@ import React from "react"
 import { Input } from "../../ui/Input"
 import { Button } from "../../ui/Button"
 import { useAuth } from "../../../context/AuthContext"
-import { ImageCrop } from "../../ImageCrop"
+import { message } from "antd"
 import { useMutation } from "../../../hooks/useMutation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { message, UploadFile } from "antd"
-import { UpdateResponse, User } from "../../../lib/types"
+import { ImageSelector2 } from "../../ImageSelector2"
 import { AdministratorSchemas } from "../../../lib/schemas"
+import { MutationResponse, User } from "../../../lib/types"
 import { buildRequestBody, handleFormError } from "../../../lib/form"
+import { useEffect, Dispatch, SetStateAction } from "react"
 import { updateAdministrator, updateProfessional } from "../../../lib/actions"
-import { useEffect, useState, Dispatch, SetStateAction } from "react"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
 
 interface UpdateProfileProps {
@@ -20,10 +20,9 @@ interface UpdateProfileProps {
 }
 
 const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdateForm }) => {
-	const { user, setUser, role } = useAuth()
-	const [imageFile, setImageFile] = useState<UploadFile | null>(null)
-
 	const methods = useForm({ resolver: zodResolver(AdministratorSchemas.Update) })
+
+	const { user, setUser, role } = useAuth()
 	const { reset, handleSubmit, setError } = methods
 
 	const handleReset = () => {
@@ -32,8 +31,8 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdat
 			email: user?.email,
 			password: "",
 			confirmPassword: "",
+			image: null,
 		})
-		setImageFile(null)
 	}
 
 	const handleCancel = () => {
@@ -45,20 +44,37 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdat
 		if (user) handleReset()
 	}, [user])
 
-	const mutation = useMutation<UpdateResponse<User>>({
+	const mutation = useMutation<MutationResponse<User>>({
 		mutateFn: role === "ADMIN" ? updateAdministrator : updateProfessional,
 	})
 
 	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
-		const body = buildRequestBody({ ...formData, image: imageFile })
+		console.log(formData)
+
+		const originalData = {
+			name: user?.name,
+			email: user?.email,
+			password: "",
+			confirmPassword: "",
+			image: null,
+		}
+
+		if (JSON.stringify(formData) === JSON.stringify(originalData)) {
+			message.error("No se han realizado cambios")
+			return
+		}
+
+		const body = buildRequestBody(formData)
 
 		await mutation.mutate({
 			params: { id: user?.id, body },
 			onSuccess: (data) => {
-				setUser(data.updated)
-				if (data.image) setImageSrc(data.image)
+				setUser(data.modified)
+				if (data.image) setImageSrc(`${data.image}?${Date.now()}`)
 				message.success("Hecho")
 				handleReset()
+				setTimeout(() => {}, 2000)
+				setShowUpdateForm(false)
 			},
 			onError: (error) => {
 				message.error(error)
@@ -84,7 +100,7 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdat
 				<Input name="password" label="Contraseña" type="password" placeholder="••••••••" />
 				<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••••••" />
 
-				<ImageCrop imageLabel="Imagen de perfil" setImageFile={setImageFile} />
+				<ImageSelector2 imageLabel="Imagen de perfil" />
 
 				<div className="flex flex-row gap-4 w-full justify-end mt-4">
 					<Button variant="secondary" onClick={() => handleCancel()} className="w-1/4" type="button">

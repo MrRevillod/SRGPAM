@@ -34,7 +34,6 @@ export const createAdministrator = async (props: MutateActionProps) => {
 }
 
 export const updateAdministrator = async (props: MutateActionProps) => {
-	console.log("realizando peticion a PATCH /dashboard/administrators")
 	return await apiRequest.patch("/dashboard/administrators", props)
 }
 
@@ -84,8 +83,8 @@ export const deleteSenior = async (props: MutateActionProps) => {
 
 // Acciones CRUD para los centros
 
-export const getCenters = async (query?: string) => {
-	return await apiRequest.get(`/dashboard/centers${query ? "?" + query : ""}`)
+export const getCenters = async (props: QueryActionProps) => {
+	return await apiRequest.get(`/dashboard/centers${props.query ? "?" + props.query : ""}`)
 }
 
 export const createCenter = async (props: MutateActionProps) => {

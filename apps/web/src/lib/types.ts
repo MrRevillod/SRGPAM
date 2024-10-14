@@ -104,7 +104,7 @@ export interface MutateActionProps {
 	body?: any
 }
 
-export type UpdateResponse<T> = {
-	updated: T
-	image: string
+export type MutationResponse<T> = {
+	modified: T
+	image?: string
 }

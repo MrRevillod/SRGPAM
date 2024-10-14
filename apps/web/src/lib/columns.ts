@@ -29,6 +29,6 @@ export const ProfessionalColumns: TableColumnType<Partial<Professional>> = [
 	{ title: "RUT", dataIndex: "id", key: "id" },
 	{ title: "Nombre", dataIndex: "name", key: "name" },
 	{ title: "Correo Electrónico", dataIndex: "email", key: "email" },
-	{ title: "Profesión", dataIndex: ["service", "name"], key: "service.name" },
+	{ title: "Profesión", dataIndex: ["service", "title"], key: "service.title" },
 	{ title: "Creado", dataIndex: "createdAt", key: "createdAt" },
 ]

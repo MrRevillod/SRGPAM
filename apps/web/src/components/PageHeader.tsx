@@ -12,7 +12,7 @@ interface PageHeaderProps {
 	pageTitle: string
 	create?: boolean
 	searchKeys?: string[]
-	data?: any[]
+	data?: any[] | null
 	setData?: Dispatch<SetStateAction<any[]>>
 }
 

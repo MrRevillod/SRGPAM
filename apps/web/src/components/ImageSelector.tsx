@@ -6,13 +6,15 @@ import { FileType } from "../lib/types"
 import { UploadFile, UploadProps } from "antd"
 import { Dispatch, SetStateAction, useState } from "react"
 
-interface ImageEditorProps {
+interface ImageSelectorProps {
 	imageLabel: string
-	setImageFile: Dispatch<SetStateAction<UploadFile | null>>
+	setImageFile?: Dispatch<SetStateAction<UploadFile | null>>
 }
 
-export const ImageCrop: React.FC<ImageEditorProps> = ({ imageLabel, setImageFile }) => {
+export const ImageSelector: React.FC<ImageSelectorProps> = ({ imageLabel, setImageFile }) => {
 	const [fileList, setFileList] = useState<UploadFile[]>([])
+
+	console.log(setImageFile)
 
 	const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
 		setFileList(newFileList)
@@ -21,13 +23,12 @@ export const ImageCrop: React.FC<ImageEditorProps> = ({ imageLabel, setImageFile
 	const beforeUpload = (file: FileType) => {
 		const reader = new FileReader()
 		reader.readAsDataURL(file)
-		reader.onload = () => setImageFile(file)
+
+		if (setImageFile) reader.onload = () => setImageFile(file)
 
 		setFileList([fileList.shift() as UploadFile])
 		return false
 	}
-
-	const onPreview = async (file: UploadFile) => {}
 
 	return (
 		<ImgCrop rotationSlider modalTitle="Editar imagen" modalOk="Confirmar" modalCancel="Cancelar">
@@ -35,7 +36,6 @@ export const ImageCrop: React.FC<ImageEditorProps> = ({ imageLabel, setImageFile
 				fileList={fileList}
 				beforeUpload={beforeUpload}
 				onChange={onChange}
-				onPreview={onPreview}
 				showUploadList={true}
 				listType="text"
 				accept=".jpg,.jpeg,.png,.webp"

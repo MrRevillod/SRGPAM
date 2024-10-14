@@ -24,7 +24,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ pageTitle, create, data, search
 					pageTitle={pageTitle}
 					create={create}
 					searchKeys={searchKeys}
-					data={data || []}
+					data={data}
 					setData={setData}
 				/>
 				<section className="w-full">{children}</section>

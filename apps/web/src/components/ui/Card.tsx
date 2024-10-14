@@ -46,17 +46,17 @@ export const Card: React.FC<Props> = ({ item, title, description, other, updatab
 						<Dropdown menu={{ items: menuItems }} placement="bottom">
 							<Button type="text" className="p-0">
 								<div className="flex flex-col justify-between gap-1 cursor-pointer p-4">
-									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>
-									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>
-									<div className="w-1 h-1 bg-gray-800 rounded-full"></div>
+									<div className="w-1 h-1 bg-gray-medium rounded-full"></div>
+									<div className="w-1 h-1 bg-gray-medium rounded-full"></div>
+									<div className="w-1 h-1 bg-gray-medium rounded-full"></div>
 								</div>
 							</Button>
 						</Dropdown>
 					</div>
-					<p className="font-normal text-gray-dark dark:text-gray-light">{description}</p>
+					<p className="font-normal text-gray-dark-medium dark:text-gray-light">{description}</p>
 				</div>
 
-				{other && <p className="mt-2">{other}</p>}
+				{other && <p className="mt-2 text-gray-medium dark:text-gray-light">{other}</p>}
 			</div>
 		</div>
 	)

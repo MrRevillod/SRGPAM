@@ -3,15 +3,15 @@ import PageLayout from "../../layouts/PageLayout"
 
 import { api } from "../../lib/axios"
 import { Input } from "../../components/ui/Input"
+import { Button } from "../../components/ui/Button"
 import { useEffect } from "react"
 import { DatePicker } from "../../components/ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "../../hooks/useMutation"
 import { SeniorSchemas } from "../../lib/schemas"
 import { message, Image } from "antd"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import { useMutation } from "../../hooks/useMutation"
-import { Button } from "../../components/ui/Button"
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()
@@ -19,13 +19,13 @@ const SeniorRegisterRequestPage: React.FC = () => {
 
 	const { senior } = location.state || {}
 
+	const methods = useForm({ resolver: zodResolver(SeniorSchemas.Validate) })
+	const { reset, handleSubmit } = methods
+
 	useEffect(() => {
 		if (!senior) navigate("/dashboard/personas-mayores/nuevos")
 		else reset({ rut: senior.id, email: senior.email })
 	}, [senior])
-
-	const methods = useForm({ resolver: zodResolver(SeniorSchemas.Validate) })
-	const { reset, handleSubmit } = methods
 
 	const AcceptMutation = useMutation<void>({
 		mutateFn: async () => {

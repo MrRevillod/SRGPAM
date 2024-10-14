@@ -1,13 +1,14 @@
 import React from "react"
-import Form from "../Form"
 
+import { Form } from "../Form"
 import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { createService } from "../../../lib/actions"
 import { ServiceSchemas } from "../../../lib/schemas"
+import { ImageSelector2 } from "../../ImageSelector2"
 import { FormProps, Service } from "../../../lib/types"
 import { FormProvider, useForm } from "react-hook-form"
-import { InputFile } from "../../ui/InputFile"
 
 const CreateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 	const methods = useForm({
@@ -17,13 +18,7 @@ const CreateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 	return (
 		<Modal type="Create" title="Añadir nuevo servicio al sistema">
 			<FormProvider {...methods}>
-				<Form
-					entityName="servicio"
-					data={data}
-					setData={setData}
-					apiEndpoint="/dashboard/services/"
-					method="POST"
-				>
+				<Form<Service> data={data} setData={setData} action={createService} actionType="create">
 					<Input name="name" label="Nombre del Servicio" type="text" placeholder="Nombre del servicio" />
 					<Input name="title" label="Título del Servicio" type="text" placeholder="Abogados" />
 					<Input
@@ -32,7 +27,7 @@ const CreateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 						type="text"
 						placeholder="Descripción breve del servicio"
 					/>
-					<InputFile name="image" label="Imagen" />
+					<ImageSelector2 imageLabel="Imagen" />
 				</Form>
 			</FormProvider>
 		</Modal>

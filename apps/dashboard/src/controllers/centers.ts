@@ -20,8 +20,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const { name, address, phone } = req.body
 		const file = req.file as Express.Multer.File
 
-		console.log(file)
-
 		if (!file) throw new AppError(400, "No se ha enviado un archivo")
 
 		const centerExists = await prisma.center.findFirst({ where: { name } })
@@ -49,7 +47,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(201).json({ values: center })
+		return res.status(201).json({ values: { modified: center } })
 	} catch (error) {
 		next(error)
 	}
@@ -81,7 +79,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			}
 		}
 
-		return res.status(200).json({ values: { updated: center } })
+		return res.status(200).json({ values: { modified: center } })
 	} catch (error) {
 		next(error)
 	}
@@ -116,7 +114,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(200).json({ values: deleted })
+		return res.status(200).json({ values: { modified: deleted } })
 	} catch (error) {
 		next(error)
 	}

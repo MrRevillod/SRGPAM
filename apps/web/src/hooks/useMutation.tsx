@@ -22,9 +22,10 @@ export const useMutation = <T,>({ mutateFn }: useMutationProps) => {
 				throw new Error("No se encontraron datos en la respuesta")
 			}
 		} catch (err: any) {
-			if (onError) {
+			if (onError && err.response) {
 				onError(err.response?.data)
 			} else {
+				console.log(err)
 				throw new Error(err.response?.data?.message || "Error desconocido")
 			}
 		}

@@ -23,9 +23,7 @@ const AdministratorsPage: React.FC = () => {
 		if (data) setAdministrators(data)
 	}, [data])
 
-	if (error) {
-		message.error("Error al cargar los datos")
-	}
+	if (error) message.error("Error al cargar los datos")
 
 	return (
 		<PageLayout
@@ -50,7 +48,7 @@ const AdministratorsPage: React.FC = () => {
 				text="¿Estás seguro(a) de que deseas eliminar este usuario?"
 				data={administrators}
 				setData={setAdministrators}
-				executeAction={deleteAdministrator}
+				action={deleteAdministrator}
 			/>
 		</PageLayout>
 	)

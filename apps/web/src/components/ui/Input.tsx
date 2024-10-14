@@ -62,7 +62,7 @@ export const Input: React.FC<InputProps> = (props) => {
 			<Show when={!login}>
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<InputLabel label={label} />
-					{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
+					{errors[name] && <div className="text-red text-sm">{errors[name]?.message?.toString()}</div>}
 				</div>
 			</Show>
 

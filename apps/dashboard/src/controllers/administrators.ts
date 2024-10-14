@@ -59,7 +59,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			data: { id, name, email, password: defaulAdminPassword },
 		})
 
-		return res.status(201).json({ values: administrator })
+		return res.status(201).json({ values: { modified: administrator } })
 	} catch (error) {
 		next(error)
 	}
@@ -93,7 +93,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			},
 		})
 
-		const response = { updated: administrator, image: null }
+		const response = { modified: administrator, image: null }
 
 		if (req.file) {
 			const storageResponse = await uploadProfilePicture({
@@ -133,7 +133,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(storageResponse.status || 500, storageResponse.message)
 		}
 
-		return res.status(200).json({ values: deleted })
+		return res.status(200).json({ values: { modified: deleted } })
 	} catch (error) {
 		next(error)
 	}

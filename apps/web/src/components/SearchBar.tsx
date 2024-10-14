@@ -25,7 +25,7 @@ const SearchBar: React.FC<Props> = ({ data, setData, keys }) => {
 	}
 
 	const classes = clsx(
-		"border-gray dark:border-gray-medium",
+		"border-gray-medium",
 		"rounded-lg px-4 w-3/4 h-10 placeholder-grey",
 		"text-dark dark:text-light border-1 bg-light dark:bg-primary-dark",
 	)
