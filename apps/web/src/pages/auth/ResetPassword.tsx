@@ -26,7 +26,7 @@ const ResetPasswordPage: React.FC = () => {
 			})
 
 			message.success(response.data.message)
-
+			// localStorage.setItem("RESET_PASSWORD_ROLE", data.role)
 			reset()
 		} catch (error: any) {
 			message.error(error.response.data.message || "Error inesperado.")

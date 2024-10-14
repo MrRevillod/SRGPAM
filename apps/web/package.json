@@ -24,6 +24,7 @@
 		"date-fns": "^4.1.0",
 		"flowbite-react": "^0.10.1",
 		"fullcalendar": "^6.1.15",
+		"jwt-decode": "^4.0.0",
 		"react": "^18.2.0",
 		"react-datepicker": "^7.4.0",
 		"react-datetime": "^3.2.0",

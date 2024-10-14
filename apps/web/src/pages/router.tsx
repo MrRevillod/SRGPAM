@@ -49,7 +49,7 @@ const Router: React.FC = () => {
 			</Route>
 
 			<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-			<Route path="/auth/reset-password/:id/:token" element={<ValidatePasswordPage />} />
+			<Route path="/auth/reset-password/:id/:token/:role" element={<ValidatePasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
 				<Route path="/perfil" element={<ProfilePage />} />

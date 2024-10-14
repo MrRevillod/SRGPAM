@@ -2,8 +2,9 @@ import { hash } from "bcrypt"
 import { prisma } from "@repo/database"
 import { Request, Response, NextFunction } from "express"
 import sendMail from "../utils/mailer"
-import { AppError, CustomTokenOpts, signJsonwebtoken, services, findUser, verifyJsonwebtoken } from "@repo/lib"
+import { AppError, CustomTokenOpts, signJsonwebtoken, services, findUser, verifyJsonwebtoken, AccessTokenOpts, isValidUserRole } from "@repo/lib"
 import { match } from "ts-pattern"
+import { resetPasswordBody } from "../utils/emailTemplates"
 
 export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction) => {
 	const userRole = req.query.variant
@@ -27,23 +28,12 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
 		const tokenOpt = CustomTokenOpts(user.password, "30d")
 		const token = signJsonwebtoken(payload, tokenOpt)
 
-		const resetLink = `${services.WEB_APP.url}auth/reset-password/${user.id}/${token}`
+		const rolePayload = { role: userRole }
+		const roleToken = signJsonwebtoken(rolePayload, AccessTokenOpts)
 
-		const htmlTemplate = `
-			<div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-				<h2 style="color: #4CAF50; text-align: center;">Restablecer contraseña</h2>
-				<p>Hola, <strong>${user.name}</strong>.</p>
-				<p>Has solicitado restablecer tu contraseña. Por favor, haz clic en el enlace a continuación para continuar con el proceso de restablecimiento:</p>
-				<p style="text-align: center;">
-					<a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-					Restablecer contraseña
-					</a>
-				</p>
-				<p>Este enlace expirará en 30 días. Si no solicitaste este cambio, simplemente ignora este correo.</p>
-				<hr style="margin-top: 40px; border-color: #ddd;">
-				<p style="text-align: center; color: #888;">© 2024 SRGPAM. Todos los derechos reservados.</p>
-			</div>
-		`
+		const resetLink = `${services.WEB_APP.url}auth/reset-password/${user.id}/${token}/${roleToken}`
+
+		const htmlTemplate = resetPasswordBody(user.name, resetLink)
 
 		await sendMail(email, "Restablecimiento de contraseña", htmlTemplate)
 
@@ -58,10 +48,14 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id, token } = req.params
-		const { password, userRole } = req.body
+		const { id, token, role } = req.params
+		const { password } = req.body
 
-		const user = await findUser({ id }, userRole)
+		const rolePayload = verifyJsonwebtoken(role, AccessTokenOpts)
+
+		if (!rolePayload.role || isValidUserRole(rolePayload.role)) throw new AppError(401, "No autorizado.")
+
+		const user = await findUser({ id }, rolePayload.role)
 
 		if (!user) {
 			return res.status(404).json({
@@ -75,7 +69,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 		const hashedPassword = await hash(password, 10)
 
 		let updatedUser
-		const updated = await match(userRole)
+		const updated = await match(rolePayload.role)
 			.with("SENIOR", async () => {
 				updatedUser = await prisma.senior.update({
 					where: { id: id },

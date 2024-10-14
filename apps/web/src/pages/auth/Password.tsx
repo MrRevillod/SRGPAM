@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 import { Input } from "../../components/ui/Input"
 import { FormProvider, useForm } from "react-hook-form"
 import { api } from "../../lib/axios"
@@ -6,11 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getValidationSchema } from "../../lib/schemas"
 import { message } from "antd"
 import { Helmet } from "react-helmet"
+import { jwtDecode } from "jwt-decode"
 
 const ValidatePasswordPage: React.FC = () => {
-	const [role, setRole] = useState("")
+	const { id, token, role } = useParams()
 
-	const formSchemas = getValidationSchema(role)
+	if (!id || !role || !token) throw new Error()
+
+	const payload = jwtDecode(role) as { role: string }
+
+	const formSchemas = getValidationSchema(payload.role)
 
 	const methods = useForm({
 		resolver: zodResolver(formSchemas),
@@ -20,9 +26,8 @@ const ValidatePasswordPage: React.FC = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			const response = await api.post(`/reset-password/${data.id}/${data.token}`, {
+			const response = await api.post(`/reset-password/${id}/${token}/${role}`, {
 				password: data.password,
-				userRole: data.role,
 			})
 
 			message.success(response.data.message)
@@ -57,18 +62,6 @@ const ValidatePasswordPage: React.FC = () => {
 								type="password"
 								name="confirmPassword"
 								placeholder="Confirma tu nueva contraseña"
-							/>
-
-							<Input
-								label="Ocupación"
-								type="select"
-								name="role"
-								options={[
-									{ value: "ADMIN", label: "Administrador" },
-									{ value: "PROFESSIONAL", label: "Profesional" },
-									{ value: "SENIOR", label: "Persona Mayor" },
-								]}
-								defaultValue="SENIOR"
 							/>
 
 							<div className="mt-4">
