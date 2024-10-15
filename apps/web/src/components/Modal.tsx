@@ -21,6 +21,8 @@ export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
 			closable={true}
             footer={[]}
             onClose={handleClose}
+            
+            
 		>
 			{children}
 		</AntDModal>

@@ -12,6 +12,7 @@ import { DatePicker } from "../../ui/InputDate"
 import DatetimeSelect from "../../ui/DatetimeSelect"
 import locale from "antd/locale/es_ES"
 import { ConfigProvider } from "antd"
+import dayjs from "dayjs"
 
 type SelectValues = {
 	value: string | number
@@ -72,7 +73,10 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 						<SuperSelect label="Seleccione el servicio" name="serviceId" options={services} />
 						<div className="flex  gap-2 justify-between">
 							<DatetimeSelect label="Seleccione fecha y hora de inicio del evento" name="startsAt" />
-							<DatetimeSelect label="Seleccione fecha y hora de término del evento" name="endsAt" />
+							<DatetimeSelect
+								label="Seleccione fecha y hora de término del evento"
+								name="endsAt"
+							/>
 						</div>
 					</Form>
 				</ConfigProvider>

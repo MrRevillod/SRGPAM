@@ -2,7 +2,8 @@ import React from "react"
 
 const ButtonVariants = {
 	primary: "bg-green-700 text-neutral-100",
-	secondary: "bg-white border-1 border-red-700 text-red-700",
+    secondary: "bg-white border-1 border-red-700 text-red-700",
+    delete:"bg-red-700 text-neutral-100"
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

@@ -38,7 +38,8 @@ const UpdateCenter: React.FC<FormProps<Center>> = ({ data, setData }) => {
 					data={data}
 					setData={setData}
 					apiEndpoint={`/dashboard/centers/${selectedData?.id}`}
-					method="PATCH"
+                    method="PATCH"
+                    
 				>
 					<Input name="name" label="Nombre" type="text" />
 					<Input name="address" label="Dirección" type="text" />

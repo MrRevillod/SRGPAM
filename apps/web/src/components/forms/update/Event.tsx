@@ -12,6 +12,8 @@ import { Modal } from "../../Modal"
 import { ModalProvider, useModal } from "../../../context/ModalContext"
 import DatetimeSelect from "../../ui/DatetimeSelect"
 import dayjs from "dayjs"
+import { Input } from "../../ui/Input"
+import { BooleanSelect } from "../../ui/BooleanSelect"
 
 type SelectValues = {
 	value: string | number
@@ -21,10 +23,11 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 	const methods = useForm({
 		resolver: zodResolver(EventSchemas.Update),
 	})
-	const { selectedData } = useModal()
+	const { selectedData, showModal } = useModal()
 
 	const [professionals, setProfessionals] = useState<SelectValues[]>()
-	const [services, setServices] = useState<SelectValues[]>()
+	// const [services, setServices] = useState<SelectValues[]>()
+	const [centers, setCenters] = useState<SelectValues[]>()
 
 	const getProfessionals = async () => {
 		const res = await api.get("/dashboard/professionals")
@@ -39,9 +42,24 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 		setProfessionals(proffesionals_tem)
 	}
 
-	const getServices = async () => {
-		const res = await api.get("/dashboard/services")
-		const values = await res.data.values?.services
+	// const getServices = async () => {
+	// 	const res = await api.get("/dashboard/services")
+	// 	const values = await res.data.values?.services
+
+	// 	const temp = new Array<SelectValues>()
+
+	// 	values.forEach((pfs: Service) => {
+	// 		temp.push({
+	// 			label: pfs.name,
+	// 			value: pfs.id,
+	// 		})
+	// 	})
+	// 	setServices(temp)
+	// }
+
+	const getCenters = async () => {
+		const res = await api.get("/dashboard/centers")
+		const values = await res.data.values?.centers
 
 		const temp = new Array<SelectValues>()
 
@@ -51,50 +69,71 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 				value: pfs.id,
 			})
 		})
-		setServices(temp)
+		setCenters(temp)
 	}
 
 	useEffect(() => {
+		if (selectedData) {
+			methods.setValue("serviceId", selectedData.serviceId)
+		}
 		getProfessionals()
-		getServices()
+		// getServices()
+        getCenters()
+        console.log(selectedData)
 	}, [selectedData])
 
 	return (
 		<Modal type="Edit" title="Editar un evento">
 			<FormProvider {...methods}>
-					<Form
-						entityName="Evento"
-						data={data}
-						setData={setData}
-						apiEndpoint={`/dashboard/events/${selectedData?.id}`}
-						method="PATCH"
-					>
-						<SuperSelect
-							label="Seleccione el profesional"
-							name="professionalId"
-							options={professionals}
-							defaultValue={selectedData?.professionalId}
-						/>
-						<SuperSelect
-							label="Seleccione el servicio"
-							name="serviceId"
-							options={services}
-							defaultValue={selectedData?.serviceId}
-						/>
+				<Form
+					entityName="Evento"
+					data={new Array<any>()}
+					setData={() => {}}
+					apiEndpoint={`/dashboard/events/${selectedData?.id}`}
+					method="PATCH"
+					deleteable
+				>
+					<SuperSelect
+						label="Seleccione el profesional"
+						name="professionalId"
+						options={professionals}
+						defaultValue={selectedData?.professionalId}
+					/>
+					{/* <SuperSelect
+						label="Seleccione el servicio"
+						name="serviceId"
+						options={services}
+						defaultValue={selectedData?.serviceId}
+					/> */}
 
-						<div className="flex  gap-2 justify-between">
-							<DatetimeSelect
-								label="Seleccione fecha y hora de inicio del evento"
-								name="startsAt"
-								defaultValue={ dayjs( selectedData?.startsAt)}
-							/>
-							<DatetimeSelect
-								label="Seleccione fecha y hora de término del evento"
-								name="endsAt"
-								defaultValue={dayjs(selectedData?.endsAt)}
-							/>
-						</div>
-					</Form>
+					<SuperSelect
+						label="Seleccione el centro de atención (opcional)"
+						name="centerId"
+						options={centers}
+						defaultValue={selectedData?.centerId}
+					/>
+					<div className="flex  gap-2 justify-between">
+						<DatetimeSelect
+							label="Seleccione fecha y hora de inicio del evento"
+							name="startsAt"
+							defaultValue={dayjs(selectedData?.startsAt)}
+						/>
+						<DatetimeSelect
+							label="Seleccione fecha y hora de término del evento"
+							name="endsAt"
+							defaultValue={dayjs(selectedData?.endsAt)}
+						/>
+					</div>
+                    <BooleanSelect
+                        name={"assistance"}
+                        defaultValue={selectedData?.assistance}
+                        options={[
+                            { label: "Asistió", value: true },
+                            { label: "No asistió", value: false },
+                        ]}
+                        setValue={methods.setValue}
+                    />
+				</Form>
 			</FormProvider>
 		</Modal>
 	)

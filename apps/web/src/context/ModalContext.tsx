@@ -11,6 +11,7 @@ interface ModalContextProps {
 	handleOk: () => void
 	handleCancel: () => void
 	handleClose: () => void
+	handleDelete: () => void
 	modalType: Nullable<ModalType>
 	selectedData: any
 	setSelectedData: Dispatch<SetStateAction<any>>
@@ -22,8 +23,8 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [modalType, setModalType] = useState<ModalType | null>(null)
 	const [selectedData, setSelectedData] = useState<any>(null)
-
-	const showModal = (type: ModalType, data: any) => {
+    
+    const showModal = (type: ModalType, data: any) => {
 		setModalType(type)
 		setSelectedData(data)
 		setIsModalOpen(true)
@@ -45,9 +46,24 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         
     }
 
+    const handleDelete = () => {
+		setIsModalOpen(false)
+		showModal("Confirm", selectedData)
+	}
+
 	return (
 		<ModalContext.Provider
-			value={{ setSelectedData, isModalOpen, showModal, handleOk, handleCancel, modalType, selectedData,handleClose }}
+			value={{
+				setSelectedData,
+				isModalOpen,
+				showModal,
+				handleOk,
+				handleCancel,
+				modalType,
+				selectedData,
+				handleClose,
+				handleDelete,
+			}}
 		>
 			{children}
 		</ModalContext.Provider>

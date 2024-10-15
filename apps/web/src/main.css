@@ -158,6 +158,7 @@ body {
 }
 
 .fc {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-height: 100%;
     overflow-x: auto;
     overflow-y: scroll;
@@ -168,6 +169,22 @@ body {
     
 }
 
+@media (max-height:1370px){
+    .fc {
+        max-height: 400px;
+        font-size: 0.75rem; /* Reducir el tamaño del texto */
+        overflow-x: auto;
+    }
+
+      
+      .fc .fc-toolbar {
+        padding: 0.5rem 0; /* Reducir el padding del toolbar */
+      }
+      
+      .fc .fc-daygrid-day-number {
+        font-size: 0.65rem; /* Reducir el tamaño de los números de los días */
+      }
+}
   @media (max-width: 768px) {
     .fc-toolbar {
       display: block;

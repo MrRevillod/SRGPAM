@@ -2,6 +2,7 @@ import { Select } from "antd/lib"
 import React, { useEffect, useState } from "react"
 import { Control, Controller, useFormContext } from "react-hook-form"
 import { useModal } from "../../context/ModalContext"
+import { Space } from "antd"
 
 export const SuperSelect = ({
 	name,
@@ -24,18 +25,22 @@ export const SuperSelect = ({
 
 	const { isModalOpen } = useModal()
 	useEffect(() => {
-		setValue(name, defaultValue) // Actualiza el valor del campo cuando cambia el defaultValue
+		if (!defaultValue) {
+			setValue(name, undefined) // Actualiza el valor del campo cuando cambia el defaultValue
+		} else {
+			setValue(name, defaultValue) // Actualiza el valor del campo cuando cambia el defaultValue
+		}
 	}, [defaultValue, name, setValue])
 
-    useEffect(() => {
-       reset() 
-    },[isModalOpen])
+	useEffect(() => {
+		if (!isModalOpen) {
+			reset()
+		}
+	}, [isModalOpen])
 	return (
 		<>
 			<div className="flex flex-row gap-2 items-center justify-between">
-				<label className="font-semibold">
-					{label}
-				</label>
+				<label className="font-semibold">{label}</label>
 				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
 			</div>
 			<Controller

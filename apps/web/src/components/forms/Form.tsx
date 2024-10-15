@@ -6,6 +6,7 @@ import { message } from "antd"
 import { useModal } from "../../context/ModalContext"
 import { FieldValues, SubmitHandler, useFormContext } from "react-hook-form"
 import { buildRequestBody, handleConflicts } from "../../lib/form"
+import { Show } from "../ui/Show"
 
 interface FormProps {
 	entityName: string
@@ -14,16 +15,20 @@ interface FormProps {
 	apiEndpoint: string
 	children: React.ReactNode
 	method: "POST" | "PATCH"
+	deleteable?: boolean 
 }
 
-const Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, children, method }) => {
-	const { handleOk, handleCancel, setSelectedData } = useModal()
+const   Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, children, method, deleteable }) => {
+	const { handleOk, handleCancel, setSelectedData, handleDelete } = useModal()
 	const { handleSubmit, reset } = useFormContext()
 
 	const onCancel = () => {
-        handleCancel()
+		handleCancel()
 	}
 
+	const onDelete = () => {
+		handleDelete()
+	}
 	const onSubmit: SubmitHandler<FieldValues> = async (form) => {
 		const body = buildRequestBody(form)
 
@@ -40,14 +45,14 @@ const Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, chi
 			const res = await api.request(request)
 
 			if (method === "PATCH") {
-				const updatedEntity = res.data.values.updated
+				const updatedEntity = res.data.values.updated   
 				const index = data.findIndex((entity) => entity.id === updatedEntity.id)
 
 				if (index !== -1) {
 					const updatedData = [...data]
 					updatedData[index] = updatedEntity
 					setData(updatedData)
-				}
+                }
 			}
 
 			if (method === "POST") {
@@ -78,6 +83,11 @@ const Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, chi
 		<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit)}>
 			{children}
 			<div className="flex flex-row gap-4 w-full justify-end -mb-6">
+				{deleteable &&
+					<Button type="button" className="justify" variant="delete" onClick={onDelete}>
+						Eliminar
+					</Button>
+				}
 				<Button type="button" variant="secondary" onClick={onCancel}>
 					Cancelar
 				</Button>
