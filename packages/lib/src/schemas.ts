@@ -176,26 +176,25 @@ export const AdministratorSchemas = {
 }
 
 export const EventSchemas = {
-	Create: z
-		.object({
-			startsAt: dateTimeSchema,
-			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
-			serviceId: z.number(),
-			seniorId: z.optional(rutSchema),
-			centerId: z.optional(z.string()),
-		})
-,
-
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.number()),
+	}),
 	Update: z.object({
 		startsAt: dateTimeSchema,
 		endsAt: dateTimeSchema,
 		professionalId: rutSchema,
 		serviceId: z.number(),
-		assistance: z.optional(z.boolean()),
+		assistance: z.optional(z.boolean().nullable()),
 		seniorId: z.optional(rutSchema),
-		centerId: z.optional(z.string()),
-	}),
+		centerId: z.optional(z.number().nullable()),
+	}).refine((data) => data.startsAt < data.endsAt, {
+        message: "Rango de tiempo invalido",
+    }),
 }
 
 
