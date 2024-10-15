@@ -1,6 +1,8 @@
+
 import React from "react"
 
 import { Nullable } from "../lib/types"
+import { useFormContext } from "react-hook-form"
 import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react"
 
 export type ModalType = "Create" | "Edit" | "Confirm"
@@ -14,6 +16,8 @@ interface ModalContextProps {
 	showModal: (type: ModalType, data: any) => void
 	handleOk: () => void
 	handleCancel: () => void
+	handleClose: () => void
+	handleDelete: () => void
 	modalType: Nullable<ModalType>
 	selectedData: any
 	setSelectedData: Dispatch<SetStateAction<any>>
@@ -46,13 +50,24 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 	const handleOk = () => {
 		setCachedData(selectedData)
 		setSelectedData(null)
-		setIsModalOpen(false)
+        setIsModalOpen(false)
 	}
 
 	// handleCancel: Función que se ejecuta al hacer click en el botón de cancelar del modal
 	const handleCancel = () => {
 		setSelectedData(null)
 		setIsModalOpen(false)
+    }
+    
+    const handleClose = () => {
+        setSelectedData(null)
+        setIsModalOpen(false)
+        
+    }
+
+    const handleDelete = () => {
+		setIsModalOpen(false)
+		showModal("Confirm", selectedData)
 	}
 
 	return (
@@ -65,6 +80,8 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 				handleCancel,
 				modalType,
 				selectedData,
+				handleClose,
+				handleDelete,
 				cachedData,
 			}}
 		>

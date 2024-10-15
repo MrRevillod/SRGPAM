@@ -137,21 +137,32 @@ const dateTimeSchema = z.number().refine(
 )
 
 export const EventSchemas = {
-	Create: z.object({
-		startsAt: dateTimeSchema,
-		endsAt: dateTimeSchema,
-		professionalId: rules.rutSchema,
-		serviceId: z.number(),
-		seniorId: z.optional(rules.rutSchema),
-		centerId: z.optional(z.string()),
-	}),
-	Update: z.object({
-		startsAt: dateTimeSchema,
-		endsAt: dateTimeSchema,
-		professionalId: rules.rutSchema,
-		serviceId: z.number(),
-		assistance: z.optional(z.boolean()),
-		seniorId: z.optional(rules.rutSchema),
-		centerId: z.optional(z.string()),
-	}),
+	Create: z
+		.object({
+			startsAt: dateTimeSchema,
+			endsAt: dateTimeSchema,
+			professionalId: rutSchema,
+			serviceId: z.number(),
+			seniorId: z.optional(rutSchema),
+			centerId: z.optional(z.string()),
+		})
+		.refine((data) => data.startsAt < data.endsAt, {
+			path: ["endsAt", "startsAt"],
+			message: "Rango de tiempo invalido",
+		}),
+
+	Update: z
+		.object({
+			startsAt: dateTimeSchema,
+			endsAt: dateTimeSchema,
+			professionalId: rutSchema,
+			serviceId: z.number(),
+			assistance: z.optional(z.boolean()),
+			seniorId: z.optional(rutSchema),
+			centerId: z.optional(z.number().nullable()),
+		})
+		.refine((data) => data.startsAt < data.endsAt, {
+			path: ["endsAt", "startsAt"],
+			message: "Rango de tiempo invalido",
+		}),
 }

@@ -19,6 +19,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 				professionalId: true,
 				serviceId: true,
 				centerId: true,
+				service: {
+					select: {
+						name: true,
+						color: true,
+					},
+				},
 			},
 		})
 
@@ -92,12 +98,28 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		) {
 			const event = await prisma.event.create({
 				data: {
-                    startsAt: new Date(startsAt),
-                    endsAt: new Date(endsAt),
+					startsAt: new Date(startsAt),
+					endsAt: new Date(endsAt),
 					professionalId,
 					serviceId: parseInt(serviceId),
 					seniorId: seniorId || null,
 					centerId: centerId ? parseInt(serviceId) : null,
+				},
+				select: {
+					id: true,
+					startsAt: true,
+					endsAt: true,
+					assistance: true,
+					seniorId: true,
+					professionalId: true,
+					serviceId: true,
+					centerId: true,
+					service: {
+						select: {
+							name: true,
+							color: true,
+						},
+					},
 				},
 			})
 
@@ -107,6 +129,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			return res.status(200).json({
 				message: "Creación exitosa",
 				type: "success",
+				values: event,
 			})
 		} else {
 			return res.status(409).json({
@@ -177,22 +200,23 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			const event = await prisma.event.update({
 				where: { id: parseInt(req.params.id) },
 				data: {
-                    startsAt: new Date(startsAt),
-                    endsAt: new Date(endsAt),
+					startsAt: new Date(startsAt),
+					endsAt: new Date(endsAt),
 					professionalId,
 					serviceId: parseInt(serviceId),
-					centerId: centerId ? parseInt(serviceId) : null,
+					centerId: centerId ? centerId : null,
 					seniorId: seniorId || null,
 					assistance: assistance || false,
 				},
 			})
 
+			console.log(event)
 			io.emit("updatedEvent", event)
 
 			return res.status(200).json({
 				message: "Actualización exitosa",
 				type: "success",
-				values: { event },
+				values: { updated: event },
 			})
 		} else {
 			return res.status(409).json({

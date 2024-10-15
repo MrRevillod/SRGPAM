@@ -77,6 +77,12 @@ export const AdministratorSchemas = {
 
 export const EventSchemas = {
 	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.number()),
 		startsAt: rules.dateTimeSchema,
 		endsAt: rules.dateTimeSchema,
 		professionalId: rules.rutSchema,
@@ -92,7 +98,6 @@ export const EventSchemas = {
 		assistance: z.optional(z.boolean()),
 		seniorId: z.optional(rules.rutSchema),
 		centerId: z.optional(z.string()),
-	}),
 }
 
 export const ProfessionalSchemas = AdministratorSchemas

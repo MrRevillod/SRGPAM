@@ -1,55 +1,65 @@
+import { Select } from "antd/lib"
 import React, { useEffect, useState } from "react"
-import { Control, UseFormSetValue } from "react-hook-form"
-import Select from "react-select"
+import { Control, Controller, useFormContext } from "react-hook-form"
+import { useModal } from "../../context/ModalContext"
+import { Space } from "antd"
 
 export const SuperSelect = ({
-	control,
 	name,
 	label,
 	options,
-	setValue,
-	getValues,
 	defaultValue,
 }: {
-	control: Control<any>
 	name: string
 	label: string
 	options: any
-	setValue: UseFormSetValue<any>
-	getValues: any
 	defaultValue?: any
 }) => {
-	// Usa defaultValue como valor inicial, si está definido
-	const [valor, setValor] = useState<any>(defaultValue || null)
+	const {
+		setValue,
+		formState: { errors },
+		control,
+		getValues,
+		reset,
+	} = useFormContext()
+
+	const { isModalOpen } = useModal()
+	useEffect(() => {
+		if (!defaultValue) {
+			setValue(name, undefined) // Actualiza el valor del campo cuando cambia el defaultValue
+		} else {
+			setValue(name, defaultValue) // Actualiza el valor del campo cuando cambia el defaultValue
+		}
+	}, [defaultValue, name, setValue])
 
 	useEffect(() => {
-		// Si defaultValue cambia, actualiza el valor del select
-		if (defaultValue) {
-			setValor(defaultValue)
+		if (!isModalOpen) {
+			reset()
 		}
-	}, [defaultValue])
-
-	useEffect(() => {
-		// Verificar si getValues tiene el valor actual
-		if (getValues(name) === undefined) {
-			setValor("")
-		}
-	}, [getValues, name])
-
+	}, [isModalOpen])
 	return (
 		<>
-			<label htmlFor={name} className="font-semibold text-neutral-950">
-				{label}
-			</label>
-
-			<Select
-				id="myvalue"
-				options={options}
-				value={valor}
-				onChange={(value) => {
-					setValor(value) // Actualizar el estado local
-					setValue(name, value?.value) // Actualizar el valor en el formulario de React Hook Form
-				}}
+			<div className="flex flex-row gap-2 items-center justify-between">
+				<label className="font-semibold">{label}</label>
+				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
+			</div>
+			<Controller
+				control={control}
+				name={name}
+				defaultValue={defaultValue}
+				render={({ field }) => (
+					<Select
+						{...field}
+						value={field.value} // Usa "value" en lugar de "defaultValue"
+						showSearch
+						placeholder={"Selecciona una opcion"}
+						options={options} // Agrega las opciones pasadas como prop
+						filterOption={(input, option) =>
+							(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+						}
+						onChange={(value) => field.onChange(value)} // Controla el cambio del valor
+					/>
+				)}
 			/>
 		</>
 	)

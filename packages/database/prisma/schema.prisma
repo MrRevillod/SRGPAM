@@ -37,6 +37,7 @@ model Service {
   name        String   @db.Text
   title       String   @db.Text
   description String   @db.Text
+  color       String   @db.Text    
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

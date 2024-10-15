@@ -58,7 +58,7 @@ const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action }: 
 				<h2 className="text-lg font-light text-center">{text}</h2>
 				<div className="flex flex-row gap-4 w-full justify-center mt-4">
 					<Button type="button" variant="secondary" className="w-1/4" onClick={() => handleCancel()}>
-						Volver
+						Cancelar
 					</Button>
 
 					<Button onClick={() => handleConfirm()} variant="primary" className="w-1/4">
