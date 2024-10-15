@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { UploadFile } from "antd"
 
 import * as rules from "./validationRules"
 
@@ -7,6 +8,30 @@ export const LoginFormSchema = z.object({
 	password: z.string().min(1, "La contraseña es requerida"),
 	role: z.enum(["ADMIN", "PROFESSIONAL"]),
 })
+
+const ALLOWED_IMAGE_FORMATS = ["image/jpeg", "image/png", "image/webp"]
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+
+const imageSchemaCreate = z
+	.any()
+	.refine((file) => !!file, {
+		message: "La imagen es obligatoria",
+	})
+	.refine((file) => ALLOWED_IMAGE_FORMATS.includes(file?.type), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => file?.size <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
+
+const imageSchemaUpdate = z
+	.any()
+	.refine((file) => !file || ALLOWED_IMAGE_FORMATS.includes(file?.type || ""), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => !file || (file?.size || 0) <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
 
 export const SeniorSchemas = {
 	MobileRegister: z.object({
@@ -60,6 +85,7 @@ export const AdministratorSchemas = {
 			email: rules.emailSchema,
 			password: rules.optionalPasswordSchema,
 			confirmPassword: rules.optionalPasswordSchema,
+      image: imageSchemaUpdate,
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",

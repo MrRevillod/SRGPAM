@@ -1,9 +1,13 @@
-import React, { useState } from "react"
+import clsx from "clsx"
+import React from "react"
+
 import { Link } from "react-router-dom"
 import { Show } from "./Show"
+import { Tooltip } from "antd"
+import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { AiFillExclamationCircle, AiFillEye } from "react-icons/ai"
-import { Tooltip } from "antd"
+
 type InputType = "text" | "password" | "email" | "number" | "select"
 
 interface InputProps {
@@ -18,7 +22,7 @@ interface InputProps {
 }
 
 const InputLabel: React.FC<{ label: string }> = ({ label }) => {
-	return <label className="font-semibold text-neutral-950">{label}</label>
+	return <label className="font-semibold text-dark dark:text-light">{label}</label>
 }
 
 export const Input: React.FC<InputProps> = (props) => {
@@ -35,10 +39,12 @@ export const Input: React.FC<InputProps> = (props) => {
 		setShowPassword(!showPassword)
 	}
 
-	const classes = `border-1 ${errors[name] ? "border-red-400" : "border-neutral-500"} rounded-lg 
-        p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full 
-        pl-4 placeholder-neutral-400 text-neutral-950 mb-1
-    `
+	const classes = clsx(
+		errors[name] ? "border-red" : "border-gray dark:border-medium",
+		"rounded-lg p-2 focus:outline-none focus:ring-primary-green",
+		"focus:border-primary-green w-full pl-4 placeholder-neutral-400",
+		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
+	)
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
@@ -104,7 +110,7 @@ export const Input: React.FC<InputProps> = (props) => {
 								onClick={handleTogglePasswordVisibility}
 								className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-neutral-600 hover:text-blue-500"
 							>
-								<AiFillEye className="text-neutral-600 text-xl mr-1" />
+								<AiFillEye className="text-neutral-600 dark:text-gray text-xl mr-1" />
 							</button>
 						</Show>
 					</div>

@@ -1,6 +1,5 @@
 import React from "react"
-import Loading from "../components/Loading"
-import HomePage from "./Home"
+import HomePage from "./dashboard/Home"
 import LoginPage from "./auth/Login"
 // import EventsPage from "./dashboard/Events"
 import CentersPage from "./dashboard/Centers"
@@ -14,6 +13,7 @@ import ProfessionalsPage from "./dashboard/Professionals"
 import ResetPasswordPage from "./auth/ResetPassword"
 import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 
+import { Loading } from "../components/Loading"
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
 
@@ -33,8 +33,6 @@ const Router: React.FC = () => {
 
 	return (
 		<Routes>
-			<Route path="/" element={<HomePage />} />
-
 			<Route
 				path="/auth/login"
 				element={
@@ -50,6 +48,7 @@ const Router: React.FC = () => {
 			<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
+				<Route path="/dashboard" element={<HomePage />} />
 				<Route path="/perfil" element={<ProfilePage />} />
 				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
 				<Route path="/dashboard/profesionales" element={<ProfessionalsPage />} />

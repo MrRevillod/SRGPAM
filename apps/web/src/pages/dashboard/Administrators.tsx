@@ -5,66 +5,50 @@ import ConfirmAction from "../../components/ConfirmAction"
 import UpdateAdministrator from "../../components/forms/update/Administrator"
 import CreateAdministrator from "../../components/forms/create/Administrator"
 
-import { api } from "../../lib/axios"
-import { useModal } from "../../context/ModalContext"
+import { message } from "antd"
+import { useRequest } from "../../hooks/useRequest"
 import { Administrator } from "../../lib/types"
+import { useState, useEffect } from "react"
 import { AdministratorColumns } from "../../lib/columns"
-import { useState, useEffect, Fragment } from "react"
+import { deleteAdministrator, getAdministrators } from "../../lib/actions"
 
 const AdministratorsPage: React.FC = () => {
-	const [data, setData] = useState<Administrator[]>([])
-	const [originalData, setOriginalData] = useState<Administrator[]>([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const [administrators, setAdministrators] = useState<Administrator[]>([])
 
-	const fetchAdministrators = async () => {
-		try {
-			const { data } = await api.get("/dashboard/administrators")
-			setData(data.values.administrators)
-			setOriginalData(data.values.administrators)
-		} catch (err) {
-			setError("Error al obtener los datos de seniors")
-		} finally {
-			setLoading(false)
-		}
-	}
+	const { error, loading, data } = useRequest<Administrator[]>({
+		action: getAdministrators,
+	})
 
 	useEffect(() => {
-		fetchAdministrators()
-	}, [])
+		if (data) setAdministrators(data)
+	}, [data])
 
-	const handleDelete = async (administrator: any) => {
-		try {
-			const response = await api.delete(`/dashboard/administrators/${administrator.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
-	}
-
-	const { showModal } = useModal()
+	if (error) message.error("Error al cargar los datos")
 
 	return (
 		<PageLayout
 			pageTitle="Administradores"
 			create={true}
-			data={originalData}
-			setData={setData}
+			data={data}
+			setData={setAdministrators}
 			searchKeys={["id", "name", "email"]}
 		>
 			<DataTable<Administrator>
-				data={data}
+				editable
+				deletable
+				loading={loading}
+				data={administrators}
 				columnsConfig={AdministratorColumns}
-				onEdit={(element) => showModal("Edit", element)}
-				onDelete={(element) => showModal("Confirm", element)}
 			/>
-			<CreateAdministrator data={data} setData={setData} />
-			<UpdateAdministrator data={data} setData={setData} />
-			<ConfirmAction
+
+			<CreateAdministrator data={administrators} setData={setAdministrators} />
+			<UpdateAdministrator data={administrators} setData={setAdministrators} />
+
+			<ConfirmAction<Administrator>
 				text="¿Estás seguro(a) de que deseas eliminar este usuario?"
-				data={data}
-				setData={setData}
-				executeAction={(element) => handleDelete(element)}
+				data={administrators}
+				setData={setAdministrators}
+				action={deleteAdministrator}
 			/>
 		</PageLayout>
 	)
