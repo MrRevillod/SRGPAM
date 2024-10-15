@@ -3,9 +3,10 @@ import React from "react"
 
 import { Link } from "react-router-dom"
 import { Show } from "./Show"
+import { Tooltip } from "antd"
 import { useState } from "react"
-import { AiFillEye } from "react-icons/ai"
 import { useFormContext } from "react-hook-form"
+import { AiFillExclamationCircle, AiFillEye } from "react-icons/ai"
 
 type InputType = "text" | "password" | "email" | "number" | "select"
 
@@ -62,7 +63,23 @@ export const Input: React.FC<InputProps> = (props) => {
 			<Show when={!login}>
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<InputLabel label={label} />
-					{errors[name] && <div className="text-red text-sm">{errors[name]?.message?.toString()}</div>}
+					<Show when={type !== "password"}>
+						{errors[name] && (
+							<div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>
+						)}
+					</Show>
+
+					<Show when={type === "password"}>
+						{errors[name] && (
+							<div className="relative flex items-center text-red-600 text-sm gap-1 group">
+								<AiFillExclamationCircle className="h-6 w-6 text-red-600" />
+								<div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex items-center justify-center bg-red-700 text-white text-sm rounded px-4 py-2 w-64">
+									{errors[name]?.message?.toString()}
+									<div className="absolute left-1/2 transform -translate-x-1/2 top-full border-8 border-transparent border-t-red-600"></div>
+								</div>
+							</div>
+						)}
+					</Show>
 				</div>
 			</Show>
 
