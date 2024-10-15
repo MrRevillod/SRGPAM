@@ -7,7 +7,7 @@ import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { updateCenter } from "../../../lib/actions"
-import { ImageSelector2 } from "../../ImageSelector2"
+import { ImageSelector } from "../../ImageSelector"
 import { CentersSchemas } from "../../../lib/schemas"
 import { Center, FormProps } from "../../../lib/types"
 import { FormProvider, useForm } from "react-hook-form"
@@ -37,7 +37,7 @@ const UpdateCenter: React.FC<FormProps<Center>> = ({ data, setData }) => {
 					<Input name="name" label="Nombre" type="text" />
 					<Input name="address" label="Dirección" type="text" />
 					<Input name="phone" label="Teléfono" type="text" />
-					<ImageSelector2 imageLabel="Imagen del centro" />
+					<ImageSelector imageLabel="Imagen del centro de atención" />
 				</Form>
 			</FormProvider>
 		</Modal>

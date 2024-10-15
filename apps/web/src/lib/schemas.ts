@@ -129,10 +129,6 @@ const imageSchemaCreate = z
 
 const imageSchemaUpdate = z
 	.any()
-	.nullable()
-	.refine((file) => file instanceof File || file === null, {
-		message: "Tipo de archivo no válido",
-	})
 	.refine((file) => !file || ALLOWED_IMAGE_FORMATS.includes(file?.type || ""), {
 		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
 	})

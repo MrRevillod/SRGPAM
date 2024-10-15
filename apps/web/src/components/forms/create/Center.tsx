@@ -5,7 +5,7 @@ import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createCenter } from "../../../lib/actions"
-import { ImageSelector2 } from "../../ImageSelector2"
+import { ImageSelector } from "../../ImageSelector"
 import { CentersSchemas } from "../../../lib/schemas"
 import { Center, FormProps } from "../../../lib/types"
 import { FormProvider, useForm } from "react-hook-form"
@@ -20,7 +20,7 @@ const CreateCenter: React.FC<FormProps<Center>> = ({ data, setData }) => {
 					<Input name="name" label="Nombre" type="text" placeholder="Centro de atención San José" />
 					<Input name="address" label="Dirección" type="text" placeholder="Pedro Montt #41" />
 					<Input name="phone" label="Teléfono" type="text" placeholder="56955473897" />
-					<ImageSelector2 imageLabel="Imagen del centro" />
+					<ImageSelector imageLabel="Imagen del centro de atención" />
 				</Form>
 			</FormProvider>
 		</Modal>

@@ -8,7 +8,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const { isAuthenticated, user } = useAuth()
 
 	return (
-		<article className="h-screen w-screen dark:bg-primary-dark">
+		<article className="max-h-screen h-screen w-screen dark:bg-primary-dark">
 			<Show when={isAuthenticated && user !== null}>
 				<Header />
 			</Show>

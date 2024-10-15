@@ -8,7 +8,7 @@ import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { updateService } from "../../../lib/actions"
 import { ServiceSchemas } from "../../../lib/schemas"
-import { ImageSelector2 } from "../../ImageSelector2"
+import { ImageSelector } from "../../ImageSelector"
 import { Service, FormProps } from "../../../lib/types"
 import { FormProvider, useForm } from "react-hook-form"
 
@@ -43,7 +43,7 @@ const UpdateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 						type="text"
 						placeholder="¿En qué consiste el servicio?"
 					/>
-					<ImageSelector2 imageLabel="Imagen" />
+					<ImageSelector imageLabel="Imagen del servicio" />
 				</Form>
 			</FormProvider>
 		</Modal>

@@ -6,7 +6,7 @@ import { useAuth } from "../../../context/AuthContext"
 import { message } from "antd"
 import { useMutation } from "../../../hooks/useMutation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ImageSelector2 } from "../../ImageSelector2"
+import { ImageSelector } from "../../ImageSelector"
 import { AdministratorSchemas } from "../../../lib/schemas"
 import { MutationResponse, User } from "../../../lib/types"
 import { buildRequestBody, handleFormError } from "../../../lib/form"
@@ -100,7 +100,7 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdat
 				<Input name="password" label="Contraseña" type="password" placeholder="••••••••" />
 				<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••••••" />
 
-				<ImageSelector2 imageLabel="Imagen de perfil" />
+				<ImageSelector imageLabel="Imagen de perfil" />
 
 				<div className="flex flex-row gap-4 w-full justify-end mt-4">
 					<Button variant="secondary" onClick={() => handleCancel()} className="w-1/4" type="button">

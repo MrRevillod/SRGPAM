@@ -4,7 +4,7 @@ import CreateService from "../../components/forms/create/Service"
 import UpdateService from "../../components/forms/update/Service"
 import ConfirmDelete from "../../components/ConfirmAction"
 
-import { Card } from "../../components/ui/Card"
+import { ImageCard } from "../../components/ui/ImageCard"
 import { message } from "antd"
 import { Service } from "../../lib/types"
 import { CardLayout } from "../../components/CardLayout"
@@ -31,12 +31,12 @@ const ServicesPage: React.FC = () => {
 				data={services}
 				loading={loading}
 				renderCard={(service: Service) => (
-					<Card
+					<ImageCard
 						key={service.id}
 						item={service}
 						title={service.name}
 						description={service.description}
-						imageSrc={`/services/${service.id}.webp`}
+						imagePath={`/services`}
 						deletable
 						updatable
 					/>

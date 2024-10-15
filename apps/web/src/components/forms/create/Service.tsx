@@ -5,8 +5,8 @@ import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createService } from "../../../lib/actions"
+import { ImageSelector } from "../../ImageSelector"
 import { ServiceSchemas } from "../../../lib/schemas"
-import { ImageSelector2 } from "../../ImageSelector2"
 import { FormProps, Service } from "../../../lib/types"
 import { FormProvider, useForm } from "react-hook-form"
 
@@ -27,7 +27,7 @@ const CreateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 						type="text"
 						placeholder="Descripción breve del servicio"
 					/>
-					<ImageSelector2 imageLabel="Imagen" />
+					<ImageSelector imageLabel="Imagen del servicio" />
 				</Form>
 			</FormProvider>
 		</Modal>

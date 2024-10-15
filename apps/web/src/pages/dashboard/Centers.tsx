@@ -4,9 +4,9 @@ import UpdateCenter from "../../components/forms/update/Center"
 import CreateCenter from "../../components/forms/create/Center"
 import ConfirmAction from "../../components/ConfirmAction"
 
-import { Card } from "../../components/ui/Card"
 import { Center } from "../../lib/types"
 import { message } from "antd"
+import { ImageCard } from "../../components/ui/ImageCard"
 import { CardLayout } from "../../components/CardLayout"
 import { useRequest } from "../../hooks/useRequest"
 import { useEffect, useState } from "react"
@@ -35,15 +35,15 @@ const CentersPage: React.FC = () => {
 			<CardLayout<Center>
 				data={centers}
 				loading={loading}
-				itemsPerPage={9}
+				itemsPerPage={6}
 				renderCard={(center: Center) => (
-					<Card
+					<ImageCard
 						key={center.id}
 						item={center}
 						title={center.name}
 						description={center.address}
 						other={`Teléfono: ${center.phone}`}
-						imageSrc={`/centers/${center.id}.webp`}
+						imagePath={`/centers`}
 						deletable
 						updatable
 					/>

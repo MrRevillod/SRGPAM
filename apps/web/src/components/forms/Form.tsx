@@ -1,13 +1,14 @@
-import React from "react"
+import React, { useState } from "react"
 
 import { Button } from "../ui/Button"
-import { message } from "antd"
 import { useModal } from "../../context/ModalContext"
 import { useMutation } from "../../hooks/useMutation"
+import { ImageSelector } from "../ImageSelector"
+import { message, UploadFile } from "antd"
 import { buildRequestBody, handleFormError } from "../../lib/form"
 import { Dispatch, ReactNode, SetStateAction } from "react"
 import { FieldValues, SubmitHandler, useFormContext } from "react-hook-form"
-import { BaseDataType, MutateAction, MutationResponse } from "../../lib/types"
+import { BaseDataType, MutateAction, MutationResponse, Nullable } from "../../lib/types"
 
 interface FormProps<T> {
 	data: T[]
@@ -21,8 +22,11 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 	const { handleSubmit, reset, setError } = useFormContext()
 	const { handleOk, handleCancel, selectedData } = useModal()
 
+	const [imageFile, setImageFile] = useState<UploadFile[]>([])
+
 	const onCancel = () => {
 		handleCancel()
+		setImageFile([])
 	}
 
 	const mutation = useMutation<MutationResponse<T>>({
@@ -30,8 +34,6 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 	})
 
 	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
-		console.log(formData)
-
 		const body = buildRequestBody(formData)
 
 		await mutation.mutate({
@@ -57,6 +59,7 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 
 				message.success("Hecho")
 				reset()
+				setImageFile([])
 				handleOk()
 			},
 			onError: (error) => {
@@ -70,7 +73,12 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 			className="flex flex-col gap-4 py-6 bg-light dark:bg-primary-dark rounded-lg"
 			onSubmit={handleSubmit(onSubmit)}
 		>
-			{children}
+			{React.Children.map(children, (child) => {
+				if (React.isValidElement(child) && child.type === ImageSelector) {
+					return React.cloneElement(child, { imageFile, setImageFile } as any)
+				}
+				return child
+			})}
 			<div className="flex flex-row gap-4 w-full justify-end -mb-6">
 				<Button type="button" variant="secondary" onClick={onCancel}>
 					Cancelar

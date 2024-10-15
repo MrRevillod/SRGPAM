@@ -1,58 +1,81 @@
 import React from "react"
 import ImgCrop from "antd-img-crop"
 
+import { Dispatch, SetStateAction } from "react"
 import { Upload } from "antd"
 import { FileType } from "../lib/types"
 import { UploadFile, UploadProps } from "antd"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Controller, useFormContext } from "react-hook-form"
 
 interface ImageSelectorProps {
 	imageLabel: string
-	setImageFile?: Dispatch<SetStateAction<UploadFile | null>>
+	imageFile?: UploadFile[]
+	setImageFile?: Dispatch<SetStateAction<UploadFile[]>>
 }
 
-export const ImageSelector: React.FC<ImageSelectorProps> = ({ imageLabel, setImageFile }) => {
-	const [fileList, setFileList] = useState<UploadFile[]>([])
-
-	console.log(setImageFile)
+export const ImageSelector: React.FC<ImageSelectorProps> = ({ imageLabel, imageFile, setImageFile }) => {
+	const {
+		control,
+		setValue,
+		formState: { errors },
+	} = useFormContext()
 
 	const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
-		setFileList(newFileList)
+		setImageFile && setImageFile(newFileList)
 	}
 
 	const beforeUpload = (file: FileType) => {
 		const reader = new FileReader()
 		reader.readAsDataURL(file)
 
-		if (setImageFile) reader.onload = () => setImageFile(file)
+		reader.onload = () => {
+			setValue("image", file)
+		}
 
-		setFileList([fileList.shift() as UploadFile])
 		return false
 	}
 
-	return (
-		<ImgCrop rotationSlider modalTitle="Editar imagen" modalOk="Confirmar" modalCancel="Cancelar">
-			<Upload
-				fileList={fileList}
-				beforeUpload={beforeUpload}
-				onChange={onChange}
-				showUploadList={true}
-				listType="text"
-				accept=".jpg,.jpeg,.png,.webp"
-			>
-				<div className="flex flex-col gap-2 w-full">
-					<p className="font-semibold text-dark dark:text-light text-base">{imageLabel}</p>
+	const handleRemove = () => {
+		setValue("image", null)
+		setImageFile && setImageFile([])
+	}
 
-					<div className="flex flex-row justify-center w-full rounded-lg cursor-pointer">
-						<div className="flex flex-col gap-1">
-							<p className="text-gray-dark dark:text-gray-light">Haga click para subir una imagen</p>
-							<p className="text-gray-dark dark:text-gray-light">
-								Formatos permitidos: .jpg, .jpeg, .png .webp
-							</p>
+	return (
+		<Controller
+			control={control}
+			name="image"
+			render={() => (
+				<ImgCrop rotationSlider modalTitle="Editar imagen" modalOk="Confirmar" modalCancel="Cancelar">
+					<Upload
+						fileList={imageFile}
+						beforeUpload={beforeUpload}
+						onChange={onChange}
+						showUploadList={true}
+						listType="text"
+						accept=".jpg,.jpeg,.png,.webp"
+						maxCount={1}
+						onRemove={handleRemove}
+					>
+						<div className="flex flex-col gap-2 w-full">
+							<p className="font-semibold text-dark dark:text-light text-base">{imageLabel}</p>
+
+							<div className="flex flex-row justify-center w-full rounded-lg cursor-pointer">
+								<div className="flex flex-col gap-1">
+									{errors["image"] && (
+										<p className="text-red">{errors["image"].message?.toString()}</p>
+									)}
+									<p className="text-neutral-500 dark:text-gray-light">
+										Haga click para subir una imagen
+									</p>
+									<p className="text-neutral-500 dark:text-gray-light">
+										Formatos permitidos: .jpg, .jpeg, .png .webp
+									</p>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-			</Upload>
-		</ImgCrop>
+					</Upload>
+				</ImgCrop>
+			)}
+		/>
 	)
 }

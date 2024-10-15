@@ -2,6 +2,8 @@ import { AxiosResponse } from "axios"
 import { GetProp, UploadProps } from "antd"
 import { Dispatch, SetStateAction } from "react"
 
+export type Nullable<T> = T | null
+
 export type BaseDataType = {
 	id: string | number
 }
