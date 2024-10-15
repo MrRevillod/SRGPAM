@@ -2,7 +2,7 @@ import * as administrators from "../controllers/administrators"
 
 import { Router } from "express"
 import { validateRole } from "../middlewares/authentication"
-import { validateSchema } from "../middlewares/validation"
+import { validateSchema, validateUserId } from "../middlewares/validation"
 import { singleImageupload } from "../config"
 import { AdministratorSchemas } from "@repo/lib"
 
@@ -19,9 +19,9 @@ router.get("/", validateRole("ADMIN"), administrators.getAll)
 router.post("/", validateRole("ADMIN"), validateSchema(Create), administrators.create)
 
 // Actualizar un administrador por id --- Requiere rol de administrador
-router.patch("/:id", singleImageupload, validateRole("ADMIN"), validateSchema(Update), administrators.updateById)
+router.patch("/:id", singleImageupload, validateUserId("ADMIN"), validateRole("ADMIN"), validateSchema(Update), administrators.updateById)
 
 // Eliminar un administrador por id --- Requiere rol de administrador
-router.delete("/:id", validateRole("ADMIN"), administrators.deleteById)
+router.delete("/:id", validateUserId("ADMIN"), validateRole("ADMIN"), administrators.deleteById)
 
 export default router

@@ -6,66 +6,50 @@ import ConfirmAction from "../../components/ConfirmAction"
 import CreateProfessional from "../../components/forms/create/Professional"
 import UpdateProfessional from "../../components/forms/update/Professional"
 
-import { api } from "../../lib/axios"
-import { useModal } from "../../context/ModalContext"
+import { message } from "antd"
+import { useRequest } from "../../hooks/useRequest"
 import { Professional } from "../../lib/types"
 import { ProfessionalColumns } from "../../lib/columns"
 import { useState, useEffect } from "react"
+import { deleteProfessional, getProfessionals } from "../../lib/actions"
 
 const ProfessionalsPage: React.FC = () => {
-	const [data, setData] = useState<Professional[]>([])
-	const [originalData, setOriginalData] = useState<Professional[]>([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const [professionals, setProfessionals] = useState<Professional[]>([])
 
-	const fetchProfessionals = async () => {
-		try {
-			const { data } = await api.get("/dashboard/professionals")
-			setData(data.values.professionals)
-			setOriginalData(data.values.professionals)
-		} catch (err) {
-			setError("Error al obtener los datos")
-		} finally {
-			setLoading(false)
-		}
-	}
+	const { error, loading, data } = useRequest<Professional[]>({
+		action: getProfessionals,
+	})
 
 	useEffect(() => {
-		fetchProfessionals()
-	}, [])
+		if (data) setProfessionals(data)
+	}, [data])
 
-	const handleDelete = async (professional: any) => {
-		try {
-			const response = await api.delete(`/dashboard/professionals/${professional.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
-	}
-
-	const { showModal } = useModal()
+	if (error) message.error("Error al cargar los datos")
 
 	return (
 		<PageLayout
 			pageTitle="Profesionales"
 			create={true}
-			data={originalData}
-			setData={setData}
+			data={data}
+			setData={setProfessionals}
 			searchKeys={["id", "name", "email"]}
 		>
 			<DataTable<Professional>
-				data={data}
+				editable
+				deletable
+				loading={loading}
+				data={professionals}
 				columnsConfig={ProfessionalColumns}
-				onEdit={(element) => showModal("Edit", element)}
-				onDelete={(element) => showModal("Confirm", element)}
 			/>
-			<CreateProfessional data={data} setData={setData} />
-			<UpdateProfessional data={data} setData={setData} />
-			<ConfirmAction
+
+			<CreateProfessional data={professionals} setData={setProfessionals} />
+			<UpdateProfessional data={professionals} setData={setProfessionals} />
+
+			<ConfirmAction<Professional>
 				text="¿Estás seguro de que deseas eliminar este profesional?"
-				data={data}
-				setData={setData}
-				executeAction={(element) => handleDelete(element)}
+				data={professionals}
+				setData={setProfessionals}
+				action={deleteProfessional}
 			/>
 		</PageLayout>
 	)

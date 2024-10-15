@@ -1,74 +1,38 @@
-import React, { useState } from "react"
+import React from "react"
 
-import { api } from "../../../lib/axios"
 import { Input } from "../../ui/Input"
 import { Button } from "../../ui/Button"
 import { useAuth } from "../../../context/AuthContext"
-import { message, UploadFile } from "antd"
-import { useEffect } from "react"
+import { message } from "antd"
+import { useMutation } from "../../../hooks/useMutation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LoginVariant, User } from "../../../lib/types"
-import { buildRequestBody, handleConflicts } from "../../../lib/form"
+import { ImageSelector } from "../../ImageSelector"
 import { AdministratorSchemas } from "../../../lib/schemas"
+import { MutationResponse, User } from "../../../lib/types"
+import { buildRequestBody, handleFormError } from "../../../lib/form"
+import { useEffect, Dispatch, SetStateAction } from "react"
+import { updateAdministrator, updateProfessional } from "../../../lib/actions"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import { ImageEditor } from "../../ImageCrop"
 
 interface UpdateProfileProps {
-	imageSrc: string
-	setImageSrc: React.Dispatch<React.SetStateAction<string>>
-	setShowUpdateForm: React.Dispatch<React.SetStateAction<boolean>>
+	setImageSrc: Dispatch<SetStateAction<string>>
+	setShowUpdateForm: Dispatch<SetStateAction<boolean>>
 }
 
-const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, setShowUpdateForm }) => {
+const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdateForm }) => {
+	const methods = useForm({ resolver: zodResolver(AdministratorSchemas.Update) })
+
 	const { user, setUser, role } = useAuth()
-	const [imageFile, setImageFile] = useState<UploadFile | null>(null)
-
-	const methods = useForm({
-		resolver: zodResolver(AdministratorSchemas.Update),
-	})
-
-	const { reset, handleSubmit } = methods
+	const { reset, handleSubmit, setError } = methods
 
 	const handleReset = () => {
-		reset({ name: user?.name, email: user?.email, password: "", confirmPassword: "" })
-		setImageFile(null)
-	}
-
-	useEffect(() => {
-		if (user) handleReset()
-	}, [user])
-
-	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-		if (data.name === user?.name && data.email && imageFile === null) {
-			message.error("No se han realizado cambios")
-			return
-		}
-
-		const endpoints = {
-			ADMIN: `/dashboard/administrators/${user?.id}`,
-			PROFESSIONAL: `/dashboard/professionals/${user?.id}`,
-		}
-
-		const body = buildRequestBody({ ...data, image: imageFile })
-
-		try {
-			const response = await api.patch(endpoints[role as LoginVariant], body, {
-				headers: {
-					"Content-Type": imageFile !== null ? "multipart/form-data" : "application/json",
-				},
-			})
-
-			setImageSrc(response.data.values.image)
-			message.success(response.data.message)
-			setUser(response.data.values.updated as User)
-
-			handleReset()
-		} catch (error: any) {
-			if (error.response.status === 409) {
-				message.error(error.response.data.message)
-				handleConflicts("perfíl", error.response.data.values.conflicts)
-			}
-		}
+		reset({
+			name: user?.name,
+			email: user?.email,
+			password: "",
+			confirmPassword: "",
+			image: null,
+		})
 	}
 
 	const handleCancel = () => {
@@ -76,10 +40,57 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, se
 		handleReset()
 	}
 
+	useEffect(() => {
+		if (user) handleReset()
+	}, [user])
+
+	const mutation = useMutation<MutationResponse<User>>({
+		mutateFn: role === "ADMIN" ? updateAdministrator : updateProfessional,
+	})
+
+	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
+		console.log(formData)
+
+		const originalData = {
+			name: user?.name,
+			email: user?.email,
+			password: "",
+			confirmPassword: "",
+			image: null,
+		}
+
+		if (JSON.stringify(formData) === JSON.stringify(originalData)) {
+			message.error("No se han realizado cambios")
+			return
+		}
+
+		const body = buildRequestBody(formData)
+
+		await mutation.mutate({
+			params: { id: user?.id, body },
+			onSuccess: (data) => {
+				setUser(data.modified)
+				if (data.image) setImageSrc(`${data.image}?${Date.now()}`)
+				message.success("Hecho")
+				handleReset()
+				setTimeout(() => {}, 2000)
+				setShowUpdateForm(false)
+			},
+			onError: (error) => {
+				message.error(error)
+				if (error?.conflicts) {
+					handleFormError(error, setError)
+				}
+			},
+		})
+	}
+
 	return (
 		<FormProvider {...methods}>
 			<div className="w-full mb-4">
-				<h3 className="font-semibold text-start text-lg">Editar información del perfil</h3>
+				<h3 className="font-semibold text-start text-xl text-dark dark:text-light">
+					Editar información del perfil
+				</h3>
 			</div>
 
 			<form className="w-full flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +100,7 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ imageSrc, setImageSrc, se
 				<Input name="password" label="Contraseña" type="password" placeholder="••••••••" />
 				<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••••••" />
 
-				<ImageEditor imageLabel="Imagen de perfil" setImageFile={setImageFile} />
+				<ImageSelector imageLabel="Imagen de perfil" />
 
 				<div className="flex flex-row gap-4 w-full justify-end mt-4">
 					<Button variant="secondary" onClick={() => handleCancel()} className="w-1/4" type="button">

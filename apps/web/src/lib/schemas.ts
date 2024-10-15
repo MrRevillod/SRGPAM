@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { UploadFile } from "antd"
 
 export const LoginFormSchema = z.object({
 	email: z.string().email().min(1, "El correo electrónico es requerido"),
@@ -60,7 +61,7 @@ const optionalPasswordSchema = z
 		{
 			message:
 				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial.",
-		}
+		},
 	)
 
 const nameSchema = z
@@ -78,6 +79,62 @@ const addressSchema = z.string().min(4, "La dirección debe tener al menos 4 car
 const birthDateSchema = z.coerce.date({
 	message: "La fecha de nacimiento ingresada no es válida",
 })
+
+const nameServiceSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
+
+const titleServiceSchema = z
+	.string()
+	.min(2, "El título debe tener al menos 2 caracteres")
+	.max(50, "El título no debe tener más de 50 caracteres")
+	.regex(
+		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
+		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()",
+	)
+
+const nameCenterSchema = z
+	.string()
+	.min(2, "El nombre debe tener al menos 2 caracteres")
+	.max(50, "El nombre no debe tener más de 50 caracteres")
+	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
+
+const addressCenterSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
+
+const phoneSchema = z
+	.string()
+	.regex(/^[0-9]+$/, "El teléfono solo puede contener números")
+	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
+	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
+
+const ALLOWED_IMAGE_FORMATS = ["image/jpeg", "image/png", "image/webp"]
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+
+const imageSchemaCreate = z
+	.any()
+	.refine((file) => !!file, {
+		message: "La imagen es obligatoria",
+	})
+	.refine((file) => ALLOWED_IMAGE_FORMATS.includes(file?.type), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => file?.size <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
+
+const imageSchemaUpdate = z
+	.any()
+	.refine((file) => !file || ALLOWED_IMAGE_FORMATS.includes(file?.type || ""), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => !file || (file?.size || 0) <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
 
 export const SeniorSchemas = {
 	MobileRegister: z.object({
@@ -129,64 +186,13 @@ export const AdministratorSchemas = {
 			email: emailSchema,
 			password: optionalPasswordSchema,
 			confirmPassword: optionalPasswordSchema,
+			image: imageSchemaUpdate,
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
 		}),
 }
 
-const nameServiceSchema = z
-	.string()
-	.min(2, "El nombre debe tener al menos 2 caracteres")
-	.max(50, "El nombre no debe tener más de 50 caracteres")
-	.regex(
-		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El nombre solo puede contener letras, espacios y caracteres especiales como - ' . ()"
-	)
-
-const titleServiceSchema = z
-	.string()
-	.min(2, "El título debe tener al menos 2 caracteres")
-	.max(50, "El título no debe tener más de 50 caracteres")
-	.regex(
-		/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ\-'.()]+$/,
-		"El título solo puede contener letras, espacios y caracteres especiales como - ' . ()"
-	)
-
-const nameCenterSchema = z
-	.string()
-	.min(2, "El nombre debe tener al menos 2 caracteres")
-	.max(50, "El nombre no debe tener más de 50 caracteres")
-	.regex(/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/, "El nombre solo puede contener letras y espacios")
-
-const addressCenterSchema = z.string().min(2, "La dirección debe tener al menos 2 caracteres")
-
-const phoneSchema = z
-	.string()
-	.regex(/^[0-9]+$/, "El teléfono solo puede contener números")
-	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
-	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
-
-const imageSchemaCreate = z
-	.any()
-	.refine((files) => files?.length === 1, "La imagen es obligatoria")
-	.refine((files) => files?.[0]?.size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
-	.refine(
-		(files) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files?.[0]?.type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP"
-	)
-const imageSchemaUpdate = z
-	.any()
-	.nullable()
-	.refine((files) => !files || files.length === 0 || files.length === 1, "Solo puedes subir una imagen")
-	.refine((files) => !files || files.length === 0 || files[0].size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
-	.refine(
-		(files) =>
-			!files ||
-			files.length === 0 ||
-			["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files[0].type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP"
-	)
 export const ServiceSchemas = {
 	Create: z.object({
 		name: nameServiceSchema,
@@ -218,24 +224,25 @@ export const CentersSchemas = {
 }
 export const ProfessionalSchemas = AdministratorSchemas
 
-const dateTimeSchema = z.number().refine((value) => {
-    const date = new Date(value);
-    return !isNaN(date.getTime())
-}, {
-	message: "La fecha de ingresada no es válida",
-})
+const dateTimeSchema = z.number().refine(
+	(value) => {
+		const date = new Date(value)
+		return !isNaN(date.getTime())
+	},
+	{
+		message: "La fecha de ingresada no es válida",
+	},
+)
 
 export const EventSchemas = {
-	Create: z
-		.object({
-			startsAt: dateTimeSchema,
-			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
-			serviceId: z.number(),
-			seniorId: z.optional(rutSchema),
-			centerId: z.optional(z.string()),
-		})
-        ,
+	Create: z.object({
+		startsAt: dateTimeSchema,
+		endsAt: dateTimeSchema,
+		professionalId: rutSchema,
+		serviceId: z.number(),
+		seniorId: z.optional(rutSchema),
+		centerId: z.optional(z.string()),
+	}),
 	Update: z.object({
 		startsAt: dateTimeSchema,
 		endsAt: dateTimeSchema,

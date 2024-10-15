@@ -9,14 +9,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 			select: { id: true, name: true, title: true, description: true },
 		})
 
-		return res.status(200).json({
-			message: "Servicios obtenidos correctamente",
-			type: "success",
-			values: {
-				services,
-				len: services.length,
-			},
-		})
+		return res.status(200).json({ values: services })
 	} catch (error) {
 		next(error)
 	}
@@ -27,9 +20,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const { name, title, description } = req.body
 		const file = req.file
 
-		if (!file) {
-			throw new AppError(400, "No se a enviado un archivo")
-		}
+		if (!file) throw new AppError(400, "No se a enviado un archivo")
 
 		const serviceExists = await prisma.service.findFirst({
 			where: { name },
@@ -56,11 +47,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(201).json({
-			message: "Servicio creado correctamente",
-			type: "success",
-			values: service,
-		})
+		return res.status(201).json({ values: { modified: service } })
 	} catch (error) {
 		next(error)
 	}
@@ -87,16 +74,11 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			})
 
 			if (response.type == "error") {
-				await prisma.service.delete({ where: { id: service.id } })
 				throw new AppError(response.status ?? 500, response.message)
 			}
 		}
 
-		return res.status(200).json({
-			message: "Servicio actualizado exitosamente",
-			type: "success",
-			values: { updated: service },
-		})
+		return res.status(200).json({ values: { modified: service } })
 	} catch (error) {
 		next(error)
 	}
@@ -117,7 +99,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			data: { serviceId: null },
 		})
 
-		await prisma.service.delete({ where: { id } })
+		const deleted = await prisma.service.delete({ where: { id } })
 
 		const response = await httpRequest<null>({
 			service: "STORAGE",
@@ -131,11 +113,7 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 			throw new AppError(response.status ?? 500, response.message)
 		}
 
-		return res.status(200).json({
-			message: "Eliminación exitosa",
-			type: "success",
-			values: { deletedId: id },
-		})
+		return res.status(200).json({ values: { modified: deleted } })
 	} catch (error) {
 		next(error)
 	}
