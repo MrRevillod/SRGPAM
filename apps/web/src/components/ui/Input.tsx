@@ -64,9 +64,7 @@ export const Input: React.FC<InputProps> = (props) => {
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<InputLabel label={label} />
 					<Show when={type !== "password"}>
-						{errors[name] && (
-							<div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>
-						)}
+						{errors[name] && <div className="text-red text-sm">{errors[name]?.message?.toString()}</div>}
 					</Show>
 
 					<Show when={type === "password"}>

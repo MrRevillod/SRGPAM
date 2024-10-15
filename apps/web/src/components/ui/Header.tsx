@@ -37,6 +37,7 @@ const Header: React.FC = () => {
 					<Dropdown
 						arrowIcon={false}
 						inline
+						className="relative z-50"
 						label={<Avatar alt="User settings" img={imageSrc} onError={handleImageError} rounded />}
 					>
 						<Dropdown.Header>
