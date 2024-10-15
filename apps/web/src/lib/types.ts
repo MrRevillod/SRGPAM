@@ -1,8 +1,11 @@
+import { AxiosResponse } from "axios"
 import { GetProp, UploadProps } from "antd"
 import { Dispatch, SetStateAction } from "react"
 
+export type Nullable<T> = T | null
+
 export type BaseDataType = {
-	id: string
+	id: string | number
 }
 
 export type LoginVariant = "ADMIN" | "PROFESSIONAL"
@@ -88,3 +91,22 @@ export type Event = {
 }
 
 export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
+
+export type ApiError = string | string[] | null
+
+export type QueryAction = ({ query }: QueryActionProps) => Promise<AxiosResponse<any, any>>
+export type MutateAction = ({ id, body }: MutateActionProps) => Promise<AxiosResponse<any, any>>
+
+export interface QueryActionProps {
+	query?: string
+}
+
+export interface MutateActionProps {
+	id?: string | number
+	body?: any
+}
+
+export type MutationResponse<T> = {
+	modified: T
+	image?: string
+}

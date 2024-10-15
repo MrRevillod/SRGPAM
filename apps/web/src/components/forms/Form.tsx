@@ -1,87 +1,88 @@
-import React from "react"
+import React, { useState } from "react"
 
-import { api } from "../../lib/axios"
 import { Button } from "../ui/Button"
-import { message } from "antd"
 import { useModal } from "../../context/ModalContext"
+import { useMutation } from "../../hooks/useMutation"
+import { ImageSelector } from "../ImageSelector"
+import { message, UploadFile } from "antd"
+import { buildRequestBody, handleFormError } from "../../lib/form"
+import { Dispatch, ReactNode, SetStateAction } from "react"
 import { FieldValues, SubmitHandler, useFormContext } from "react-hook-form"
 import { buildRequestBody, handleConflicts } from "../../lib/form"
 import { Show } from "../ui/Show"
 
-interface FormProps {
-	entityName: string
-	data: any[]
-	setData: (data: any[]) => void
-	apiEndpoint: string
-	children: React.ReactNode
-	method: "POST" | "PATCH"
-	deleteable?: boolean 
+import { BaseDataType, MutateAction, MutationResponse, Nullable } from "../../lib/types"
+
+interface FormProps<T> {
+	data: T[]
+	setData: Dispatch<SetStateAction<T[]>>
+	action: MutateAction
+	children: ReactNode
+	actionType: "update" | "create"
+  deleteable?: boolean
 }
 
-const   Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, children, method, deleteable }) => {
-	const { handleOk, handleCancel, setSelectedData, handleDelete } = useModal()
-	const { handleSubmit, reset } = useFormContext()
+export const Form = <T extends BaseDataType>({ data, setData, action, actionType, children }: FormProps<T>) => {
+	const { handleSubmit, reset, setError } = useFormContext()
+  const { handleOk, handleCancel, setSelectedData, handleDelete } = useModal()
+
+	const [imageFile, setImageFile] = useState<UploadFile[]>([])
 
 	const onCancel = () => {
 		handleCancel()
+		setImageFile([])
 	}
 
-	const onDelete = () => {
-		handleDelete()
-	}
-	const onSubmit: SubmitHandler<FieldValues> = async (form) => {
-		const body = buildRequestBody(form)
+	const mutation = useMutation<MutationResponse<T>>({
+		mutateFn: action,
+	})
 
-		const request = {
-			method,
-			url: apiEndpoint,
-			data: body,
-			headers: {
-				"Content-Type": form.image ? "multipart/form-data" : "application/json",
-			},
-		}
+	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
+		const body = buildRequestBody(formData)
 
-		try {
-			const res = await api.request(request)
-
-			if (method === "PATCH") {
-				const updatedEntity = res.data.values.updated   
-				const index = data.findIndex((entity) => entity.id === updatedEntity.id)
-
-				if (index !== -1) {
-					const updatedData = [...data]
-					updatedData[index] = updatedEntity
-					setData(updatedData)
-                }
-			}
-
-			if (method === "POST") {
-				setData([res.data.values, ...data])
-			}
-
-			message.success(res.data.message)
-			reset()
-
-			handleOk()
-		} catch (error: any) {
-			if (error.response) {
-				message.error(error.response.data.message)
-				if (error.response.status === 409) {
-					handleConflicts(entityName, error.response.data.values.conflicts)
+		await mutation.mutate({
+			params: { id: selectedData?.id || null, body },
+			onSuccess: (res) => {
+				if (!res.modified) {
+					return message.error("Error al guardar. Intente nuevamente o recargue la página.")
 				}
 
-				return
-			}
+				if (actionType === "update") {
+					const { modified: updated, image } = res
 
-			console.log(error)
+					const index = data.findIndex((entity) => entity.id === updated?.id)
 
-			message.error("Error. Intente nuevamente.")
-		}
+					if (index !== -1) {
+						const updatedData = [...data]
+						updatedData[index] = { ...updated, image }
+						setData(updatedData)
+					}
+				} else if (actionType === "create") {
+					setData([res.modified, ...data])
+				}
+
+				message.success("Hecho")
+				reset()
+				setImageFile([])
+				handleOk()
+			},
+			onError: (error) => {
+				handleFormError(error, setError)
+			},
+		})
 	}
 
 	return (
-		<form className="flex flex-col gap-4 py-6" onSubmit={handleSubmit(onSubmit)}>
-			{children}
+		<form
+			className="flex flex-col gap-4 py-6 bg-light dark:bg-primary-dark rounded-lg"
+			onSubmit={handleSubmit(onSubmit)}
+		>
+			{React.Children.map(children, (child) => {
+				if (React.isValidElement(child) && child.type === ImageSelector) {
+					return React.cloneElement(child, { imageFile, setImageFile } as any)
+				}
+				return child
+			})}
 			<div className="flex flex-row gap-4 w-full justify-end -mb-6">
 				{deleteable &&
 					<Button type="button" className="justify" variant="delete" onClick={onDelete}>
@@ -100,4 +101,3 @@ const   Form: React.FC<FormProps> = ({ entityName, data, setData, apiEndpoint, c
 	)
 }
 
-export default Form

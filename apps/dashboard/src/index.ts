@@ -25,10 +25,10 @@ export const createServer_ = (): express.Express => {
 	app.use(morgan("dev"))
 	app.use(express.urlencoded({ extended: true }))
 	app.use(express.json())
-    app.use(
+	app.use(
 		cors({
-			origin: services.WEB_APP.url, // Cambia esto por el origen del cliente
-			credentials: true, // Permitir credenciales (cookies, headers, etc.)
+			origin: services.WEB_APP.url,
+			credentials: true,
 		}),
 	)
 	app.use(cookieParser())

@@ -67,8 +67,8 @@ export const createServer = (): express.Express => {
 	app.use(express.urlencoded({ extended: true }))
 	app.use(
 		cors({
-			origin: "*", // Cambia esto por el origen del cliente
-			credentials: true, // Permitir credenciales (cookies, headers, etc.)
+			origin: "*",
+			credentials: true,
 		}),
 	)
 

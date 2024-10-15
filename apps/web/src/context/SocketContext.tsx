@@ -35,11 +35,10 @@ export const SocketProvider = ({ children }: { children?: ReactNode }) => {
             newSocket.on("newEvent", (event) => {
                 console.log(event)
             })
+
 			setSocket(newSocket)
 		}
 	}, [user, role, isAuthenticated])
-
-
 
 	return <SocketContext.Provider value={{ socket: socket  }}>{children}</SocketContext.Provider>
 }

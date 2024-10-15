@@ -1,13 +1,19 @@
+import clsx from "clsx"
 import React from "react"
+import { Spin } from "antd"
 
-import { Spinner } from "flowbite-react"
-
-const Loading: React.FC = () => {
+const Spinner: React.FC = () => {
 	return (
-		<div className="flex justify-center items-center h-screen absolute z-50 bg-red-600">
-			<Spinner size="large" />
+		<div className="flex items-center justify-center">
+			<Spin tip="Loading" size="large" />
 		</div>
 	)
 }
 
-export default Loading
+export const Loading: React.FC = () => {
+	return (
+		<div className={clsx("fixed inset-0 z-50 flex items-center justify-center h-screen")}>
+			<Spinner />
+		</div>
+	)
+}

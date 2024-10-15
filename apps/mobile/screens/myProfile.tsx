@@ -1,13 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { useState, useEffect } from "react"
-import { View, Text, ActivityIndicator, StyleSheet, Dimensions, TouchableOpacity, Image } from "react-native"
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions, TouchableOpacity, Image, Alert } from "react-native"
 import { Colors } from "@/components/colors"
 import DataDisplayer from "@/components/dataDisplayer"
 import { formatDate, calculateAge, formatRUT } from "@/utils/formatter"
 import MenuBar from "@/components/menuBar"
 import { SERVER_URL } from "@/constants/colors"
 import axios from "axios"
+import { makeAuthenticatedRequest } from "@/utils/request"
 
 const rutImg = require("@/assets/images/profile/rut.png")
 const emailImg = require("@/assets/images/profile/email.png")
@@ -72,6 +73,28 @@ const Profile = ({ navigation }: any) => {
 	const formattedRUT = formatRUT(id)
 	const age = calculateAge(birthDate)
 
+	const deleteAccount = async () => {
+		console.log(id)
+		try {
+			await makeAuthenticatedRequest(`${SERVER_URL}/api/dashboard/seniors/${id}`, "DELETE", true)
+			await AsyncStorage.removeItem("user")
+			navigation.navigate("Login")
+		} catch (error) {
+			console.error("Error al eliminar la cuenta", error)
+		}
+	}
+
+	const deleteAlert = () => {
+		Alert.alert("Eliminar Cuenta", "¿Está seguro que desea eliminar su cuenta?", [
+			{
+				text: "Cancelar",
+				onPress: () => console.log("Cancel Pressed"),
+				style: "cancel",
+			},
+			{ text: "Eliminar", onPress: () => deleteAccount() },
+		])
+	}
+
 	return (
 		<>
 			<View style={styles.greenContainer}>
@@ -100,6 +123,7 @@ const Profile = ({ navigation }: any) => {
 					/>
 					<DataDisplayer imgPath={birthImg} titleField="Edad" descriptionField={`${age} Años`} />
 					<DataDisplayer imgPath={keyImg} titleField="Cambiar Contraseña" actionButton="Cambiar" />
+					<DataDisplayer titleField="Eliminar Cuenta" actionButton="ELIMINAR" onPress={deleteAlert} />
 				</View>
 			</View>
 			<MenuBar

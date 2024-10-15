@@ -3,9 +3,11 @@ import PageLayout from "../../layouts/PageLayout"
 
 import { api } from "../../lib/axios"
 import { Input } from "../../components/ui/Input"
+import { Button } from "../../components/ui/Button"
 import { useEffect } from "react"
 import { DatePicker } from "../../components/ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "../../hooks/useMutation"
 import { SeniorSchemas } from "../../lib/schemas"
 import { message, Image } from "antd"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -17,52 +19,51 @@ const SeniorRegisterRequestPage: React.FC = () => {
 
 	const { senior } = location.state || {}
 
-	useEffect(() => {
-		if (!senior) {
-			navigate("/dashboard/personas-mayores/nuevos")
-		}
-	}, [senior])
-
-	const methods = useForm({
-		resolver: zodResolver(SeniorSchemas.Validate),
-	})
-
+	const methods = useForm({ resolver: zodResolver(SeniorSchemas.Validate) })
 	const { reset, handleSubmit } = methods
 
 	useEffect(() => {
-		if (senior) {
-			reset({
-				rut: senior.id,
-				email: senior.email,
-			})
-		}
+		if (!senior) navigate("/dashboard/personas-mayores/nuevos")
+		else reset({ rut: senior.id, email: senior.email })
 	}, [senior])
 
-	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-		try {
-			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`, {
-				name: data.name,
-				address: data.address,
-				birthDate: data.birthDate,
-			})
+	const AcceptMutation = useMutation<void>({
+		mutateFn: async () => {
+			return await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
+		},
+	})
 
-			message.success("Solicitud aceptada")
-			navigate("/dashboard/personas-mayores/nuevos")
-		} catch (error: any) {
-			console.error("Error al enviar el formulario:", error.response)
-		}
+	const DenyMutation = useMutation<void>({
+		mutateFn: async () => {
+			return await api.patch(`/dashboard/seniors/${senior.id}/new?validate=false`)
+		},
+	})
+
+	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
+		await AcceptMutation.mutate({
+			params: { body: formData },
+			onSuccess: () => {
+				message.success("Solicitud aceptada")
+				navigate("/dashboard/personas-mayores/nuevos")
+			},
+			onError: (error) => {
+				message.error("Error al aceptar la solicitud. Intente nuevamente.")
+				console.error("Error al aceptar la solicitud:", error)
+			},
+		})
 	}
 
 	const onDeny = async () => {
-		try {
-			await api.patch(`/dashboard/seniors/${senior.id}/new?validate=false`)
-			console.log(`Solicitud denegada para el senior con ID: ${senior.id}`)
-			navigate("/dashboard/personas-mayores/nuevos")
-			message.success("Solicitud denegada")
-		} catch (error) {
-			message.error("Error al actualizar la solicitud. Intente nuevamente.")
-			console.error("Error al actualizar el usuario:", error)
-		}
+		await DenyMutation.mutate({
+			onSuccess: () => {
+				message.success("Solicitud denegada")
+				navigate("/dashboard/personas-mayores/nuevos")
+			},
+			onError: (error) => {
+				message.error("Error al denegar la solicitud. Intente nuevamente.")
+				console.error("Error al denegar la solicitud:", error)
+			},
+		})
 	}
 
 	return (
@@ -96,22 +97,21 @@ const SeniorRegisterRequestPage: React.FC = () => {
 							</p>
 
 							<div className="flex gap-4">
-								<button
-									key="submit"
-									type="submit"
-									className="bg-green-700 text-white px-4 py-2 rounded-lg"
-								>
+								<Button variant="primary" type="submit">
 									Aceptar
-								</button>
-								<button onClick={() => onDeny()} className="bg-red-700 text-white px-4 py-2 rounded-lg">
+								</Button>
+
+								<Button variant="delete" type="button" onClick={() => onDeny()}>
 									Denegar
-								</button>
-								<button
+								</Button>
+
+								<Button
+									variant="secondary"
+									type="button"
 									onClick={() => navigate("/dashboard/personas-mayores/nuevos")}
-									className="border-red-700 border-1 text-red-700 px-4 py-2 rounded-lg"
 								>
 									Cancelar
-								</button>
+								</Button>
 							</div>
 						</div>
 					</form>

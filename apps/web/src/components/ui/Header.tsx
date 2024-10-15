@@ -1,11 +1,14 @@
 import React from "react"
+
 import { Show } from "./Show"
 import { useAuth } from "../../context/AuthContext"
 import { API_URL } from "../../lib/axios"
+import { useTheme } from "../../context/ThemeContext"
 import { Link, redirect } from "react-router-dom"
 import { Avatar, Dropdown, Navbar } from "flowbite-react"
 
 const Header: React.FC = () => {
+	const { toggleTheme, isDarkMode } = useTheme()
 	const { isAuthenticated, user, logout } = useAuth()
 
 	const [imageSrc, setImageSrc] = React.useState<string>(
@@ -24,22 +27,29 @@ const Header: React.FC = () => {
 	const linkClasses = `text-neutral-200 font-base hover:text-neutral-50`
 
 	return (
-		<Navbar fluid className="pt-5 h-20 w-full bg-green-700 rounded-none">
-			<Navbar.Brand className="ml-14">
+		<Navbar fluid className="pt-5 h-20 w-full bg-primary dark:bg-primary-darker rounded-none">
+			<Navbar.Brand className="ml-14 pl-2">
 				<img src="/logo-white.webp" alt="logo" width="60" />
 			</Navbar.Brand>
 
 			<Show when={isAuthenticated && user !== null}>
-				<div className="flex md:order-2 mr-14">
+				<div className="flex md:order-2 mr-16">
 					<Dropdown
 						arrowIcon={false}
 						inline
+						className="relative z-50"
 						label={<Avatar alt="User settings" img={imageSrc} onError={handleImageError} rounded />}
 					>
 						<Dropdown.Header>
 							<span className="block text-sm">{user?.name}</span>
 							<span className="block truncate text-sm font-medium">{user?.email}</span>
 						</Dropdown.Header>
+						<Dropdown.Item onClick={() => toggleTheme()}>
+							<span className="block truncate text-sm font-medium">
+								{`Tema: ${isDarkMode ? "Oscuro" : "Claro"}`}
+							</span>
+						</Dropdown.Item>
+						<Dropdown.Divider />
 						<Link to="/perfil">
 							<Dropdown.Item>Mi perfíl</Dropdown.Item>
 						</Link>
@@ -67,9 +77,7 @@ const Header: React.FC = () => {
 								label=""
 								placement="right-start"
 								dismissOnClick={false}
-								renderTrigger={() => (
-									<span className={`cursor-pointer text-neutral-900`}>Personas Mayores</span>
-								)}
+								renderTrigger={() => <span className={`cursor-pointer`}>Personas Mayores</span>}
 								className="w-48"
 							>
 								<Link to="/dashboard/personas-mayores">

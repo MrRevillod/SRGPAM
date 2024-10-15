@@ -1,18 +1,22 @@
 import React from "react"
 
-const ButtonVariants = {
-	primary: "bg-green-700 text-neutral-100",
-    secondary: "bg-white border-1 border-red-700 text-red-700",
-    delete:"bg-red-700 text-neutral-100"
+type ButtonVariant = "primary" | "secondary" | "delete" | "deny"
+
+const ButtonVariants: Record<ButtonVariant, string> = {
+	primary: "bg-primary text-neutral-100",
+	secondary:
+		"bg-light dark:bg-primary-dark border-1 border-gray-dark dark:border-gray-medium text-dark dark:text-gray-light",
+	delete: "bg-red border-none text-neutral-100",
+	deny: "bg-red border-none text-neutral-100",
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant: keyof typeof ButtonVariants
-	className?: React.ComponentProps<"button">["className"]
+	variant: ButtonVariant
+	className?: string
 	ref?: React.Ref<HTMLButtonElement>
 }
 
-export const Button = ({ variant, className, ...props }: ButtonProps) => {
+export const Button: React.FC<ButtonProps> = ({ variant, className = "", ...props }) => {
 	const classes = `px-4 py-2 rounded-lg font-semibold ${ButtonVariants[variant]} ${className}`
 	return <button className={classes} {...props} />
 }

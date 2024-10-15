@@ -2,40 +2,43 @@ import React from "react"
 import DataTable from "../../components/Table"
 import PageLayout from "../../layouts/PageLayout"
 
-import { api } from "../../lib/axios"
+import { message } from "antd"
+import { useRequest } from "../../hooks/useRequest"
 import { useNavigate } from "react-router-dom"
+import { getNewSeniors } from "../../lib/actions"
 import { useState, useEffect } from "react"
 import { Senior, UnvalidatedSenior } from "../../lib/types"
 import { UnvalidatedSeniorsColumns } from "../../lib/columns"
 
 const NewSeniorsPage: React.FC = () => {
-	const [data, setData] = useState<Senior[]>([])
-	const [loading, setLoading] = useState(true)
+	const [seniors, setSeniors] = useState<Senior[]>([])
 	const navigate = useNavigate()
 
-	const fetchSeniors = async () => {
-		try {
-			const response = await api.get("/dashboard/seniors/new")
-			setData(response.data.values.seniors)
-		} catch (err) {
-			console.log(err)
-			console.error("Error al obtener los datos de seniors")
-		} finally {
-			setLoading(false)
-		}
-	}
+	const { error, loading, data } = useRequest<Senior[]>({
+		action: getNewSeniors,
+	})
 
 	useEffect(() => {
-		fetchSeniors()
-	}, [])
+		if (data) setSeniors(data)
+	}, [data])
+
+	if (error) message.error("Error al cargar los datos")
 
 	const handleView = (senior: UnvalidatedSenior) => {
-		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, { state: { senior } })
+		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, {
+			state: { senior },
+		})
 	}
 
 	return (
 		<PageLayout pageTitle="Solicitudes de registro de personas mayores">
-			<DataTable<UnvalidatedSenior> data={data} onView={handleView} columnsConfig={UnvalidatedSeniorsColumns} />
+			<DataTable<UnvalidatedSenior>
+				data={seniors}
+				loading={loading}
+				onView={handleView}
+				viewable
+				columnsConfig={UnvalidatedSeniorsColumns}
+			/>
 		</PageLayout>
 	)
 }

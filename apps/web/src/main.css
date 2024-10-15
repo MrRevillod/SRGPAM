@@ -1,6 +1,11 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@layer tailwind-base, antd;
+
+@layer tailwind-base {
+	@tailwind base;
+}
+
+@tailwind components;
+@tailwind utilities;
 
 html {
 	font-family:
@@ -21,13 +26,6 @@ html {
 	tab-size: 4;
 	zoom: 100%;
 }
-
-/* .react-datepicker__navigation--previous,
-.react-datepicker__navigation--next {
-	display: none;
-} */
-
-
 
 /* Date picker  */
 
@@ -213,6 +211,7 @@ body {
     border-radius: 10px;
     width: 100%;
   }
+
 
 .profile-image-container {
 	position: relative;

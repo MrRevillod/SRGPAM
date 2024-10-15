@@ -7,16 +7,18 @@ import { AuthProvider } from "./context/AuthContext"
 import { ModalProvider } from "./context/ModalContext"
 import { BrowserRouter } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
-import { SocketProvider } from "./context/SocketContext"
+import { StyleProvider } from "@ant-design/cssinjs"
+// import { SocketProvider } from "./context/SocketContext"
 
 import "./main.css"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
 root.render(
-	<ThemeProvider>
-		<AuthProvider>
-			<SocketProvider>
+	<StyleProvider>
+		<ThemeProvider>
+			<AuthProvider>
+				{/* <SocketProvider> */}
 				<ModalProvider>
 					<BrowserRouter>
 						<AppLayout>
@@ -24,7 +26,8 @@ root.render(
 						</AppLayout>
 					</BrowserRouter>
 				</ModalProvider>
-			</SocketProvider>
-		</AuthProvider>
-	</ThemeProvider>,
+				{/* </SocketProvider> */}
+			</AuthProvider>
+		</ThemeProvider>
+	</StyleProvider>,
 )
