@@ -2,10 +2,13 @@ import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry"
 import { getAccessToken, getRefreshToken } from "./storage"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { SERVER_URL } from "@/constants/colors"
+import { Alert } from "react-native"
+import { AuthResponse } from "./types"
 
 export const makeAuthenticatedRequest = async (
 	url: string,
 	method: "GET" | "POST" | "PUT" | "DELETE",
+	showAlert: boolean,
 	options: AxiosRequestConfig = {},
 ): Promise<AxiosResponse | null> => {
 	try {
@@ -21,7 +24,7 @@ export const makeAuthenticatedRequest = async (
 			Authorization: `Bearer ${accessToken}, Bearer ${refreshToken}`,
 		}
 
-		const response = await axios({
+		const response = await axios<AuthResponse>({
 			url: url,
 			method,
 			...options,
@@ -29,15 +32,17 @@ export const makeAuthenticatedRequest = async (
 		})
 
 		return response
-	} catch (error) {
-		console.error("Error en la solicitud autenticada", error)
+	} catch (error: any) {
+		if (showAlert && error.response.data.message) {
+			Alert.alert("Error", error.response.data.message)
+		}
+		console.error(error.response.data.message)
 		return null
 	}
 }
 
 export const checkUniqueField = async (field: string, getValues: any, trigger: any, setError: any): Promise<boolean | undefined> => {
 	try {
-		console.log(field)
 		const fieldValue = getValues(field)
 		const isValid = await trigger(field)
 		if (isValid) {
