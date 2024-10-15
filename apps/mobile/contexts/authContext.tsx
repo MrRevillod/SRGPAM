@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		checkAuth()
+		console.warn(isAuthenticated)
 	}, [])
 
 	return <AuthContext.Provider value={{ isAuthenticated, user, role, loading, login }}>{children}</AuthContext.Provider>

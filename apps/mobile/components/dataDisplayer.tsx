@@ -7,10 +7,11 @@ type DataDisplayerProps = {
 	imgPath?: ImageSourcePropType
 	titleField: string | number
 	descriptionField?: String | number
-	actionButton?: "Ingresar" | "Cambiar"
+	actionButton?: "Ingresar" | "Cambiar" | "ELIMINAR"
+	onPress?: () => void
 }
 
-const DataDisplayer = ({ imgPath, titleField, descriptionField, actionButton }: DataDisplayerProps) => {
+const DataDisplayer = ({ imgPath, titleField, descriptionField, actionButton, onPress }: DataDisplayerProps) => {
 	return (
 		<View style={styles.dataContainer}>
 			<View style={{ flexDirection: "row", alignItems: "center", padding: width * 0.01 }}>
@@ -39,7 +40,7 @@ const DataDisplayer = ({ imgPath, titleField, descriptionField, actionButton }: 
 				)}
 			</View>
 			{actionButton && (
-				<TouchableOpacity>
+				<TouchableOpacity onPress={onPress}>
 					<Text style={{ fontSize: 16, color: Colors.green, textDecorationLine: "underline", marginHorizontal: width * 0.05 }}>
 						{actionButton}
 					</Text>
