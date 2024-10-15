@@ -29,7 +29,7 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
 		const token = signJsonwebtoken(payload, tokenOpt)
 
 		const rolePayload = { role: userRole }
-		const roleToken = signJsonwebtoken(rolePayload, AccessTokenOpts)
+		const roleToken = signJsonwebtoken(rolePayload, CustomTokenOpts("", "30d"))
 
 		const resetLink = `${services.WEB_APP.url}auth/reset-password/${user.id}/${token}/${roleToken}`
 
@@ -52,17 +52,11 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 		const { password } = req.body
 
 		const rolePayload = verifyJsonwebtoken(role, AccessTokenOpts)
-
-		if (!rolePayload.role || isValidUserRole(rolePayload.role)) throw new AppError(401, "No autorizado.")
+		if (!rolePayload.role || !isValidUserRole(rolePayload.role)) throw new AppError(401, "No autorizado.")
 
 		const user = await findUser({ id }, rolePayload.role)
 
-		if (!user) {
-			return res.status(404).json({
-				message: "Usuario no encontrado",
-				type: "error",
-			})
-		}
+		if (!user) throw new AppError(404, "Usuario no econtrado.")
 
 		verifyJsonwebtoken(token, CustomTokenOpts(user?.password || "", "30d"))
 

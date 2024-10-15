@@ -39,12 +39,12 @@ const rutSchema = z.string().refine(isValidRut, {
 
 const emailSchema = z.string().email("El correo electrónico ingresado no es válido")
 
-const pinSchema = z.string().refine((value) => value.length === 4, {
-	message: "El PIN debe tener 4 dígitos",
-})
-
 const optionalPinSchema = z.string().refine((value) => value === "" || /^[0-9]{4}$/.test(value), {
 	message: "El pin debe contener 4 dígitos numéricos",
+})
+
+const pinSchema = z.string().refine((value) => value.length === 4, {
+	message: "El PIN debe tener 4 dígitos",
 })
 
 const passwordSchema = z
@@ -55,16 +55,17 @@ const passwordSchema = z
 	.regex(/[0-9]/, "La contraseña debe contener al menos un número")
 	.regex(/[\W_]/, "La contraseña debe contener al menos un carácter especial")
 
-export const getValidationSchema = (role: string) => {
-	if (role === "SENIOR") {
-		return pinSchema
-	} else if (role === "ADMIN" || role === "PROFESSIONAL") {
-		return passwordSchema
-	} else {
-		throw new Error("Rol no válido")
-	}
+export const resetPasswordSchema = (role: "ADMIN" | "PROFESSIONAL" | "SENIOR"): any => {
+	return z
+		.object({
+			password: role === "SENIOR" ? pinSchema : passwordSchema,
+			confirmPassword: role === "SENIOR" ? pinSchema : passwordSchema,
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Las contraseñas ingresadas no coinciden",
+			path: ["confirmPassword"],
+		})
 }
-
 const optionalPasswordSchema = z
 	.string()
 	.refine(

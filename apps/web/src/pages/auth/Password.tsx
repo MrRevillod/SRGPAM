@@ -1,46 +1,53 @@
-import React, { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
-import { Input } from "../../components/ui/Input"
-import { FormProvider, useForm } from "react-hook-form"
+import React from "react"
 import { api } from "../../lib/axios"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { getValidationSchema } from "../../lib/schemas"
-import { message } from "antd"
+import { Input } from "../../components/ui/Input"
 import { Helmet } from "react-helmet"
+import { message } from "antd"
+import { useAuth } from "../../context/AuthContext"
 import { jwtDecode } from "jwt-decode"
+import { useParams } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { resetPasswordSchema } from "../../lib/schemas"
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form"
+
+interface ResetPasswordFormData {
+	password: string
+	confirmPassword: string
+}
 
 const ValidatePasswordPage: React.FC = () => {
 	const { id, token, role } = useParams()
 
-	if (!id || !role || !token) throw new Error()
+	if (!id || !role || !token) throw new Error("Datos incompletos")
 
-	const payload = jwtDecode(role) as { role: string }
+	const payload = jwtDecode<{ role: string }>(role)
 
-	const formSchemas = getValidationSchema(payload.role)
+	const validationSchema = resetPasswordSchema(payload.role as any)
 
-	const methods = useForm({
-		resolver: zodResolver(formSchemas),
+	const methods = useForm<ResetPasswordFormData>({
+		resolver: zodResolver(validationSchema),
 	})
 
 	const { handleSubmit, reset } = methods
+	const { error } = useAuth()
 
-	const onSubmit = async (data: any) => {
+	const onSubmit: SubmitHandler<ResetPasswordFormData> = async (formData) => {
 		try {
-			const response = await api.post(`/reset-password/${id}/${token}/${role}`, {
-				password: data.password,
+			const response = await api.post(`/dashboard/account/reset-password/${id}/${token}/${role}`, {
+				password: formData.password,
 			})
 
 			message.success(response.data.message)
 			reset()
 		} catch (error: any) {
-			message.error(error.response.data.message || "Error inesperado.")
+			message.error(error.response?.data?.message || "Error inesperado")
 		}
 	}
 
 	return (
-		<FormProvider {...methods}>
+		<React.Fragment>
 			<Helmet>
-				<title>Restablecer contraseña - Dirección de personas mayores de la municipalidad de Temuco</title>
+				<title>Restablecer contraseña - Dirección de personas mayores de Temuco</title>
 			</Helmet>
 
 			<div className="flex w-full login-container items-center justify-center absolute">
@@ -49,34 +56,39 @@ const ValidatePasswordPage: React.FC = () => {
 						<h2 className="text-4xl font-bold text-gray-900 text-center mb-8">Restablecer Contraseña</h2>
 						<p className="text-center text-gray-600 mb-6">Ingresa y confirma tu nueva contraseña.</p>
 
-						<form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-							<Input
-								label="Nueva Contraseña"
-								type="password"
-								name="password"
-								placeholder="Ingresa tu nueva contraseña"
-							/>
+						{error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
-							<Input
-								label="Confirmar Contraseña"
-								type="password"
-								name="confirmPassword"
-								placeholder="Confirma tu nueva contraseña"
-							/>
+						<FormProvider {...methods}>
+							<form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+								<Input
+									name="password"
+									label="Nueva Contraseña"
+									type="password"
+									placeholder="Ingresa tu nueva contraseña"
+								/>
 
-							<div className="mt-4">
-								<button
-									type="submit"
-									className="bg-green-800 text-neutral-100 rounded-lg p-2 w-full h-12 font-bold"
-								>
-									Restablecer Contraseña
-								</button>
-							</div>
-						</form>
+								<Input
+									name="confirmPassword"
+									label="Confirmar Contraseña"
+									type="password"
+									placeholder="Confirma tu nueva contraseña"
+								/>
+
+								<div className="mt-4">
+									<button
+										type="submit"
+										className="bg-green-800 text-neutral-100 rounded-lg p-2 w-full h-12 font-bold"
+									>
+										Restablecer Contraseña
+									</button>
+								</div>
+							</form>
+						</FormProvider>
 					</div>
 				</div>
 			</div>
-		</FormProvider>
+		</React.Fragment>
 	)
 }
+
 export default ValidatePasswordPage
