@@ -25,7 +25,7 @@ const NewSeniorsPage: React.FC = () => {
 	if (error) message.error("Error al cargar los datos")
 
 	const handleView = (senior: UnvalidatedSenior) => {
-		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, {
+		navigate(`/personas-mayores/solicitud-de-registro`, {
 			state: { senior },
 		})
 	}

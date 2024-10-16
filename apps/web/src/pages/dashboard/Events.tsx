@@ -72,7 +72,7 @@ const EventsPage: React.FC = () => {
 	}, [events])
 
 	return (
-		<PageLayout pageTitle="Eventos" create={true}>
+		<PageLayout pageTitle="Agenda y horas de atención" create={true}>
 			<FullCalendar
 				plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
 				initialView="dayGridMonth"

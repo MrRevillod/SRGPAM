@@ -15,19 +15,19 @@ import "./main.css"
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
 root.render(
-	<StyleProvider>
-		<ThemeProvider>
-			<AuthProvider>
-				{/* <SocketProvider> */}
-				<ModalProvider>
-					<BrowserRouter>
+	<BrowserRouter>
+		<StyleProvider>
+			<ThemeProvider>
+				<AuthProvider>
+					{/* <SocketProvider> */}
+					<ModalProvider>
 						<AppLayout>
 							<Router />
 						</AppLayout>
-					</BrowserRouter>
-				</ModalProvider>
-				{/* </SocketProvider> */}
-			</AuthProvider>
-		</ThemeProvider>
-	</StyleProvider>,
+					</ModalProvider>
+					{/* </SocketProvider> */}
+				</AuthProvider>
+			</ThemeProvider>
+		</StyleProvider>
+	</BrowserRouter>,
 )

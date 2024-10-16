@@ -10,12 +10,14 @@ import { LoginFormSchema } from "../../lib/schemas"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 
 const LoginPage: React.FC = () => {
+	const lastLoginRole = localStorage.getItem("role")
+
 	const methods = useForm({
 		resolver: zodResolver(LoginFormSchema),
 	})
 
 	const { handleSubmit } = methods
-	const { login, error, role } = useAuth()
+	const { login, error } = useAuth()
 
 	const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
 		await login(formData)
@@ -35,7 +37,7 @@ const LoginPage: React.FC = () => {
 							Dirección de personas mayores de la municipalidad de Temuco.
 						</p>
 
-						{error && <p className="text-red-600 text-center mb-4">{error}</p>}
+						{error && <p className="text-red text-center mb-4">{error}</p>}
 
 						<FormProvider {...methods}>
 							<form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit as any)}>
@@ -62,7 +64,7 @@ const LoginPage: React.FC = () => {
 										{ value: "ADMIN", label: "Administrador" },
 										{ value: "PROFESSIONAL", label: "Profesional" },
 									]}
-									defaultValue={role || "ADMIN"}
+									defaultValue={lastLoginRole || "ADMIN"}
 								/>
 
 								<div className="mt-4">

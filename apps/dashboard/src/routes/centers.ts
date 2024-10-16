@@ -13,15 +13,15 @@ const router: Router = Router()
 // -- Endpoints CRUD
 
 // Obtener todos los centros
-router.get("/", validateRole("ADMIN"), centers.getAll)
+router.get("/", validateRole(["ADMIN", "PROFESSIONAL"]), centers.getAll)
 
 // Crear un centro de atención, requiere validación de rol ADMIN.
-router.post("/", singleImageupload, validateRole("ADMIN"), validateSchema(Create), centers.create)
+router.post("/", singleImageupload, validateRole(["ADMIN"]), validateSchema(Create), centers.create)
 
 // Actualizar un centro de atención por id, requiere validación de rol ADMIN.
-router.patch("/:id", singleImageupload, validateRole("ADMIN"), validateSchema(Update), centers.updateById)
+router.patch("/:id", singleImageupload, validateRole(["ADMIN"]), validateSchema(Update), centers.updateById)
 
 // Eliminar un centro de atención por id requiere validación de rol ADMIN.
-router.delete("/:id", validateRole("ADMIN"), centers.deleteById)
+router.delete("/:id", validateRole(["ADMIN"]), centers.deleteById)
 
 export default router

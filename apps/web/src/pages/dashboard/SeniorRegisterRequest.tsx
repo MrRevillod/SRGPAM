@@ -23,13 +23,13 @@ const SeniorRegisterRequestPage: React.FC = () => {
 	const { reset, handleSubmit } = methods
 
 	useEffect(() => {
-		if (!senior) navigate("/dashboard/personas-mayores/nuevos")
+		if (!senior) navigate("/personas-mayores/nuevos")
 		else reset({ rut: senior.id, email: senior.email })
 	}, [senior])
 
 	const AcceptMutation = useMutation<void>({
 		mutateFn: async () => {
-			return await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
+			return await api.patch(`/seniors/${senior.id}/new?validate=true`)
 		},
 	})
 
@@ -44,7 +44,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 			params: { body: formData },
 			onSuccess: () => {
 				message.success("Solicitud aceptada")
-				navigate("/dashboard/personas-mayores/nuevos")
+				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
 				message.error("Error al aceptar la solicitud. Intente nuevamente.")
@@ -57,7 +57,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 		await DenyMutation.mutate({
 			onSuccess: () => {
 				message.success("Solicitud denegada")
-				navigate("/dashboard/personas-mayores/nuevos")
+				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
 				message.error("Error al denegar la solicitud. Intente nuevamente.")
@@ -108,7 +108,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 								<Button
 									variant="secondary"
 									type="button"
-									onClick={() => navigate("/dashboard/personas-mayores/nuevos")}
+									onClick={() => navigate("/personas-mayores/nuevos")}
 								>
 									Cancelar
 								</Button>

@@ -8,12 +8,12 @@ export type BaseDataType = {
 	id: string | number
 }
 
-export type LoginVariant = "ADMIN" | "PROFESSIONAL"
+export type UserRole = "ADMIN" | "PROFESSIONAL"
 
 export type LoginFormData = {
 	email: string
 	password: string
-	role: LoginVariant
+	role: UserRole
 }
 
 interface IUser {

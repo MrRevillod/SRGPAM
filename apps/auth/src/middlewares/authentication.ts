@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { AppError, findUser, isValidUserRole } from "@repo/lib"
+import { AppError, findUser, isValidUserRole, UserRole } from "@repo/lib"
 import { verifyJsonwebtoken, AccessTokenOpts, getServerTokens } from "@repo/lib"
 
 // Middleware que se encarga de verificar y validar una sesión
@@ -17,7 +17,6 @@ export const sessionMiddleware = async (req: Request, res: Response, next: NextF
 		}
 		const accessToken = accessCookie || accessHeaderToken
 
-		console.log("TOKEN FROM AUTH", accessToken)
 		if (!accessToken) throw new AppError(401, "No tienes autorización para acceder a este recurso")
 
 		const payload = verifyJsonwebtoken(accessToken, AccessTokenOpts)
@@ -48,16 +47,19 @@ export const authenticationByRole = async (req: Request, res: Response, next: Ne
 	// Se obtiene el rol requerido para acceder al recurso
 	// desde la URL de la petición "/validate-role/ADMIN
 	const requiredRole = req.params.role
+	const requestedRoles = requiredRole.split(",") as UserRole[]
 
 	try {
-		if (!isValidUserRole(requiredRole)) {
-			throw new AppError(401, "No tienes permisos para acceder a este recurso")
-		}
+		requestedRoles.forEach((role) => {
+			if (!isValidUserRole(role)) {
+				throw new AppError(400, "El rol solicitado no es válido")
+			}
+		})
 
 		// Se obtiene el rol del usuario que está realizando la petición
-		const currentUserRole = req.getExtension("role")
+		const currentUserRole = req.getExtension("role") as UserRole
 
-		if (currentUserRole !== requiredRole) {
+		if (!requestedRoles.includes(currentUserRole)) {
 			throw new AppError(401, "No tienes permisos para acceder a este recurso")
 		}
 
