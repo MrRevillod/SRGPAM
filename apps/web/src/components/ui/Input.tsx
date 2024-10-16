@@ -3,7 +3,6 @@ import React from "react"
 
 import { Link } from "react-router-dom"
 import { Show } from "./Show"
-import { Tooltip } from "antd"
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { AiFillExclamationCircle, AiFillEye } from "react-icons/ai"

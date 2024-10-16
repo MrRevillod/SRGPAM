@@ -30,7 +30,7 @@ const DatetimeSelect = ({ label, name, defaultValue }: { label: string; name: st
 			setValue(name, startsAtValue)
 			setDate(dayjs(startsAtValue))
 		}
-	}, [defaultValue, name, setValue, getValues, startsAtValue])
+	}, [defaultValue, name, startsAtValue])
 
 	useEffect(() => {
 		if (!isModalOpen) {

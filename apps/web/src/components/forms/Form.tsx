@@ -8,10 +8,7 @@ import { message, UploadFile } from "antd"
 import { buildRequestBody, handleFormError } from "../../lib/form"
 import { Dispatch, ReactNode, SetStateAction } from "react"
 import { FieldValues, SubmitHandler, useFormContext } from "react-hook-form"
-import { buildRequestBody, handleConflicts } from "../../lib/form"
-import { Show } from "../ui/Show"
-
-import { BaseDataType, MutateAction, MutationResponse, Nullable } from "../../lib/types"
+import { BaseDataType, MutateAction, MutationResponse } from "../../lib/types"
 
 interface FormProps<T> {
 	data: T[]
@@ -19,18 +16,29 @@ interface FormProps<T> {
 	action: MutateAction
 	children: ReactNode
 	actionType: "update" | "create"
-  deleteable?: boolean
+	deletable?: boolean
 }
 
-export const Form = <T extends BaseDataType>({ data, setData, action, actionType, children }: FormProps<T>) => {
+export const Form = <T extends BaseDataType>({
+	data,
+	setData,
+	action,
+	actionType,
+	deletable,
+	children,
+}: FormProps<T>) => {
 	const { handleSubmit, reset, setError } = useFormContext()
-  const { handleOk, handleCancel, setSelectedData, handleDelete } = useModal()
+	const { handleOk, handleCancel, selectedData, handleDelete } = useModal()
 
 	const [imageFile, setImageFile] = useState<UploadFile[]>([])
 
 	const onCancel = () => {
 		handleCancel()
 		setImageFile([])
+	}
+
+	const onDelete = () => {
+		handleDelete()
 	}
 
 	const mutation = useMutation<MutationResponse<T>>({
@@ -84,11 +92,11 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 				return child
 			})}
 			<div className="flex flex-row gap-4 w-full justify-end -mb-6">
-				{deleteable &&
+				{deletable && (
 					<Button type="button" className="justify" variant="delete" onClick={onDelete}>
 						Eliminar
 					</Button>
-				}
+				)}
 				<Button type="button" variant="secondary" onClick={onCancel}>
 					Cancelar
 				</Button>
@@ -100,4 +108,3 @@ export const Form = <T extends BaseDataType>({ data, setData, action, actionType
 		</form>
 	)
 }
-

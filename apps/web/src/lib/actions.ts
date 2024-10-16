@@ -116,3 +116,21 @@ export const updateService = async (props: MutateActionProps) => {
 export const deleteService = async (props: MutateActionProps) => {
 	return await apiRequest.delete("/dashboard/services", props)
 }
+
+// Acciones CRUD para los eventos
+
+export const getEvents = async (props: QueryActionProps) => {
+	return await apiRequest.get(`/dashboard/events${props.query ? "?" + props.query : ""}`)
+}
+
+export const createEvent = async (props: MutateActionProps) => {
+	return await apiRequest.post("/dashboard/events", props)
+}
+
+export const updateEvent = async (props: MutateActionProps) => {
+	return await apiRequest.patch("/dashboard/events", props)
+}
+
+export const deleteEvent = async (props: MutateActionProps) => {
+	return await apiRequest.delete("/dashboard/events", props)
+}

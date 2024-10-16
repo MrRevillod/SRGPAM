@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import Form from "../Form"
+import { Form } from "../Form"
 import "react-datetime/css/react-datetime.css"
 import { EventSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
@@ -7,13 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Event, FormProps, Professional, Service } from "../../../lib/types"
 import { api } from "../../../lib/axios"
 import { SuperSelect } from "../../ui/SuperSelect"
-import Loading from "../../Loading"
 import { Modal } from "../../Modal"
-import { ModalProvider, useModal } from "../../../context/ModalContext"
+import { useModal } from "../../../context/ModalContext"
 import DatetimeSelect from "../../ui/DatetimeSelect"
 import dayjs from "dayjs"
-import { Input } from "../../ui/Input"
 import { BooleanSelect } from "../../ui/BooleanSelect"
+import { updateEvent } from "../../../lib/actions"
 
 type SelectValues = {
 	value: string | number
@@ -23,15 +22,14 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 	const methods = useForm({
 		resolver: zodResolver(EventSchemas.Update),
 	})
-	const { selectedData, showModal } = useModal()
 
-	const [professionals, setProfessionals] = useState<SelectValues[]>()
-	// const [services, setServices] = useState<SelectValues[]>()
+	const { selectedData } = useModal()
 	const [centers, setCenters] = useState<SelectValues[]>()
+	const [professionals, setProfessionals] = useState<SelectValues[]>()
 
 	const getProfessionals = async () => {
 		const res = await api.get("/dashboard/professionals")
-		const values = await res.data.values?.professionals
+		const values = await res.data.values
 		const proffesionals_tem = new Array<SelectValues>()
 		values.forEach((pfs: Professional) => {
 			proffesionals_tem.push({
@@ -42,24 +40,9 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 		setProfessionals(proffesionals_tem)
 	}
 
-	// const getServices = async () => {
-	// 	const res = await api.get("/dashboard/services")
-	// 	const values = await res.data.values?.services
-
-	// 	const temp = new Array<SelectValues>()
-
-	// 	values.forEach((pfs: Service) => {
-	// 		temp.push({
-	// 			label: pfs.name,
-	// 			value: pfs.id,
-	// 		})
-	// 	})
-	// 	setServices(temp)
-	// }
-
 	const getCenters = async () => {
 		const res = await api.get("/dashboard/centers")
-		const values = await res.data.values?.centers
+		const values = await res.data.values
 
 		const temp = new Array<SelectValues>()
 
@@ -74,37 +57,23 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 
 	useEffect(() => {
 		if (selectedData) {
-			methods.setValue("serviceId", selectedData.serviceId)
+			methods.setValue("serviceId", selectedData.serviceId, { shouldDirty: true })
 		}
 		getProfessionals()
-		// getServices()
-        getCenters()
-        console.log(selectedData)
+		getCenters()
+		console.log(selectedData)
 	}, [selectedData])
 
 	return (
 		<Modal type="Edit" title="Editar un evento">
 			<FormProvider {...methods}>
-				<Form
-					entityName="Evento"
-					data={new Array<any>()}
-					setData={() => {}}
-					apiEndpoint={`/dashboard/events/${selectedData?.id}`}
-					method="PATCH"
-					deleteable
-				>
+				<Form data={[]} setData={() => {}} action={updateEvent} actionType="update" deletable>
 					<SuperSelect
 						label="Seleccione el profesional"
 						name="professionalId"
 						options={professionals}
 						defaultValue={selectedData?.professionalId}
 					/>
-					{/* <SuperSelect
-						label="Seleccione el servicio"
-						name="serviceId"
-						options={services}
-						defaultValue={selectedData?.serviceId}
-					/> */}
 
 					<SuperSelect
 						label="Seleccione el centro de atención (opcional)"
@@ -124,15 +93,15 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 							defaultValue={dayjs(selectedData?.endsAt)}
 						/>
 					</div>
-                    <BooleanSelect
-                        name={"assistance"}
-                        defaultValue={selectedData?.assistance}
-                        options={[
-                            { label: "Asistió", value: true },
-                            { label: "No asistió", value: false },
-                        ]}
-                        setValue={methods.setValue}
-                    />
+					<BooleanSelect
+						name={"assistance"}
+						defaultValue={selectedData?.assistance}
+						options={[
+							{ label: "Asistió", value: true },
+							{ label: "No asistió", value: false },
+						]}
+						setValue={methods.setValue}
+					/>
 				</Form>
 			</FormProvider>
 		</Modal>

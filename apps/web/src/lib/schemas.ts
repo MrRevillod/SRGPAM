@@ -1,6 +1,4 @@
 import { z } from "zod"
-import { UploadFile } from "antd"
-
 import * as rules from "./validationRules"
 
 export const LoginFormSchema = z.object({
@@ -8,30 +6,6 @@ export const LoginFormSchema = z.object({
 	password: z.string().min(1, "La contraseña es requerida"),
 	role: z.enum(["ADMIN", "PROFESSIONAL"]),
 })
-
-const ALLOWED_IMAGE_FORMATS = ["image/jpeg", "image/png", "image/webp"]
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024
-
-const imageSchemaCreate = z
-	.any()
-	.refine((file) => !!file, {
-		message: "La imagen es obligatoria",
-	})
-	.refine((file) => ALLOWED_IMAGE_FORMATS.includes(file?.type), {
-		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
-	})
-	.refine((file) => file?.size <= MAX_IMAGE_SIZE, {
-		message: "El tamaño máximo de la imagen es de 5 MB",
-	})
-
-const imageSchemaUpdate = z
-	.any()
-	.refine((file) => !file || ALLOWED_IMAGE_FORMATS.includes(file?.type || ""), {
-		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
-	})
-	.refine((file) => !file || (file?.size || 0) <= MAX_IMAGE_SIZE, {
-		message: "El tamaño máximo de la imagen es de 5 MB",
-	})
 
 export const SeniorSchemas = {
 	MobileRegister: z.object({
@@ -61,15 +35,13 @@ export const SeniorSchemas = {
 			path: ["confirmPassword"],
 		}),
 
-	Validate: z
-		.object({
-			rut: rules.rutSchema,
-			name: rules.nameSchema,
-			email: rules.emailSchema,
-			address: rules.addressSchema,
-			birthDate: rules.birthDateSchema,
-		})
-		
+	Validate: z.object({
+		rut: rules.rutSchema,
+		name: rules.nameSchema,
+		email: rules.emailSchema,
+		address: rules.addressSchema,
+		birthDate: rules.birthDateSchema,
+	}),
 }
 
 export const AdministratorSchemas = {
@@ -85,7 +57,7 @@ export const AdministratorSchemas = {
 			email: rules.emailSchema,
 			password: rules.optionalPasswordSchema,
 			confirmPassword: rules.optionalPasswordSchema,
-      image: imageSchemaUpdate,
+			image: rules.imageSchemaUpdate,
 		})
 		.refine((data) => data.password === data.confirmPassword, {
 			message: "Las contraseñas ingresadas no coinciden",
@@ -141,10 +113,10 @@ export const EventSchemas = {
 		.object({
 			startsAt: dateTimeSchema,
 			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
+			professionalId: rules.rutSchema,
 			serviceId: z.number(),
-			seniorId: z.optional(rutSchema),
-			centerId: z.optional(z.string()),
+			seniorId: z.optional(rules.rutSchema),
+			centerId: z.optional(z.number().nullable()),
 		})
 		.refine((data) => data.startsAt < data.endsAt, {
 			path: ["endsAt", "startsAt"],
@@ -155,10 +127,10 @@ export const EventSchemas = {
 		.object({
 			startsAt: dateTimeSchema,
 			endsAt: dateTimeSchema,
-			professionalId: rutSchema,
+			professionalId: rules.rutSchema,
 			serviceId: z.number(),
-			assistance: z.optional(z.boolean()),
-			seniorId: z.optional(rutSchema),
+			assistance: z.optional(z.boolean().nullable()),
+			seniorId: z.optional(rules.rutSchema),
 			centerId: z.optional(z.number().nullable()),
 		})
 		.refine((data) => data.startsAt < data.endsAt, {

@@ -10,7 +10,7 @@ interface ModalProps {
 	children: React.ReactNode
 }
 
-export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
+export const Modal: React.FC<ModalProps> = ({ title, type, loading, children }) => {
 	const { isModalOpen, handleOk, handleCancel, modalType, handleClose } = useModal()
 
 	return (
@@ -20,8 +20,8 @@ export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
 			onOk={handleOk}
 			onCancel={handleCancel}
 			closable={true}
-      footer={[]}
-      onClose={handleClose}
+			footer={[]}
+			onClose={handleClose}
 			loading={loading}
 		>
 			{children}

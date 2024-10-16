@@ -109,24 +109,26 @@ export const phoneSchema = z
 	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
 	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
 
+const ALLOWED_IMAGE_FORMATS = ["image/jpeg", "image/png", "image/webp"]
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+
 export const imageSchemaCreate = z
 	.any()
-	.refine((files) => files?.length === 1, "La imagen es obligatoria")
-	.refine((files) => files?.[0]?.size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
-	.refine(
-		(files) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files?.[0]?.type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP",
-	)
+	.refine((file) => !!file, {
+		message: "La imagen es obligatoria",
+	})
+	.refine((file) => ALLOWED_IMAGE_FORMATS.includes(file?.type), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => file?.size <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
 
 export const imageSchemaUpdate = z
 	.any()
-	.nullable()
-	.refine((files) => !files || files.length === 0 || files.length === 1, "Solo puedes subir una imagen")
-	.refine((files) => !files || files.length === 0 || files[0].size <= 5 * 1048576, "La imagen debe ser menor a 5MB")
-	.refine(
-		(files) =>
-			!files ||
-			files.length === 0 ||
-			["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(files[0].type),
-		"Formato de imagen no permitido. Solo se permiten JPEG, PNG, JPG y WEBP",
-	)
+	.refine((file) => !file || ALLOWED_IMAGE_FORMATS.includes(file?.type || ""), {
+		message: "Formato de imagen no válido. Debe ser .jpg, .jpeg, .png o .webp",
+	})
+	.refine((file) => !file || (file?.size || 0) <= MAX_IMAGE_SIZE, {
+		message: "El tamaño máximo de la imagen es de 5 MB",
+	})

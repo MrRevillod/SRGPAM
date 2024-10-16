@@ -11,7 +11,6 @@ import { useRequest } from "../../hooks/useRequest"
 import { SeniorsColumns } from "../../lib/columns"
 import { useState, useEffect } from "react"
 import { deleteSenior, getSeniors } from "../../lib/actions"
-import { useNavigate } from "react-router-dom"
 
 const SeniorsPage: React.FC = () => {
 	const [seniors, setSeniors] = useState<Senior[]>([])

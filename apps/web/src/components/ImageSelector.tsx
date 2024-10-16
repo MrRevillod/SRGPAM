@@ -1,10 +1,10 @@
 import React from "react"
 import ImgCrop from "antd-img-crop"
 
-import { Dispatch, SetStateAction } from "react"
 import { Upload } from "antd"
 import { FileType } from "../lib/types"
 import { UploadFile, UploadProps } from "antd"
+import { Dispatch, SetStateAction } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 
 interface ImageSelectorProps {

@@ -59,7 +59,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 
 					<Show when={create != undefined}>
 						<button
-							className="bg-green-600 text-light font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
+							className="bg-primary text-light font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
 							onClick={() => create && showModal("Create", null)}
 						>
 							Nuevo
