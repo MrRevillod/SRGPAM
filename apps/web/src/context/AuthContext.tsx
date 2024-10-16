@@ -5,6 +5,10 @@ import { Dispatch, SetStateAction } from "react"
 import { LoginFormData, LoginVariant, User } from "../lib/types"
 import { createContext, ReactNode, useEffect, useState } from "react"
 
+// Contexto para manejar la autenticación de los usuarios
+// Se utiliza un contexto ya que la autenticación es necesaria
+// en toda la aplicación web
+
 interface AuthContextType {
 	isAuthenticated: boolean
 	user: User | null
@@ -19,6 +23,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// isAuthenticated: Indica si el usuario está autenticado o no
+// user: Datos del usuario autenticado
+// loading: Indica si la petición está en proceso
+// error: Mensaje de error en caso de que ocurra un error
+// role: Rol del usuario autenticado
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
 	const [user, setUser] = useState<User | null>(null)
@@ -26,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [error, setError] = useState<string | null>(null)
 	const [role, setRole] = useState<LoginVariant | null>(null)
 
+	// login: Función para iniciar sesión en la aplicación
 	const login = async (credentials: LoginFormData) => {
 		setLoading(true)
 
@@ -33,7 +44,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await api.post(`/auth/login?variant=${credentials.role}`, {
 				email: credentials.email,
 				password: credentials.password,
-			})
+            })
+            console.log(response)
 			setUser(response.data.values.user)
 			setIsAuthenticated(true)
 			setError(null)
@@ -47,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(false)
 	}
 
+	// logout: Función para cerrar sesión en la aplicación
 	const logout = async () => {
 		setLoading(true)
 
@@ -63,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(false)
 	}
 
+	// checkAuth: Función para validar la autenticación del usuario
 	const checkAuth = async () => {
 		setLoading(true)
 
@@ -78,6 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setLoading(false)
 	}
 
+	// refreshToken: Función para refrescar el token de autenticación
 	const refreshToken = async () => {
 		setLoading(true)
 

@@ -1,61 +1,35 @@
 import React, { useEffect, useState } from "react"
-import Form from "../Form"
+import { Form } from "../Form"
 import "react-datetime/css/react-datetime.css"
 import { EventSchemas } from "../../../lib/schemas"
-import { useForm } from "react-hook-form"
+import { FormProvider, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Event, Professional, Service, UpdateEntityFormProps } from "../../../lib/types"
-import { DatetimeSelect } from "../../ui/DatetimeSelect"
+import { Event, FormProps, Professional, Service } from "../../../lib/types"
 import { api } from "../../../lib/axios"
 import { SuperSelect } from "../../ui/SuperSelect"
-import Loading from "../../Loading"
+import { Modal } from "../../Modal"
+import { useModal } from "../../../context/ModalContext"
+import DatetimeSelect from "../../ui/DatetimeSelect"
+import dayjs from "dayjs"
+import { BooleanSelect } from "../../ui/BooleanSelect"
+import { updateEvent } from "../../../lib/actions"
 
 type SelectValues = {
 	value: string | number
 	label: string
 }
-const UpdateEvent: React.FC<UpdateEntityFormProps<Event>> = ({ visible, onCancel, onOk, data, setData, entity }) => {
-	const formContext = useForm({
+const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
+	const methods = useForm({
 		resolver: zodResolver(EventSchemas.Update),
-		defaultValues: {
-			startsAt: new Date(entity?.startsAt || "").valueOf(),
-			endsAt: new Date(entity?.endsAt || "").valueOf(),
-			professionalId: entity?.professionalId || "",
-			serviceId: entity?.serviceId || 0,
-		},
 	})
 
+	const { selectedData } = useModal()
+	const [centers, setCenters] = useState<SelectValues[]>()
 	const [professionals, setProfessionals] = useState<SelectValues[]>()
-	const [services, setServices] = useState<SelectValues[]>()
 
-	const [profs, setProfs] = useState<Professional[]>()
-	const [servs, setServs] = useState<Service[]>()
-
-	const [service, setService] = useState<SelectValues>()
-	const [professional, setProfessional] = useState<SelectValues>()
-
-	const setProf = () => {
-		profs?.forEach((pfs: Professional) => {
-			if (pfs.id == entity?.professionalId)
-				setProfessional({
-					label: pfs.name,
-					value: pfs.id,
-				})
-		})
-	}
-	const setServ = () => {
-		servs?.forEach((pfs: Service) => {
-			if (pfs.id == entity?.serviceId)
-				setService({
-					label: pfs.name,
-					value: pfs.id,
-				})
-		})
-	}
 	const getProfessionals = async () => {
 		const res = await api.get("/dashboard/professionals")
-		const values = await res.data.values?.professionals
-		setProfs(values)
+		const values = await res.data.values
 		const proffesionals_tem = new Array<SelectValues>()
 		values.forEach((pfs: Professional) => {
 			proffesionals_tem.push({
@@ -66,10 +40,9 @@ const UpdateEvent: React.FC<UpdateEntityFormProps<Event>> = ({ visible, onCancel
 		setProfessionals(proffesionals_tem)
 	}
 
-	const getServices = async () => {
-		const res = await api.get("/dashboard/services")
-		const values = await res.data.values?.services
-		setServs(values)
+	const getCenters = async () => {
+		const res = await api.get("/dashboard/centers")
+		const values = await res.data.values
 
 		const temp = new Array<SelectValues>()
 
@@ -78,103 +51,60 @@ const UpdateEvent: React.FC<UpdateEntityFormProps<Event>> = ({ visible, onCancel
 				label: pfs.name,
 				value: pfs.id,
 			})
-			if (pfs.id == entity?.serviceId)
-				setService({
-					label: pfs.name,
-					value: pfs.id,
-				})
 		})
-		setServices(temp)
+		setCenters(temp)
 	}
 
 	useEffect(() => {
-		getProfessionals()
-		getServices()
-		console.log(entity)
-	}, [entity])
-
-	useEffect(() => {
-		setServ()
-		setProf()
-	}, [servs, profs, entity])
-
-	const {
-		formState: { errors },
-		control,
-		setValue,
-        getValues,
-        reset
-	} = formContext
-
-	useEffect(() => {
-		console.log(entity)
-		if (entity) {
-			setValue("startsAt", new Date(entity.startsAt).valueOf())
-			setValue("endsAt", new Date(entity.endsAt).valueOf() )
-			setValue("professionalId", entity.professionalId)
-			setValue("serviceId", entity.serviceId || 0)
+		if (selectedData) {
+			methods.setValue("serviceId", selectedData.serviceId, { shouldDirty: true })
 		}
-	}, [entity])
+		getProfessionals()
+		getCenters()
+		console.log(selectedData)
+	}, [selectedData])
 
-    useEffect(() => {
-        if (!visible) {
-            reset()
-        }
-    },[visible])
 	return (
-		<Form
-			modalTitle="Editar un evento"
-			entityName="Evento"
-			onOk={onOk}
-			data={data}
-			setData={setData}
-			visible={visible}
-			onCancel={onCancel}
-			apiEndpoint={`/dashboard/events/${entity?.id || 0}`}
-			formContext={formContext as any}
-			method="PATCH"
-		>
-			<>
-				<h3> {errors.professionalId && errors.professionalId.message?.toString()}</h3>
-				<SuperSelect
-					control={control}
-					label="Seleccione el profesional"
-					name="professionalId"
-					options={professionals}
-					setValue={setValue}
-					getValues={getValues}
-					defaultValue={professional}
-				/>
-				<h3> {errors.serviceId && errors.serviceId.message?.toString()}</h3>
-				<SuperSelect
-					control={control}
-					label="Seleccione el servicio"
-					name="serviceId"
-					options={services}
-					setValue={setValue}
-					getValues={getValues}
-					defaultValue={service}
-				/>
-				<h3> {errors.startsAt && errors.startsAt.message?.toString()}</h3>
-				<DatetimeSelect
-					getValues={getValues}
-					control={control}
-					setValue={setValue}
-					name="startsAt"
-					label="Fecha y hora de inicio"
-					preDate={new Date(entity?.startsAt || "")}
-				/>
-				<h3> {errors.endsAt && errors.endsAt.message?.toString()}</h3>
-				<DatetimeSelect
-					getValues={getValues}
-					control={control}
-					setValue={setValue}
-					name="endsAt"
-					label="Fecha y hora de término"
-					preDate={new Date(entity?.endsAt || "")}
-				/>
-			</>
-		</Form>
+		<Modal type="Edit" title="Editar un evento">
+			<FormProvider {...methods}>
+				<Form data={[]} setData={() => {}} action={updateEvent} actionType="update" deletable>
+					<SuperSelect
+						label="Seleccione el profesional"
+						name="professionalId"
+						options={professionals}
+						defaultValue={selectedData?.professionalId}
+					/>
+
+					<SuperSelect
+						label="Seleccione el centro de atención (opcional)"
+						name="centerId"
+						options={centers}
+						defaultValue={selectedData?.centerId}
+					/>
+					<div className="flex  gap-2 justify-between">
+						<DatetimeSelect
+							label="Seleccione fecha y hora de inicio del evento"
+							name="startsAt"
+							defaultValue={dayjs(selectedData?.startsAt)}
+						/>
+						<DatetimeSelect
+							label="Seleccione fecha y hora de término del evento"
+							name="endsAt"
+							defaultValue={dayjs(selectedData?.endsAt)}
+						/>
+					</div>
+					<BooleanSelect
+						name={"assistance"}
+						defaultValue={selectedData?.assistance}
+						options={[
+							{ label: "Asistió", value: true },
+							{ label: "No asistió", value: false },
+						]}
+						setValue={methods.setValue}
+					/>
+				</Form>
+			</FormProvider>
+		</Modal>
 	)
 }
 

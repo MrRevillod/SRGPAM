@@ -4,18 +4,17 @@ import { io, Socket } from "socket.io-client"
 import { useAuth } from "./AuthContext"
 
 interface SocketState {
-	socket: Socket
+	socket: Socket | undefined
 }
 
 const SocketContext = createContext<SocketState | undefined>(undefined)
 
 export const SocketProvider = ({ children }: { children?: ReactNode }) => {
 	const { user, role, isAuthenticated } = useAuth()
-	const [socket, setSocket] = useState<Socket>(io())
+	const [socket, setSocket] = useState<Socket>()
 
 	useEffect(() => {
 		if (isAuthenticated) {
-			socket.disconnect()
 			const newSocket = io(import.meta.env.DASHBOARD_SERVICE_URL || "http://localhost:5000", {
 				query: { userId: user?.id, userRole: role },
             })
@@ -24,7 +23,7 @@ export const SocketProvider = ({ children }: { children?: ReactNode }) => {
             })
         
             newSocket.on("disconnect", (reason) => {
-                if (socket.active) {
+                if (newSocket.active) {
                     console.log("....reconectando socket")
                 } else {
                     // La conexión se cerró forzosamente por el cliente o el servidor
@@ -36,13 +35,12 @@ export const SocketProvider = ({ children }: { children?: ReactNode }) => {
             newSocket.on("newEvent", (event) => {
                 console.log(event)
             })
+
 			setSocket(newSocket)
 		}
 	}, [user, role, isAuthenticated])
 
-
-
-	return <SocketContext.Provider value={{ socket: socket }}>{children}</SocketContext.Provider>
+	return <SocketContext.Provider value={{ socket: socket  }}>{children}</SocketContext.Provider>
 }
 
 export const useSocket = (): SocketState => {

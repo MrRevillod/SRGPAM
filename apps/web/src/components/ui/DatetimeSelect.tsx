@@ -1,82 +1,69 @@
 import React, { useEffect, useState } from "react"
-import { Control, Controller, FieldValues, UseFormSetValue } from "react-hook-form"
-import Datetime from "react-datetime"
+import { ConfigProvider, DatePicker, Space } from "antd"
+import { Controller, useFormContext } from "react-hook-form"
+import { useModal } from "../../context/ModalContext"
+import dayjs, { Dayjs } from "dayjs"
+import locale from "antd/locale/es_ES"
 
-export const DatetimeSelect = ({
-	control,
-	name,
-	label,
-	setValue,
-	getValues,
-	preDate,
-	setDate,
-}: {
-	control: Control<any>
-	name: string
-	label: string
-	setValue: UseFormSetValue<any>
-	getValues: any
-	preDate?: Date
-	setDate?: React.Dispatch<React.SetStateAction<Date|undefined>>
-}) => {
-	const [valor, setValor] = useState<any>("")
-	const [initDate, setInitDate] = useState<Date>(preDate || new Date())
+const DatetimeSelect = ({ label, name, defaultValue }: { label: string; name: string; defaultValue?: Dayjs }) => {
+	const {
+		setValue,
+		formState: { errors },
+		control,
+		getValues,
+		watch, // Permite observar cambios en los valores
+	} = useFormContext()
 
-    useEffect(() => {
-        if (getValues(name) === undefined) {
-            console.log("xd")
-			setValor("")
-        }
-        
-	}, [getValues(name)])
+	const [date, setDate] = useState<Dayjs | null>(defaultValue || null)
+	const { isModalOpen } = useModal()
 
-    useEffect(() => {
-        if (preDate) {
-            setValor(
-                new Date(preDate.valueOf()).toLocaleDateString() +
-                "   " +
-                new Date(preDate.valueOf()).toLocaleTimeString(),
-            )
-            setValue(name, preDate.valueOf())
-            setInitDate(preDate)
-        }
-        
-    }, [preDate])
-    
-	const renderInput = (props: any, openCalendar: any, closeCalendar: any) => {
-		return <input {...props} value={valor} readOnly={true} />
-	}
+	// Observar el valor de startsAt
+	const startsAtValue = watch("startsAt")
+
+	useEffect(() => {
+		// Actualiza el valor del campo cuando cambia el defaultValue
+		if (defaultValue) {
+			setValue(name, defaultValue.valueOf())
+			setDate(defaultValue)
+		} else if (name === "endsAt" && !getValues(name) && startsAtValue) {
+			// Auto rellena endsAt cuando startsAt tiene un valor y endsAt está vacío
+			setValue(name, startsAtValue)
+			setDate(dayjs(startsAtValue))
+		}
+	}, [defaultValue, name, startsAtValue])
+
+	useEffect(() => {
+		if (!isModalOpen) {
+			setDate(null)
+		}
+	}, [isModalOpen])
+
 	return (
-		<>
-			<label htmlFor={name} className="font-semibold text-neutral-950">
-				{label}
-			</label>
-
-			<Datetime
-				onChange={(value) => {
-					setValor(
-						new Date(value.valueOf()).toLocaleDateString() +
-							"   " +
-							new Date(value.valueOf()).toLocaleTimeString(),
-					)
-					setValue(name, value.valueOf())
-				}}
-				initialViewMode={"time"}
-				initialViewDate={initDate}
-				renderInput={renderInput}
-				className="datetime-select"
-				closeOnClickOutside={true}
-				closeOnSelect={true}
-				onClose={(props) => {
-					if (!props) {
-						setValor(initDate.toLocaleDateString() + "   " + initDate.toLocaleTimeString())
-						setValue(name, initDate.valueOf())
-					}
-				}}
-				inputProps={{
-					className: "input-date",
-				}}
+		<Space direction="vertical" size={12}>
+			<div className="flex flex-row gap-2 items-center justify-between">
+				<label className="font-semibold">{label}</label>
+				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
+			</div>
+			<Controller
+				control={control}
+				name={name}
+				render={({ field }) => (
+					<ConfigProvider locale={locale}>
+						<DatePicker
+							{...field}
+							showTime
+							value={date} // El valor que manejamos en el estado
+							defaultValue={defaultValue} // Solo inicializa el valor, pero luego depende de `value`
+							onChange={(value) => {
+								setValue(name, value?.valueOf()) // Guarda el valor como timestamp
+								setDate(value) // Actualiza el estado local
+							}}
+						/>
+					</ConfigProvider>
+				)}
 			/>
-		</>
+		</Space>
 	)
 }
+
+export default DatetimeSelect

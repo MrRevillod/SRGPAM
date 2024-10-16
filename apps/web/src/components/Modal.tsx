@@ -3,14 +3,15 @@ import React from "react"
 import { Modal as AntDModal } from "antd"
 import { ModalType, useModal } from "../context/ModalContext"
 
-interface ModalsProps {
+interface ModalProps {
 	title: string
 	type: ModalType
+	loading?: boolean
 	children: React.ReactNode
 }
 
-export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
-	const { isModalOpen, handleOk, handleCancel, modalType } = useModal()
+export const Modal: React.FC<ModalProps> = ({ title, type, loading, children }) => {
+	const { isModalOpen, handleOk, handleCancel, modalType, handleClose } = useModal()
 
 	return (
 		<AntDModal
@@ -20,6 +21,8 @@ export const Modal: React.FC<ModalsProps> = ({ title, type, children }) => {
 			onCancel={handleCancel}
 			closable={true}
 			footer={[]}
+			onClose={handleClose}
+			loading={loading}
 		>
 			{children}
 		</AntDModal>

@@ -9,6 +9,7 @@ import axios from "axios"
 import { SERVER_URL } from "@/constants/colors"
 import { storeTokens, storeUser } from "@/utils/storage"
 import { useEffect } from "react"
+import { useAuth } from "@/contexts/authContext"
 
 const Pin = ({ navigation, control, errors, setValue, handleSubmit, rutSenior }: commonProps) => {
 	useEffect(() => {
@@ -17,17 +18,10 @@ const Pin = ({ navigation, control, errors, setValue, handleSubmit, rutSenior }:
 		}
 	}, [rutSenior])
 
+	const { login } = useAuth()
+
 	const onSubmit = async (data: any) => {
-		try {
-			const response = await axios.post(`${SERVER_URL}/api/auth/login-senior`, data)
-			const { message, values } = response.data
-			const { accessToken, refreshToken, publicUser } = values
-			storeTokens(accessToken, refreshToken)
-			storeUser(publicUser)
-			Alert.alert("Éxito", message)
-		} catch (error: any) {
-			error.response.data.message && Alert.alert("Error", error.response.data.message)
-		}
+		await login(data)
 	}
 
 	return (

@@ -1,8 +1,7 @@
 import React from "react"
-import Loading from "../components/Loading"
-import HomePage from "./Home"
+import HomePage from "./dashboard/Home"
 import LoginPage from "./auth/Login"
-// import EventsPage from "./dashboard/Events"
+import EventsPage from "./dashboard/Events"
 import CentersPage from "./dashboard/Centers"
 import SeniorsPage from "./dashboard/Seniors"
 import ProfilePage from "./Profile"
@@ -14,6 +13,7 @@ import ProfessionalsPage from "./dashboard/Professionals"
 import ResetPasswordPage from "./auth/ResetPassword"
 import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 
+import { Loading } from "../components/Loading"
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
 import ValidatePasswordPage from "./auth/Password"
@@ -34,8 +34,6 @@ const Router: React.FC = () => {
 
 	return (
 		<Routes>
-			<Route path="/" element={<HomePage />} />
-
 			<Route
 				path="/auth/login"
 				element={
@@ -52,6 +50,7 @@ const Router: React.FC = () => {
 			<Route path="/auth/reset-password/:id/:token/:role" element={<ValidatePasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
+				<Route path="/dashboard" element={<HomePage />} />
 				<Route path="/perfil" element={<ProfilePage />} />
 				<Route path="/dashboard/administradores" element={<AdministratorPage />} />
 				<Route path="/dashboard/profesionales" element={<ProfessionalsPage />} />
@@ -61,7 +60,7 @@ const Router: React.FC = () => {
 					path="/dashboard/personas-mayores/solicitud-de-registro"
 					element={<SeniorRegisterRequestPage />}
 				/>
-				{/* <Route path="/dashboard/eventos" element={<EventsPage />} /> */}
+				<Route path="/dashboard/eventos" element={<EventsPage />} />
 				<Route path="/dashboard/servicios" element={<ServicesPage />} />
 				<Route path="/dashboard/centros-de-atencion" element={<CentersPage />} />
 			</Route>

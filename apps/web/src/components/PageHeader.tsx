@@ -5,14 +5,14 @@ import { Show } from "./ui/Show"
 import { useModal } from "../context/ModalContext"
 import { Breadcrumb } from "flowbite-react"
 import { useNavigate } from "react-router-dom"
-import { HiHome, HiUserAdd } from "react-icons/hi"
+import { AiOutlinePlus, AiFillHome } from "react-icons/ai"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 interface PageHeaderProps {
 	pageTitle: string
 	create?: boolean
 	searchKeys?: string[]
-	data?: any[]
+	data?: any[] | null
 	setData?: Dispatch<SetStateAction<any[]>>
 }
 
@@ -40,12 +40,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 	const { showModal } = useModal()
 
 	return (
-		<section className="flex flex-col gap-4 w-full">
+		<section className="flex flex-col gap-4 w-full mb-4">
 			<div className="flex flex-row w-full">
 				<div className="flex flex-col gap-4 w-4/6">
-					<h1 className="text-2xl font-bold">{pageTitle}</h1>
+					<h1 className="text-2xl font-bold text-dark dark:text-light">{pageTitle}</h1>
 					<Breadcrumb aria-label="Default breadcrumb example" className="text-neutral-500">
-						<Breadcrumb.Item href="/" icon={HiHome} />
+						<Breadcrumb.Item href="/" icon={AiFillHome} />
 						{breadcrumbItems.map((item, index) => (
 							<Breadcrumb.Item key={index} href="#" onClick={() => navigateTo(item)}>
 								{capitalize(item)}
@@ -59,17 +59,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 
 					<Show when={create != undefined}>
 						<button
-							className="bg-green-600 text-neutral-50 font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
+							className="bg-primary text-light font-semibold w-1/4 h-10 rounded-lg flex items-center justify-center gap-2"
 							onClick={() => create && showModal("Create", null)}
 						>
 							Nuevo
-							<HiUserAdd className="text-neutral-50 text-lg" />
+							<AiOutlinePlus className="text-light text-lg" />
 						</button>
 					</Show>
 				</div>
 			</div>
 
-			<hr className="my-1" />
+			{/* <hr className="my-1 border-neutral-700 dark:border-gray-medium" /> */}
 		</section>
 	)
 }

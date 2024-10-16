@@ -27,12 +27,12 @@ export const createServer_ = (): express.Express => {
 	app.use(express.json())
 	app.use(
 		cors({
-			origin: "http://localhost:8000", // Cambia esto por el origen del cliente
-			credentials: true, // Permitir credenciales (cookies, headers, etc.)
+			origin: services.WEB_APP.url,
+			credentials: true,
 		}),
 	)
+  
 	app.use(cookieParser())
-
 	app.use(extensions)
 
 	app.use("/api/dashboard/centers", centerRouter)

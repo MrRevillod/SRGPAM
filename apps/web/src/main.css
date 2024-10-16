@@ -1,6 +1,11 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@layer tailwind-base, antd;
+
+@layer tailwind-base {
+	@tailwind base;
+}
+
+@tailwind components;
+@tailwind utilities;
 
 html {
 	font-family:
@@ -21,13 +26,6 @@ html {
 	tab-size: 4;
 	zoom: 100%;
 }
-
-/* .react-datepicker__navigation--previous,
-.react-datepicker__navigation--next {
-	display: none;
-} */
-
-
 
 /* Date picker  */
 
@@ -158,44 +156,63 @@ body {
 }
 
 .fc {
-    max-height: 100%;
-    overflow-x: auto;
-    overflow-y: scroll;
-  }
-.fc-view-harness{
-    max-height: 300px;
-    overflow-y: scroll;
-    
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	max-height: 100%;
+	overflow-x: auto;
+	overflow-y: scroll;
 }
 
-  @media (max-width: 768px) {
-    .fc-toolbar {
-      display: block;
-      text-align: center;
+.fc-view-harness {
+	max-height: 100%;
+	overflow-y: scroll;
+
+}
+
+/* @media (max-height:1370px){
+    .fc {
+        max-height: 400px;
+        font-size: 0.75rem;
+        overflow-x: auto;
     }
-    
-    .fc-header-toolbar .fc-left, 
-    .fc-header-toolbar .fc-right {
-      float: none;
-      margin-bottom: 10px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .fc-toolbar-title {
-      font-size: 1.2em;
-    }
-    
-    .fc-header-toolbar .fc-button {
-      margin: 0 5px;
-      font-size: 0.8em;
-    }
-  }
-  
-  .input-date{
-    border-radius: 10px;
-    width: 100%;
-  }
+
+      
+      .fc .fc-toolbar {
+        padding: 0.5rem 0;
+      }
+      
+      .fc .fc-daygrid-day-number {
+        font-size: 0.65rem;
+      }
+} */
+@media (max-width: 768px) {
+	.fc-toolbar {
+		display: block;
+		text-align: center;
+	}
+
+	.fc-header-toolbar .fc-left,
+	.fc-header-toolbar .fc-right {
+		float: none;
+		margin-bottom: 10px;
+	}
+}
+
+@media (max-width: 480px) {
+	.fc-toolbar-title {
+		font-size: 1.2em;
+	}
+
+	.fc-header-toolbar .fc-button {
+		margin: 0 5px;
+		font-size: 0.8em;
+	}
+}
+
+.input-date {
+	border-radius: 10px;
+	width: 100%;
+}
+
 
 .profile-image-container {
 	position: relative;

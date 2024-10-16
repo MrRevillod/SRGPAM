@@ -1,20 +1,40 @@
 import React from "react"
+
+import { useModal } from "../context/ModalContext"
 import { Table, Space } from "antd"
-import { AiFillEdit, AiFillDelete, AiFillEye } from "react-icons/ai"
-import { BaseDataType, TableColumnType } from "../lib/types"
 import { tableColumnsFormatters } from "../lib/formatters"
+import { BaseDataType, TableColumnType } from "../lib/types"
+import { AiFillEdit, AiFillDelete, AiFillEye } from "react-icons/ai"
 
 interface TableProps<T> {
 	data: T[]
 	columnsConfig: TableColumnType<T>
-	onView?: (person: T) => void
-	onEdit?: (person: T) => void
-	onDelete?: (person: T) => void
+	loading?: boolean
+	viewable?: boolean
+	editable?: boolean
+	deletable?: boolean
+	onView?: (record: T) => void
 }
 
-const DataTable = <T extends BaseDataType>({ data, columnsConfig, onView, onEdit, onDelete }: TableProps<T>) => {
+const DataTable = <T extends BaseDataType>({
+	data,
+	columnsConfig,
+	loading,
+	viewable,
+	editable,
+	deletable,
+	onView,
+}: TableProps<T>) => {
+	const { showModal } = useModal()
+
 	return (
-		<Table dataSource={data} rowKey={(record) => record.id} size="middle" pagination={{ size: "default" }}>
+		<Table
+			loading={loading}
+			dataSource={data}
+			rowKey={(record) => record.id}
+			size="middle"
+			pagination={{ size: "default" }}
+		>
 			{columnsConfig.map((col) => (
 				<Table.Column
 					key={col.key}
@@ -36,19 +56,19 @@ const DataTable = <T extends BaseDataType>({ data, columnsConfig, onView, onEdit
 				key="action"
 				render={(_, record: T) => (
 					<Space size="large">
-						{onEdit && (
-							<a title="Editar" onClick={() => onEdit && onEdit(record)}>
-								<AiFillEdit className="text-green-600 text-md font-light h-6 w-6" />
+						{editable && (
+							<a title="Editar" onClick={() => showModal("Edit", record)}>
+								<AiFillEdit className="text-primary dark:text-light text-md font-light h-6 w-6" />
 							</a>
 						)}
-						{onDelete && (
-							<a title="Eliminar" onClick={() => onDelete && onDelete(record)}>
-								<AiFillDelete className="text-red-700 text-md font-light h-6 w-6" />
+						{deletable && (
+							<a title="Eliminar" onClick={() => showModal("Confirm", record)}>
+								<AiFillDelete className="text-red dark:text-light text-md font-light h-6 w-6" />
 							</a>
 						)}
-						{onView && (
+						{viewable && onView && (
 							<a title="Ver" onClick={() => onView(record)}>
-								<AiFillEye className="text-blue-500 text-md font-light h-6 w-6" />
+								<AiFillEye className="text-blue dark:text-light text-md font-light h-6 w-6" />
 							</a>
 						)}
 					</Space>

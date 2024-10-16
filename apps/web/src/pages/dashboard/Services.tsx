@@ -1,88 +1,55 @@
 import React from "react"
 import PageLayout from "../../layouts/PageLayout"
-import FlowbiteCard from "../../components/ui/Card"
 import CreateService from "../../components/forms/create/Service"
 import UpdateService from "../../components/forms/update/Service"
 import ConfirmDelete from "../../components/ConfirmAction"
 
-import { api } from "../../lib/axios"
+import { ImageCard } from "../../components/ui/ImageCard"
+import { message } from "antd"
 import { Service } from "../../lib/types"
-import { useModal } from "../../context/ModalContext"
-import { Pagination } from "antd"
-import { usePagination } from "../../hooks/usePagination"
+import { CardLayout } from "../../components/CardLayout"
+import { useRequest } from "../../hooks/useRequest"
 import { useEffect, useState } from "react"
+import { deleteService, getServices } from "../../lib/actions"
 
 const ServicesPage: React.FC = () => {
-	const [data, setData] = useState<Service[]>([])
-	const [loading, setLoading] = useState(true)
+	const [services, setServices] = useState<Service[]>([])
 
-	const { showModal } = useModal()
-
-	const { paginatedData, currentPage, pageSize, total, onPageChange } = usePagination({
-		data,
-		defaultPageSize: 6,
+	const { error, loading, data } = useRequest<Service[]>({
+		action: getServices,
 	})
 
-	const fetchServices = async () => {
-		try {
-			const response = await api.get("/dashboard/services/")
-			setData(response.data.values.services)
-		} catch (err) {
-			console.log(err)
-			console.error("Error al obtener los datos de servicios")
-		} finally {
-			setLoading(false)
-		}
-	}
-
 	useEffect(() => {
-		fetchServices()
-	}, [])
+		if (data) setServices(data)
+	}, [data])
 
-	const handleDelete = async (element: any) => {
-		try {
-			const response = await api.delete(`/dashboard/services/${element.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
-	}
+	if (error) message.error("Error al cargar los datos")
 
 	return (
-		<PageLayout pageTitle="Servicios" create={true} setData={setData} data={data} searchKeys={["name"]}>
-			<section className="flex flex-col w-full h-full gap-8">
-				<div className="grid grid-cols-3 gap-8 h-full">
-					{paginatedData.map((service) => (
-						<FlowbiteCard
-							onDelete={() => showModal("Confirm", service)}
-							onUpdate={() => showModal("Edit", service)}
-							key={service.id}
-							title={service.name}
-							description={service.description}
-							imageSrcUrl={`${import.meta.env.VITE_API_URL}/storage/public/services/${service.id}.webp`}
-						/>
-					))}
-				</div>
+		<PageLayout pageTitle="Servicios" create data={data} setData={setServices} searchKeys={["name"]}>
+			<CardLayout<Service>
+				data={services}
+				loading={loading}
+				renderCard={(service: Service) => (
+					<ImageCard
+						key={service.id}
+						item={service}
+						title={service.name}
+						description={service.description}
+						imagePath={`/services`}
+						deletable
+						updatable
+					/>
+				)}
+			/>
 
-				<Pagination
-					defaultPageSize={6}
-					pageSizeOptions={["6", "12", "24", "48"]}
-					current={currentPage}
-					pageSize={pageSize}
-					total={total}
-					onChange={onPageChange}
-					size="default"
-					align="end"
-				/>
-			</section>
-
-			<CreateService data={data} setData={setData} />
-			<UpdateService data={data} setData={setData} />
-			<ConfirmDelete
+			<CreateService data={services} setData={setServices} />
+			<UpdateService data={services} setData={setServices} />
+			<ConfirmDelete<Service>
 				text="¿Estás seguro(a) de que deseas eliminar este servicio?"
-				data={data}
-				setData={setData}
-				executeAction={(element) => handleDelete(element)}
+				data={services}
+				setData={setServices}
+				action={deleteService}
 			/>
 		</PageLayout>
 	)

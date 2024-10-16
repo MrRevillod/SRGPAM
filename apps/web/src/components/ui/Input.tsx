@@ -1,8 +1,11 @@
-import React, { useState } from "react"
+import clsx from "clsx"
+import React from "react"
+
 import { Link } from "react-router-dom"
 import { Show } from "./Show"
+import { useState } from "react"
 import { useFormContext } from "react-hook-form"
-import { AiFillEye } from "react-icons/ai"
+import { AiFillExclamationCircle, AiFillEye } from "react-icons/ai"
 
 type InputType = "text" | "password" | "email" | "number" | "select"
 
@@ -18,7 +21,7 @@ interface InputProps {
 }
 
 const InputLabel: React.FC<{ label: string }> = ({ label }) => {
-	return <label className="font-semibold text-neutral-950">{label}</label>
+	return <label className="font-semibold text-dark dark:text-light">{label}</label>
 }
 
 export const Input: React.FC<InputProps> = (props) => {
@@ -35,10 +38,12 @@ export const Input: React.FC<InputProps> = (props) => {
 		setShowPassword(!showPassword)
 	}
 
-	const classes = `border-1 ${errors[name] ? "border-red-400" : "border-neutral-500"} rounded-lg 
-        p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full 
-        pl-4 placeholder-neutral-400 text-neutral-950 mb-1
-    `
+	const classes = clsx(
+		errors[name] ? "border-red" : "border-gray dark:border-medium",
+		"rounded-lg p-2 focus:outline-none focus:ring-primary-green",
+		"focus:border-primary-green w-full pl-4 placeholder-neutral-400",
+		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
+	)
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
@@ -57,7 +62,21 @@ export const Input: React.FC<InputProps> = (props) => {
 			<Show when={!login}>
 				<div className="flex flex-row gap-2 items-center justify-between">
 					<InputLabel label={label} />
-					{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
+					<Show when={type !== "password"}>
+						{errors[name] && <div className="text-red text-sm">{errors[name]?.message?.toString()}</div>}
+					</Show>
+
+					<Show when={type === "password"}>
+						{errors[name] && (
+							<div className="relative flex items-center text-red-600 text-sm gap-1 group">
+								<AiFillExclamationCircle className="h-6 w-6 text-red-600" />
+								<div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex items-center justify-center bg-red-700 text-white text-sm rounded px-4 py-2 w-64">
+									{errors[name]?.message?.toString()}
+									<div className="absolute left-1/2 transform -translate-x-1/2 top-full border-8 border-transparent border-t-red-600"></div>
+								</div>
+							</div>
+						)}
+					</Show>
 				</div>
 			</Show>
 
@@ -88,7 +107,7 @@ export const Input: React.FC<InputProps> = (props) => {
 								onClick={handleTogglePasswordVisibility}
 								className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-neutral-600 hover:text-blue-500"
 							>
-								<AiFillEye className="text-neutral-600 text-xl mr-1" />
+								<AiFillEye className="text-neutral-600 dark:text-gray text-xl mr-1" />
 							</button>
 						</Show>
 					</div>

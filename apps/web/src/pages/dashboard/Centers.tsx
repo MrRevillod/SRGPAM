@@ -1,98 +1,63 @@
 import React from "react"
 import PageLayout from "../../layouts/PageLayout"
-import FlowbiteCard from "../../components/ui/Card"
 import UpdateCenter from "../../components/forms/update/Center"
 import CreateCenter from "../../components/forms/create/Center"
 import ConfirmAction from "../../components/ConfirmAction"
 
-import { api } from "../../lib/axios"
 import { Center } from "../../lib/types"
-import { useModal } from "../../context/ModalContext"
-import { Pagination } from "antd"
-import { usePagination } from "../../hooks/usePagination"
+import { message } from "antd"
+import { ImageCard } from "../../components/ui/ImageCard"
+import { CardLayout } from "../../components/CardLayout"
+import { useRequest } from "../../hooks/useRequest"
 import { useEffect, useState } from "react"
+import { deleteCenter, getCenters } from "../../lib/actions"
 
 const CentersPage: React.FC = () => {
-	const [data, setData] = useState<Center[]>([])
-	const [loading, setLoading] = useState(true)
-
-	const { showModal } = useModal()
-	const { paginatedData, currentPage, pageSize, total, onPageChange } = usePagination({
-		data,
-		defaultPageSize: 6,
+	const [centers, setCenters] = useState<Center[]>([])
+	const { error, loading, data } = useRequest<Center[]>({
+		action: getCenters,
 	})
 
-	const fetchCenters = async () => {
-		try {
-			const response = await api.get("/dashboard/centers/")
-			setData(response.data.values.centers)
-		} catch (err) {
-			console.error("Error al obtener los datos de seniors")
-		} finally {
-			setLoading(false)
-		}
-	}
-
 	useEffect(() => {
-		fetchCenters()
-	}, [])
+		if (data) setCenters(data)
+	}, [data])
 
-	const handleDelete = async (center: any) => {
-		try {
-			const response = await api.delete(`/dashboard/centers/${center.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
-	}
+	if (error) message.error("Error al cargar los datos")
 
 	return (
 		<PageLayout
 			pageTitle="Centros de atención"
-			create={true}
+			create
 			data={data}
-			setData={setData}
+			setData={setCenters}
 			searchKeys={["name", "address", "phone"]}
 		>
-			<section className="flex flex-col w-full h-full gap-8">
-				<div className="grid grid-cols-3 gap-8">
-					{paginatedData.map((center) => {
-						const imageSrc = `${import.meta.env.VITE_API_URL}/storage/public/centers/${center.id}.webp`
+			<CardLayout<Center>
+				data={centers}
+				loading={loading}
+				itemsPerPage={6}
+				renderCard={(center: Center) => (
+					<ImageCard
+						key={center.id}
+						item={center}
+						title={center.name}
+						description={center.address}
+						other={`Teléfono: ${center.phone}`}
+						imagePath={`/centers`}
+						deletable
+						updatable
+					/>
+				)}
+			/>
 
-						return (
-							<FlowbiteCard
-								onDelete={() => showModal("Confirm", center)}
-								onUpdate={() => showModal("Edit", center)}
-								key={center.id}
-								title={center.name}
-								description={center.address}
-								other={`Teléfono: ${center.phone}`}
-								imageSrcUrl={imageSrc}
-							/>
-						)
-					})}
-				</div>
+			<CreateCenter data={centers} setData={setCenters} />
+			<UpdateCenter data={centers} setData={setCenters} />
 
-				<Pagination
-					defaultPageSize={6}
-					pageSizeOptions={["6", "12", "24", "48"]}
-					current={currentPage}
-					pageSize={pageSize}
-					total={total}
-					onChange={onPageChange}
-					size="default"
-					align="end"
-				/>
-			</section>
-
-			<CreateCenter data={data} setData={setData} />
-			<UpdateCenter data={data} setData={setData} />
-
-			<ConfirmAction
+			<ConfirmAction<Center>
 				text="¿Estás seguro(a) de que deseas eliminar este centro de atención?"
-				data={data}
-				setData={setData}
-				executeAction={(center) => handleDelete(center)}
+				data={centers}
+				setData={setCenters}
+				action={deleteCenter}
 			/>
 		</PageLayout>
 	)

@@ -13,6 +13,8 @@ const DEFAULT_PROFILE_PICTURE = "https://i.pinimg.com/originals/58/51/2e/58512eb
 
 const DEV_DEFAULT_DEVELOPER_PASSWORD = process.env.DEV_DEFAULT_DEVELOPER_PASSWORD || "dev"
 
+
+
 const generateRUT = (): string => {
 	const numero: string = Math.floor(Math.random() * 100000000)
 		.toString()
@@ -114,8 +116,8 @@ const seed = async () => {
 			const seniorEmail = `${seniorFirstName[0].toLowerCase()}${seniorLastName.toLowerCase()}@seniors.com`
 
 			const randomBirthDate = faker.date.between({ from: "1950-01-01", to: "2005-12-31" })
-			const randomStartDate = faker.date.between({ from: "2022-01-01", to: "2022-12-31" })
-			const randomEndDate = faker.date.between({ from: randomStartDate, to: "2023-12-31" })
+			const randomStartDate = faker.date.between({ from: "2024-01-01", to: "2024-12-31" })
+			const randomEndDate = faker.date.between({ from: randomStartDate, to: randomStartDate.valueOf() + 3 * 60 * 60 * 1000 })
 
 			await prisma.administrator.upsert({
 				where: { id: AdminRUT },
@@ -149,6 +151,7 @@ const seed = async () => {
 					name: randomService.name,
 					title: randomService.title,
 					description: faker.lorem.sentence(25),
+					color: randomService.color,
 				},
 				update: {},
 			})
