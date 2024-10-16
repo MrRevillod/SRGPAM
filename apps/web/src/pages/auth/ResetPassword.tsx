@@ -1,11 +1,11 @@
 import React from "react"
-import { Input } from "../../components/ui/Input"
-import { FormProvider, useForm } from "react-hook-form"
-import { api } from "../../lib/axios"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { message } from "antd"
+import { api } from "../../lib/axios"
+import { Input } from "../../components/ui/Input"
 import { Helmet } from "react-helmet"
+import { message } from "antd"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { FormProvider, useForm } from "react-hook-form"
 
 const ResetPasswordPage: React.FC = () => {
 	const formSchemas = z.object({
@@ -21,12 +21,11 @@ const ResetPasswordPage: React.FC = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			const response = await api.post(`/dashboard/mailer/reset-password?variant=${data.role}`, {
+			const response = await api.post(`/dashboard/account/reset-password?variant=${data.role}`, {
 				email: data.email,
 			})
 
 			message.success(response.data.message)
-
 			reset()
 		} catch (error: any) {
 			message.error(error.response.data.message || "Error inesperado.")

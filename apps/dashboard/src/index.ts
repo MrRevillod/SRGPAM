@@ -5,7 +5,7 @@ import express from "express"
 import cookieParser from "cookie-parser"
 
 import centerRouter from "./routes/centers"
-import mailerRouter from "./routes/mailer"
+import accountRouter from "./routes/account"
 import eventsRouter from "./routes/events"
 import serviceRouter from "./routes/services"
 import seniorsRouter from "./routes/seniors"
@@ -31,14 +31,14 @@ export const createServer_ = (): express.Express => {
 			credentials: true,
 		}),
 	)
+  
 	app.use(cookieParser())
-
 	app.use(extensions)
 
 	app.use("/api/dashboard/centers", centerRouter)
 	app.use("/api/dashboard/seniors", seniorsRouter)
 	app.use("/api/dashboard/services", serviceRouter)
-	app.use("/api/dashboard/mailer", mailerRouter)
+	app.use("/api/dashboard/account", accountRouter)
 	app.use("/api/dashboard/professionals", professionalsRouter)
 	app.use("/api/dashboard/administrators", administrarorsRouter)
 	app.use("/api/dashboard/seniors", seniorsRouter)

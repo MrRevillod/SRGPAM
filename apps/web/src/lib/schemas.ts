@@ -138,3 +138,16 @@ export const EventSchemas = {
 			message: "Rango de tiempo invalido",
 		}),
 }
+
+export const resetPasswordSchema = (role: "ADMIN" | "PROFESSIONAL" | "SENIOR"): any => {
+	return z
+		.object({
+			password: role === "SENIOR" ? rules.pinSchema : rules.passwordSchema,
+			confirmPassword: role === "SENIOR" ? rules.pinSchema : rules.passwordSchema,
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Las contraseñas ingresadas no coinciden",
+			path: ["confirmPassword"],
+		})
+}
+

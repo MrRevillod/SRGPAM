@@ -16,6 +16,7 @@ import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 import { Loading } from "../components/Loading"
 import { useAuth } from "../context/AuthContext"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
+import ValidatePasswordPage from "./auth/Password"
 
 interface RouteProps {
 	condition: boolean
@@ -46,6 +47,7 @@ const Router: React.FC = () => {
 			</Route>
 
 			<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+			<Route path="/auth/reset-password/:id/:token/:role" element={<ValidatePasswordPage />} />
 
 			<Route element={<RouteProtector condition={!user && !isAuthenticated} redirectTo="/auth/login" />}>
 				<Route path="/dashboard" element={<HomePage />} />

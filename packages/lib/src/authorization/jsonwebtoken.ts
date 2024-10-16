@@ -1,7 +1,6 @@
 import { constants } from "../config"
 import { IncomingHttpHeaders } from "http"
 import { JwtPayload, sign, verify, JsonWebTokenError } from "jsonwebtoken"
-import { log } from ".."
 
 const { JWT_SECRET } = constants
 

@@ -96,3 +96,4 @@ export const EventSchemas = {
 }
 
 export const ProfessionalSchemas = AdministratorSchemas
+
