@@ -23,7 +23,7 @@ export const useMutation = <T,>({ mutateFn }: useMutationProps) => {
 			}
 		} catch (err: any) {
 			if (onError && err.response) {
-				onError(err.response?.data)
+				onError(err)
 			} else {
 				console.log(err)
 				throw new Error(err.response?.data?.message || "Error desconocido")
