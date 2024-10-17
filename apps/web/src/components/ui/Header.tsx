@@ -1,10 +1,10 @@
 import React from "react"
 
 import { Show } from "./Show"
+import { Link } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
 import { API_URL } from "../../lib/axios"
 import { useTheme } from "../../context/ThemeContext"
-import { Link, redirect } from "react-router-dom"
 import { Avatar, Dropdown, Navbar } from "flowbite-react"
 
 const Header: React.FC = () => {
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
 							</Dropdown.Item>
 						</Dropdown>
 
-						<Link to="/eventos" className={linkClasses}>
+						<Link to="/agenda" className={linkClasses}>
 							Eventos
 						</Link>
 

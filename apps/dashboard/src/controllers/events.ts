@@ -1,41 +1,31 @@
-import { prisma } from "@repo/database"
-import { Request, Response, NextFunction } from "express"
 import { io } from ".."
-import { Prisma, Senior } from "@prisma/client"
-import { canAddEvent } from "../utils/events"
+import { prisma } from "@repo/database"
+import { Senior } from "@prisma/client"
 import { AppError } from "@repo/lib"
+import { canAddEvent } from "../utils/events"
+import { Request, Response, NextFunction } from "express"
+import { EventQuery, eventSelect, generateWhere } from "../utils/filters"
 
-// Controlador para obtener todos los administradores de la base de datos
-// se excluye el campo password de la respuesta
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
+	// Mapa de query a where
+	// Este objecto almacena las claves posibles de la query y su transformación a where
+	const queryToWhereMap = {
+		professionalId: (value: any) => ({ equals: value }),
+		serviceId: (value: any) => ({ equals: Number(value) }),
+		centerId: (value: any) => ({ equals: Number(value) }),
+		seniorId: (value: any) => (value ? { equals: value } : null),
+	}
+
+	// Generamos el where a partir de la query y el mapa
+	const where = generateWhere<EventQuery>(req.query, queryToWhereMap)
+
 	try {
-		const Events = await prisma.event.findMany({
-			select: {
-				id: true,
-				startsAt: true,
-				endsAt: true,
-				assistance: true,
-				seniorId: true,
-				professionalId: true,
-				serviceId: true,
-				centerId: true,
-				service: {
-					select: {
-						name: true,
-						color: true,
-					},
-				},
-			},
+		const events = await prisma.event.findMany({
+			where,
+			select: eventSelect,
 		})
 
-		return res.status(200).json({
-			message: "Administradores obtenidos correctamente",
-			type: "success",
-			values: {
-				Events,
-				len: Events.length,
-			},
-		})
+		return res.status(200).json({ values: events })
 	} catch (error) {
 		next(error)
 	}
@@ -90,53 +80,41 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			where: { professionalId: professionalId },
 		})
 
-		if (
-			canAddEvent(events, {
+		if (!canAddEvent(events, { startsAt: new Date(startsAt), endsAt: new Date(endsAt) })) {
+			return res.status(409).json({ message: "Superposición de horas", type: "error" })
+		}
+
+		const event = await prisma.event.create({
+			data: {
 				startsAt: new Date(startsAt),
 				endsAt: new Date(endsAt),
-			})
-		) {
-			const event = await prisma.event.create({
-				data: {
-					startsAt: new Date(startsAt),
-					endsAt: new Date(endsAt),
-					professionalId,
-					serviceId: parseInt(serviceId),
-					seniorId: seniorId || null,
-					centerId: centerId ? parseInt(serviceId) : null,
-				},
-				select: {
-					id: true,
-					startsAt: true,
-					endsAt: true,
-					assistance: true,
-					seniorId: true,
-					professionalId: true,
-					serviceId: true,
-					centerId: true,
-					service: {
-						select: {
-							name: true,
-							color: true,
-						},
+				professionalId,
+				serviceId: parseInt(serviceId),
+				seniorId: seniorId || null,
+				centerId: centerId ? parseInt(serviceId) : null,
+			},
+			select: {
+				id: true,
+				startsAt: true,
+				endsAt: true,
+				assistance: true,
+				seniorId: true,
+				professionalId: true,
+				serviceId: true,
+				centerId: true,
+				service: {
+					select: {
+						name: true,
+						color: true,
 					},
 				},
-			})
+			},
+		})
 
-			//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
-			//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+		//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
+		//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
 
-			return res.status(200).json({
-				message: "Creación exitosa",
-				type: "success",
-				values: event,
-			})
-		} else {
-			return res.status(409).json({
-				message: "Superposición de horas",
-				type: "error",
-			})
-		}
+		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
 		next(error)
 	}

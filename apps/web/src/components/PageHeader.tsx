@@ -68,8 +68,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 					</Show>
 				</div>
 			</div>
-
-			{/* <hr className="my-1 border-neutral-700 dark:border-gray-medium" /> */}
 		</section>
 	)
 }

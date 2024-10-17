@@ -71,7 +71,7 @@ const Router: React.FC = () => {
 	return (
 		<Routes>
 			<Route element={<ProtectedRoute redirectTo="/auth/login" allowedRoles={["ADMIN"]} />}>
-				<Route path="/" element={<HomePage />} />
+				<Route path="/inicio" element={<HomePage />} />
 				<Route path="/perfil" element={<ProfilePage />} />
 				<Route path="/administradores" element={<AdministratorPage />} />
 				<Route path="/profesionales" element={<ProfessionalsPage />} />

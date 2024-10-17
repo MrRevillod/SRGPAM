@@ -5,6 +5,8 @@ const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
+type DEFAULT_EMAIL_DOMAINS = "@admins.com" | "@professionals.com" | "@seniors.com"
+
 const DEFAULT_CENTER_PHONE = process.env.DEV_DEFAULT_CENTER_PHONE || "123456789"
 const DEFAULT_SENIOR_PASSWORD = process.env.DEV_DEFAULT_SENIOR_PASSWORD || "1234"
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123"
@@ -12,8 +14,6 @@ const DEFAULT_PROFESSIONAL_PASSWORD = process.env.DEFAULT_PROFESSIONAL_PASSWORD 
 const DEFAULT_PROFILE_PICTURE = "https://i.pinimg.com/originals/58/51/2e/58512eb4e598b5ea4e2414e3c115bef9.jpg"
 
 const DEV_DEFAULT_DEVELOPER_PASSWORD = process.env.DEV_DEFAULT_DEVELOPER_PASSWORD || "dev"
-
-
 
 const generateRUT = (): string => {
 	const numero: string = Math.floor(Math.random() * 100000000)
@@ -63,6 +63,10 @@ const uploadImage = async (url: string, name: string, uploadPath: string) => {
 	}
 }
 
+const generateEmail = (firstName: string, lastName: string, domain: DEFAULT_EMAIL_DOMAINS): string => {
+	return `${firstName[0].toLowerCase()}${lastName.toLowerCase()}${domain}`
+}
+
 const seed = async () => {
 	await prisma.$transaction([
 		prisma.event.deleteMany(),
@@ -77,11 +81,6 @@ const seed = async () => {
 
 	await uploadImage(DEFAULT_PROFILE_PICTURE, "default-profile", "/upload?path=%2Fusers")
 
-	const data = JSON.parse(readFileSync("./src/data.json", "utf-8"))
-
-	const services = data.services
-	const centers = data.centers
-
 	await prisma.administrator.createMany({
 		data: [
 			{ id: generateRUT(), email: "tc@dev.admin.com", password: await hash(DEV_DEFAULT_DEVELOPER_PASSWORD, 10), name: "Tomás Curihual" },
@@ -92,10 +91,39 @@ const seed = async () => {
 		],
 	})
 
+	const data = JSON.parse(readFileSync("./src/data.json", "utf-8"))
+	const services = data.services
+	const centers = data.centers
+
+	for (let i = 1; i < services.length + 1; i++) {
+		const service = services[i - 1]
+		await uploadImage(service.img, i.toString(), "/upload?path=%2Fservices")
+		await prisma.service.create({
+			data: {
+				id: Number(i),
+				name: service.name,
+				title: service.title,
+				description: service.description,
+				color: service.color,
+			},
+		})
+	}
+
+	for (let i = 1; i < centers.length + 1; i++) {
+		const center = centers[i - 1]
+		await uploadImage(center.img, i.toString(), "/upload?path=%2Fcenters")
+		await prisma.center.create({
+			data: {
+				id: Number(i),
+				name: center.name,
+				address: center.address,
+				phone: center.phone,
+			},
+		})
+	}
+
 	for (let i = 1; i <= 25; i++) {
 		const rand = Math.floor(Math.random() * 1000)
-		const randomService = services[Math.floor(Math.random() * services.length)]
-		const randomCenter = centers[Math.floor(Math.random() * centers.length)]
 
 		try {
 			const AdminRUT = generateRUT()
@@ -111,9 +139,9 @@ const seed = async () => {
 			const seniorFirstName = faker.person.firstName()
 			const seniorLastName = faker.person.lastName()
 
-			const adminEmail = `${adminFirstName[0].toLowerCase()}${adminLastName.toLowerCase()}@admins.com`
-			const professionalEmail = `${professionalFirstName[0].toLowerCase()}${professionalLastName.toLowerCase()}@professionals.com`
-			const seniorEmail = `${seniorFirstName[0].toLowerCase()}${seniorLastName.toLowerCase()}@seniors.com`
+			const adminEmail = generateEmail(adminFirstName, adminLastName, "@admins.com")
+			const professionalEmail = generateEmail(professionalFirstName, professionalLastName, "@professionals.com")
+			const seniorEmail = generateEmail(seniorFirstName, seniorLastName, "@seniors.com")
 
 			const randomBirthDate = faker.date.between({ from: "1950-01-01", to: "2005-12-31" })
 			const randomStartDate = faker.date.between({ from: "2024-01-01", to: "2024-12-31" })
@@ -143,33 +171,6 @@ const seed = async () => {
 				},
 				update: {},
 			})
-
-			await prisma.service.upsert({
-				where: { id: i },
-				create: {
-					id: i,
-					name: randomService.name,
-					title: randomService.title,
-					description: faker.lorem.sentence(25),
-					color: randomService.color,
-				},
-				update: {},
-			})
-
-			await uploadImage(randomService.img, i.toString(), "/upload?path=%2Fservices")
-
-			await prisma.center.upsert({
-				where: { id: i },
-				create: {
-					id: i,
-					name: randomCenter.name,
-					address: randomCenter.address,
-					phone: DEFAULT_CENTER_PHONE,
-				},
-				update: {},
-			})
-
-			await uploadImage(randomCenter.img, i.toString(), "/upload?path=%2Fcenters")
 
 			await prisma.professional.upsert({
 				where: { id: ProfessionalRUT },

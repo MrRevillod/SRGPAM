@@ -9,7 +9,7 @@ const { Create, Update } = EventSchemas
 
 const router: Router = Router()
 
-router.get("/", events.getAll) //getAll
+router.get("/", validateRole(["ADMIN", "PROFESSIONAL", "SENIOR"]), events.getAll) //getAll
 router.post("/", validateSchema(Create), events.create) //newEvent
 router.patch("/:id", validateSchema(Update), events.updateById) //updateEvent
 router.patch("/:id/reservate", validateRole(["SENIOR"]), events.reserveEvent)
