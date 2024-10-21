@@ -57,7 +57,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({ imageLabel, imageF
 						onRemove={handleRemove}
 					>
 						<div className="flex flex-col gap-2 w-full">
-							<p className="font-semibold text-dark dark:text-light text-base">{imageLabel}</p>
+							<p className="font-semibold text-dark dark:text-light text-sm">{imageLabel}</p>
 
 							<div className="flex flex-row justify-center w-full rounded-lg cursor-pointer">
 								<div className="flex flex-col gap-1">

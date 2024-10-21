@@ -14,10 +14,10 @@ const router: Router = Router()
 // -- Endpoints CRUD
 
 // Obtener todos los profesionales -- Requiere rol de administrador
-router.get("/", validateRole("ADMIN"), professionals.getAll)
+router.get("/", validateRole(["ADMIN"]), professionals.getAll)
 
 // Crear un profesional -- Requiere rol de administrador
-router.post("/", validateSchema(Create), validateRole("ADMIN"), professionals.create)
+router.post("/", validateSchema(Create), validateRole(["ADMIN"]), professionals.create)
 
 // Actualizar un profesional por id -- Requiere middleware de pertenencia
 router.patch("/:id", singleImageupload, validateUserId("PROFESSIONAL"), userOwnerValidation, validateSchema(Update), professionals.updateById)

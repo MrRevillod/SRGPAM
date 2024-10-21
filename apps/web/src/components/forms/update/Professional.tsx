@@ -6,10 +6,10 @@ import { Modal } from "../../Modal"
 import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { updateProfessional } from "../../../lib/actions"
 import { ProfessionalSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
 import { FormProps, Professional } from "../../../lib/types"
-import { updateProfessional } from "../../../lib/actions"
 
 const UpdateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }) => {
 	const { selectedData } = useModal()
@@ -18,11 +18,9 @@ const UpdateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }
 		resolver: zodResolver(ProfessionalSchemas.Update),
 	})
 
-	const { reset } = methods
-
 	useEffect(() => {
 		if (selectedData) {
-			reset({
+			methods.reset({
 				name: selectedData.name,
 				email: selectedData.email,
 			})
@@ -35,7 +33,6 @@ const UpdateProfessional: React.FC<FormProps<Professional>> = ({ data, setData }
 				<Form<Professional> data={data} setData={setData} actionType="update" action={updateProfessional}>
 					<Input name="name" label="Nombre" type="text" placeholder="Nombre" />
 					<Input name="email" label="Correo Electrónico" type="email" placeholder="Correo Electrónico" />
-
 					<Input name="password" label="Contraseña" type="password" placeholder="••••" />
 					<Input name="confirmPassword" label="Confirmar contraseña" type="password" placeholder="••••" />
 				</Form>

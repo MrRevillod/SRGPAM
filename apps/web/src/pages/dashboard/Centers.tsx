@@ -6,21 +6,21 @@ import ConfirmAction from "../../components/ConfirmAction"
 
 import { Center } from "../../lib/types"
 import { message } from "antd"
+import { useState } from "react"
 import { ImageCard } from "../../components/ui/ImageCard"
 import { CardLayout } from "../../components/CardLayout"
 import { useRequest } from "../../hooks/useRequest"
-import { useEffect, useState } from "react"
 import { deleteCenter, getCenters } from "../../lib/actions"
+import { useNavigate } from "react-router-dom"
 
 const CentersPage: React.FC = () => {
+	const navigate = useNavigate()
+
 	const [centers, setCenters] = useState<Center[]>([])
 	const { error, loading, data } = useRequest<Center[]>({
 		action: getCenters,
+		onSuccess: (centers) => setCenters(centers),
 	})
-
-	useEffect(() => {
-		if (data) setCenters(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 
@@ -46,6 +46,7 @@ const CentersPage: React.FC = () => {
 						imagePath={`/centers`}
 						deletable
 						updatable
+						onCardClick={(item) => navigate(`/agenda?centerId=${item.id}`)}
 					/>
 				)}
 			/>

@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express"
 import { AppError, AuthResponse, getServerTokens, httpRequest, UserRole } from "@repo/lib"
 
-export const validateRole = (role: UserRole) => async (req: Request, res: Response, next: NextFunction) => {
+export const validateRole = (roles: UserRole[]) => async (req: Request, res: Response, next: NextFunction) => {
 	const tokens = getServerTokens(req.headers, req.cookies)
 
 	try {
 		const response = await httpRequest<AuthResponse>({
 			service: "AUTH",
-			endpoint: `/validate-role/${role}`,
+			endpoint: `/validate-role/${roles.join(",")}`,
 			headers: {
 				Authorization: `Bearer ${tokens?.access || null}`,
 			},
@@ -18,7 +18,7 @@ export const validateRole = (role: UserRole) => async (req: Request, res: Respon
 		}
 
 		req.setExtension("tokens", tokens)
-		req.setExtension("role", (response.values as any).role)
+		req.setExtension("role", response.values.role)
 		req.setExtension("user", response.values.user)
 
 		next()

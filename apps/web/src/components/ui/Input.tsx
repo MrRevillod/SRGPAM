@@ -39,8 +39,8 @@ export const Input: React.FC<InputProps> = (props) => {
 	}
 
 	const classes = clsx(
-		errors[name] ? "border-red" : "border-gray dark:border-medium",
-		"rounded-lg p-2 focus:outline-none focus:ring-primary-green",
+		errors[name] ? "border-red" : "border-gray-dark",
+		"rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-primary-green",
 		"focus:border-primary-green w-full pl-4 placeholder-neutral-400",
 		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
 	)
@@ -68,9 +68,9 @@ export const Input: React.FC<InputProps> = (props) => {
 
 					<Show when={type === "password"}>
 						{errors[name] && (
-							<div className="relative flex items-center text-red-600 text-sm gap-1 group">
-								<AiFillExclamationCircle className="h-6 w-6 text-red-600" />
-								<div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex items-center justify-center bg-red-700 text-white text-sm rounded px-4 py-2 w-64">
+							<div className="relative flex items-center text-red text-sm gap-1 group">
+								<AiFillExclamationCircle className="h-6 w-6 text-red" />
+								<div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex items-center justify-center bg-red text-white text-sm rounded px-4 py-2 w-64">
 									{errors[name]?.message?.toString()}
 									<div className="absolute left-1/2 transform -translate-x-1/2 top-full border-8 border-transparent border-t-red-600"></div>
 								</div>

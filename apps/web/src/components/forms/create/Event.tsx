@@ -1,75 +1,107 @@
-import React, { useEffect, useState } from "react"
-import { Form } from "../Form"
+import React, { useEffect } from "react"
+import dayjs from "dayjs"
+import DatetimeSelect from "../../ui/DatetimeSelect"
+
 import "react-datetime/css/react-datetime.css"
+
+import { Form } from "../Form"
+import { Modal } from "../../Modal"
+import { useModal } from "../../../context/ModalContext"
+import { useState } from "react"
+import { useRequest } from "../../../hooks/useRequest"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useLocation } from "react-router-dom"
+import { SuperSelect } from "../../ui/SuperSelect"
 import { EventSchemas } from "../../../lib/schemas"
 import { FormProvider, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Event, FormProps, Professional, Service } from "../../../lib/types"
-import { api } from "../../../lib/axios"
-import { SuperSelect } from "../../ui/SuperSelect"
-import { Modal } from "../../Modal"
-import DatetimeSelect from "../../ui/DatetimeSelect"
-import locale from "antd/locale/es_ES"
-import { ConfigProvider } from "antd"
-import { createEvent } from "../../../lib/actions"
+import { getIdFromUrl, selectDataFormatter } from "../../../lib/formatters"
+import { createEvent, getCenters, getProfessionals, getServices } from "../../../lib/actions"
+import { Center, Event, FormProps, Professional, Service, SuperSelectField } from "../../../lib/types"
 
-type SelectValues = {
-	value: string | number
-	label: string
-}
+// El formulario recibe refetch, ya que en este caso es más conveniente que
+// filtrar los evento en el cliente, se vuelvan a obtener los eventos desde el servidor
 
-const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
+const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => {
+	const location = useLocation()
+
+	const [centers, setCenters] = useState<SuperSelectField[]>([])
+	const [services, setServices] = useState<SuperSelectField[]>([])
+	const [professionals, setProfessionals] = useState<SuperSelectField[]>([])
+
 	const methods = useForm({
 		resolver: zodResolver(EventSchemas.Create),
 	})
 
-	const [professionals, setProfessionals] = useState<SelectValues[]>()
-	const [services, setServices] = useState<SelectValues[]>()
+	const { isModalOpen, modalType } = useModal()
 
-	const getProfessionals = async () => {
-		const res = await api.get("/dashboard/professionals")
-		const values = res.data.values
-		const proffesionals_tem = new Array<SelectValues>()
-		values.forEach((pfs: Professional) => {
-			proffesionals_tem.push({
-				label: pfs.name,
-				value: pfs.id,
-			})
-		})
-		setProfessionals(proffesionals_tem)
-	}
+	// Se obtiene el id del centro de la url, con el fin de seleccionarlo por defecto
+	// ya que es posible crear un evento desde la url de un centro
 
-	const getServices = async () => {
-		const res = await api.get("/dashboard/services")
-		const values = res.data.values
-		const temp = new Array<SelectValues>()
-		values.forEach((pfs: Service) => {
-			temp.push({
-				label: pfs.name,
-				value: pfs.id,
-			})
-		})
-		setServices(temp)
-	}
+	const selectedCenter = getIdFromUrl(location)
+
+	// Se obtiene el servicio seleccionado, con el fin de obtener los profesionales
+	// que ofrecen ese servicio, al utilizar watch se obtiene el valor del input
+	// en tiempo real y se puede utilizar para realizar peticiones
+
+	const selectedService = methods.watch("serviceId")
+
+	// Los hooks useRequest se utilizan para obtener los servicios, profesionales y centros
+	// reciben un trigger que actua como un disparador de un useEffect
+
+	// Se obtienen los servicios cuando se abre el modal
+	useRequest<Service[]>({
+		action: getServices,
+		query: "select=name,id",
+		onSuccess: (data) => selectDataFormatter({ data, setData: setServices }),
+		trigger: isModalOpen && modalType === "Create",
+	})
+
+	// Se obtienen los servicios cuando se selecciona un servicio y el modal está abierto
+	useRequest<Professional[]>({
+		action: getProfessionals,
+		query: `serviceId=${selectedService}&select=name,id`,
+		onSuccess: (data) => selectDataFormatter({ data, setData: setProfessionals }),
+		trigger: selectedService && isModalOpen && modalType === "Create",
+	})
+
+	// Se obtienen los centros cuando se abre el modal
+	useRequest<Center[]>({
+		action: getCenters,
+		query: "select=name,id",
+		onSuccess: (data) => selectDataFormatter({ data, setData: setCenters }),
+		trigger: isModalOpen && modalType === "Create",
+	})
+
+	// Se obtiene el valor del input startsAt
+	// y se agrega 2 horas al valor de endsAt ya que esto brinda una mejor experiencia
+
+	const startsAt = methods.watch("startsAt")
 
 	useEffect(() => {
-		getProfessionals()
-		getServices()
-	}, [])
+		if (startsAt) {
+			methods.setValue("endsAt", dayjs(startsAt).add(2, "hour").toISOString())
+		}
+	}, [startsAt])
+
+	// console.log(methods.watch())
 
 	return (
 		<Modal type="Create" title="Crear un nuevo evento">
 			<FormProvider {...methods}>
-				<ConfigProvider locale={locale}>
-					<Form data={data} setData={setData} action={createEvent} actionType="update">
-						<SuperSelect label="Seleccione el profesional" name="professionalId" options={professionals} />
-						<SuperSelect label="Seleccione el servicio" name="serviceId" options={services} />
-						<div className="flex  gap-2 justify-between">
-							<DatetimeSelect label="Seleccione fecha y hora de inicio del evento" name="startsAt" />
-							<DatetimeSelect label="Seleccione fecha y hora de término del evento" name="endsAt" />
-						</div>
-					</Form>
-				</ConfigProvider>
+				<Form data={data} setData={setData} action={createEvent} actionType="update" refetch={refetch}>
+					<SuperSelect label="Seleccione un servicio" name="serviceId" options={services} />
+					<SuperSelect label="Seleccione un profesional" name="professionalId" options={professionals} />
+					<SuperSelect
+						label="Seleccione un centro de atención"
+						name="centerId"
+						options={centers}
+						defaultValue={selectedCenter ? Number(selectedCenter) : undefined}
+					/>
+					<div className="flex gap-2 justify-between">
+						<DatetimeSelect label="Inicio del evento" name="startsAt" />
+						<DatetimeSelect label="Término del evento" name="endsAt" />
+					</div>
+				</Form>
 			</FormProvider>
 		</Modal>
 	)

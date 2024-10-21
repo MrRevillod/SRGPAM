@@ -5,7 +5,7 @@ import { Button } from "../components/ui/Button"
 import { API_URL } from "../lib/axios"
 import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
-import { LoginVariant } from "../lib/types"
+import { UserRole } from "../lib/types"
 import { formatRole, formatRut } from "../lib/formatters"
 
 const ProfilePage: React.FC = () => {
@@ -45,7 +45,7 @@ const ProfilePage: React.FC = () => {
 						<div className="text-center mt-4 space-y-2">
 							<h2 className="text-2xl font-bold text-dark dark:text-light">{user?.name}</h2>
 							<p className="text-gray dark:text-gray-light">{formatRut(user?.id.toString() || "")}</p>
-							<p className="text-gray dark:text-gray-light">{formatRole(role as LoginVariant)}</p>
+							<p className="text-gray dark:text-gray-light">{formatRole(role as UserRole)}</p>
 							<p className="text-gray dark:text-gray-light">{user?.email}</p>
 						</div>
 

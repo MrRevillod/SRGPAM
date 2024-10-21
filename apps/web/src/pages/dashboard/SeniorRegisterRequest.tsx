@@ -12,6 +12,7 @@ import { SeniorSchemas } from "../../lib/schemas"
 import { message, Image } from "antd"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import DatetimeSelect from "../../components/ui/DatetimeSelect"
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()
@@ -23,13 +24,13 @@ const SeniorRegisterRequestPage: React.FC = () => {
 	const { reset, handleSubmit } = methods
 
 	useEffect(() => {
-		if (!senior) navigate("/dashboard/personas-mayores/nuevos")
+		if (!senior) navigate("/personas-mayores/nuevos")
 		else reset({ rut: senior.id, email: senior.email })
 	}, [senior])
 
 	const AcceptMutation = useMutation<void>({
 		mutateFn: async () => {
-			return await api.patch(`/dashboard/seniors/${senior.id}/new?validate=true`)
+			return await api.patch(`/seniors/${senior.id}/new?validate=true`)
 		},
 	})
 
@@ -44,7 +45,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 			params: { body: formData },
 			onSuccess: () => {
 				message.success("Solicitud aceptada")
-				navigate("/dashboard/personas-mayores/nuevos")
+				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
 				message.error("Error al aceptar la solicitud. Intente nuevamente.")
@@ -57,7 +58,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 		await DenyMutation.mutate({
 			onSuccess: () => {
 				message.success("Solicitud denegada")
-				navigate("/dashboard/personas-mayores/nuevos")
+				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
 				message.error("Error al denegar la solicitud. Intente nuevamente.")
@@ -87,7 +88,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 							readOnly={true}
 						/>
 						<Input name="address" label="Dirección" type="text" placeholder="Dirección" />
-						<DatePicker name="birthDate" label="Fecha de nacimiento" />
+						<DatetimeSelect name="birthDate" label="Fecha de nacimiento" showTime={false} />
 
 						<div className="flex flex-col gap-8">
 							<p>
@@ -108,7 +109,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 								<Button
 									variant="secondary"
 									type="button"
-									onClick={() => navigate("/dashboard/personas-mayores/nuevos")}
+									onClick={() => navigate("/personas-mayores/nuevos")}
 								>
 									Cancelar
 								</Button>

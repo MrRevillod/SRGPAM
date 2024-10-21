@@ -2,7 +2,7 @@ import React from "react"
 
 import { api } from "../lib/axios"
 import { Dispatch, SetStateAction } from "react"
-import { LoginFormData, LoginVariant, User } from "../lib/types"
+import { LoginFormData, Nullable, User, UserRole } from "../lib/types"
 import { createContext, ReactNode, useEffect, useState } from "react"
 
 // Contexto para manejar la autenticación de los usuarios
@@ -14,7 +14,7 @@ interface AuthContextType {
 	user: User | null
 	loading: boolean
 	error: string | null
-	role: LoginVariant | null
+	role: Nullable<UserRole>
 	login: (credentials: LoginFormData) => Promise<void>
 	logout: () => Promise<void>
 	refreshToken: () => Promise<void>
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null)
 	const [loading, setLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
-	const [role, setRole] = useState<LoginVariant | null>(null)
+	const [role, setRole] = useState<Nullable<UserRole>>(null)
 
 	// login: Función para iniciar sesión en la aplicación
 	const login = async (credentials: LoginFormData) => {
@@ -44,19 +44,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await api.post(`/auth/login?variant=${credentials.role}`, {
 				email: credentials.email,
 				password: credentials.password,
-            })
-            console.log(response)
-			setUser(response.data.values.user)
+			})
+
+			const res = response.data.values
+
+			setUser(res.user)
 			setIsAuthenticated(true)
 			setError(null)
-			setRole(response.data.values.role)
+			setRole(res.role)
+
+			// Se almacena el token de autenticación en el localStorage
+			// para utilizarlo en caso de cerrar sesión y mantener
+			// la selección de ocupación en el formulario de inicio de sesión
+
+			localStorage.setItem("role", res.role)
 		} catch (error: any) {
-			setError(error.response.data.message)
+			setError(error.response?.data?.message || "Error al iniciar sesión")
 			setRole(null)
 			setUser(null)
+			setIsAuthenticated(false)
+		} finally {
+			setLoading(false)
 		}
-
-		setLoading(false)
 	}
 
 	// logout: Función para cerrar sesión en la aplicación
@@ -88,14 +97,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		} catch (error) {
 			setUser(null)
 			setIsAuthenticated(false)
+			setRole(null)
 		}
+
 		setLoading(false)
 	}
 
 	// refreshToken: Función para refrescar el token de autenticación
 	const refreshToken = async () => {
-		setLoading(true)
-
 		try {
 			const response = await api.get("/auth/refresh")
 			setRole(response.data.values.role)
@@ -105,8 +114,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setRole(null)
 			setIsAuthenticated(false)
 		}
-
-		setLoading(false)
 	}
 
 	useEffect(() => {
@@ -122,12 +129,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	)
 }
 
-export const useAuth = (): AuthContextType => {
+// Hook para consumir el contexto de autenticación
+
+export const useAuth = () => {
 	const context = React.useContext(AuthContext)
-	if (!context) {
-		throw new Error("useAuth debe ser utilizado dentro de un AuthProvider")
+
+	if (context === undefined) {
+		throw new Error("useAuth must be used within an AuthProvider")
 	}
+
 	return context
 }
-
-export default AuthContext

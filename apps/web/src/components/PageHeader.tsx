@@ -7,6 +7,7 @@ import { Breadcrumb } from "flowbite-react"
 import { useNavigate } from "react-router-dom"
 import { AiOutlinePlus, AiFillHome } from "react-icons/ai"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import clsx from "clsx"
 
 interface PageHeaderProps {
 	pageTitle: string
@@ -41,8 +42,14 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 
 	return (
 		<section className="flex flex-col gap-4 w-full mb-4">
-			<div className="flex flex-row w-full">
-				<div className="flex flex-col gap-4 w-4/6">
+			<div
+				className={clsx(
+					"flex w-full gap-4 justify-between",
+					data && setData && searchKeys && "flex-col md:flex-row",
+					!data && !setData && !searchKeys && "flex-row",
+				)}
+			>
+				<div className="flex flex-col gap-4 w-full md:w-3/6 xl:w-4/6">
 					<h1 className="text-2xl font-bold text-dark dark:text-light">{pageTitle}</h1>
 					<Breadcrumb aria-label="Default breadcrumb example" className="text-neutral-500">
 						<Breadcrumb.Item href="/" icon={AiFillHome} />
@@ -54,7 +61,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 					</Breadcrumb>
 				</div>
 
-				<div className="flex flex-row gap-4 w-2/6 items-center justify-center">
+				<div className="flex flex-row gap-4 w-full md:w-3/6 xl:w-2/6 items-center justify-end">
 					{data && setData && searchKeys && <SearchBar data={data} setData={setData} keys={searchKeys} />}
 
 					<Show when={create != undefined}>
@@ -68,8 +75,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 					</Show>
 				</div>
 			</div>
-
-			{/* <hr className="my-1 border-neutral-700 dark:border-gray-medium" /> */}
 		</section>
 	)
 }

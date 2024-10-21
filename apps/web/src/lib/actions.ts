@@ -70,7 +70,7 @@ export const getNewSeniors = async () => {
 }
 
 export const createSenior = async (props: MutateActionProps) => {
-	return await apiRequest.post("/dashboard/seniors", props)
+	return await apiRequest.post("/dashboard/seniors/pre-checked", props)
 }
 
 export const updateSenior = async (props: MutateActionProps) => {

@@ -13,9 +13,10 @@ interface ConfirmActionProps<T> {
 	data: T | T[]
 	setData: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
 	action: MutateAction
+	refetch?: () => void
 }
 
-const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action }: ConfirmActionProps<T>) => {
+const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action, refetch }: ConfirmActionProps<T>) => {
 	const { handleOk, handleCancel, selectedData } = useModal()
 
 	const mutation = useMutation<MutationResponse<T>>({
@@ -26,21 +27,23 @@ const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action }: 
 		await mutation.mutate({
 			params: { id: selectedData?.id || null },
 			onSuccess: (res) => {
-				const { modified: deleted } = res
+				if (!refetch) {
+					const { modified: deleted } = res
 
-				if (!deleted) {
-					message.error("Error al guardar. Intente nuevamente o recargue la página.")
-					return
+					if (!deleted) {
+						return message.error("Error al guardar. Intente nuevamente o recargue la página.")
+					}
+
+					if (Array.isArray(data)) {
+						const setter = setData as Dispatch<SetStateAction<T[]>>
+						setter(data.filter((element) => element.id !== deleted.id))
+					} else {
+						const setter = setData as Dispatch<SetStateAction<T | null>>
+						setter(null)
+					}
 				}
 
-				if (Array.isArray(data)) {
-					const setter = setData as Dispatch<SetStateAction<T[]>>
-					setter(data.filter((element) => element.id !== deleted.id))
-				} else {
-					const setter = setData as Dispatch<SetStateAction<T | null>>
-					setter(null)
-				}
-
+				refetch && refetch()
 				message.success("Hecho")
 				handleOk()
 			},

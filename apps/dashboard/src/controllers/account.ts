@@ -1,10 +1,10 @@
 import { hash } from "bcrypt"
-import { prisma } from "@repo/database"
-import { Request, Response, NextFunction } from "express"
-import sendMail from "../utils/mailer"
-import { AppError, CustomTokenOpts, signJsonwebtoken, services, findUser, verifyJsonwebtoken, AccessTokenOpts, isValidUserRole } from "@repo/lib"
 import { match } from "ts-pattern"
+import { prisma } from "@repo/database"
+import { sendMail } from "../utils/mailer"
 import { resetPasswordBody } from "../utils/emailTemplates"
+import { Request, Response, NextFunction } from "express"
+import { AppError, CustomTokenOpts, signJsonwebtoken, services, findUser, verifyJsonwebtoken, AccessTokenOpts, isValidUserRole } from "@repo/lib"
 
 export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction) => {
 	const userRole = req.query.variant

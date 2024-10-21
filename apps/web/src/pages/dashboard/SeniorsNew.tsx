@@ -4,8 +4,8 @@ import PageLayout from "../../layouts/PageLayout"
 
 import { message } from "antd"
 import { useRequest } from "../../hooks/useRequest"
+import { getSeniors } from "../../lib/actions"
 import { useNavigate } from "react-router-dom"
-import { getNewSeniors } from "../../lib/actions"
 import { useState, useEffect } from "react"
 import { Senior, UnvalidatedSenior } from "../../lib/types"
 import { UnvalidatedSeniorsColumns } from "../../lib/columns"
@@ -15,7 +15,8 @@ const NewSeniorsPage: React.FC = () => {
 	const navigate = useNavigate()
 
 	const { error, loading, data } = useRequest<Senior[]>({
-		action: getNewSeniors,
+		action: getSeniors,
+		query: "validated=false",
 	})
 
 	useEffect(() => {
@@ -25,7 +26,7 @@ const NewSeniorsPage: React.FC = () => {
 	if (error) message.error("Error al cargar los datos")
 
 	const handleView = (senior: UnvalidatedSenior) => {
-		navigate(`/dashboard/personas-mayores/solicitud-de-registro`, {
+		navigate(`/personas-mayores/solicitud-de-registro`, {
 			state: { senior },
 		})
 	}

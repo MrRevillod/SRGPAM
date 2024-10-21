@@ -80,13 +80,15 @@ export const birthDateSchema = z.date({
 	invalid_type_error: "La fecha de nacimiento ingresada no es válida",
 	required_error: "La fecha de nacimiento es obligatoria ",
 })
-export const dateTimeSchema = z.number().refine(
+export const dateTimeSchema = z.string().refine(
 	(value) => {
+		console.log(value)
 		const date = new Date(value)
 		return !isNaN(date.getTime())
 	},
 	{
-		message: "La fecha de ingr  esada no es válida",
+		message: "La fecha de ingresada no es válida",
+		path: ["startsAt", "endsAt", "birthDate"],
 	},
 )
 
@@ -130,3 +132,7 @@ export const phoneSchema = z
 	.regex(/^[0-9]+$/, "El teléfono solo puede contener números")
 	.min(8, "El número de teléfono debe tener al menos 8 dígitos")
 	.max(15, "El número de teléfono no debe tener más de 15 dígitos")
+
+export const colorSchema = z
+	.string()
+	.regex(/^#?[0-9A-Fa-f]{6}$/, "El color debe ser un código hexadecimal válido")

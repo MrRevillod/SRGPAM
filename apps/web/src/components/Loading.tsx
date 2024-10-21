@@ -12,7 +12,7 @@ const Spinner: React.FC = () => {
 
 export const Loading: React.FC = () => {
 	return (
-		<div className={clsx("fixed inset-0 z-50 flex items-center justify-center h-screen")}>
+		<div className={clsx("fixed inset-0 z-50 flex items-center justify-center h-screen bg-transparent")}>
 			<Spinner />
 		</div>
 	)
