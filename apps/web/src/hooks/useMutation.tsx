@@ -25,7 +25,6 @@ export const useMutation = <T,>({ mutateFn }: useMutationProps) => {
 			if (onError && err.response) {
 				onError(err)
 			} else {
-				console.log(err)
 				throw new Error(err.response?.data?.message || "Error desconocido")
 			}
 		}

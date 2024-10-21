@@ -1,41 +1,36 @@
-import { prisma } from "@repo/database"
-import { Request, Response, NextFunction } from "express"
 import { io } from ".."
-import { Prisma, Senior } from "@prisma/client"
-import { canAddEvent } from "../utils/events"
+import { prisma } from "@repo/database"
+import { Senior } from "@prisma/client"
 import { AppError } from "@repo/lib"
+import { canAddEvent } from "../utils/events"
+import { Request, Response, NextFunction } from "express"
+import { EventQuery, eventSelect, generateWhere } from "../utils/filters"
 
-// Controlador para obtener todos los administradores de la base de datos
-// se excluye el campo password de la respuesta
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// y para filtrar por claves foraneas
+
+// Un ejemplo de query sería: /events?select=startsAt,endsAt&professionalId=1
+
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
+	// Mapa de query a where
+	// Este objecto almacena las claves posibles de la query y su transformación a where
+	const queryToWhereMap = {
+		professionalId: (value: any) => ({ equals: value }),
+		serviceId: (value: any) => ({ equals: Number(value) }),
+		centerId: (value: any) => ({ equals: Number(value) }),
+		seniorId: (value: any) => (value ? { equals: value } : null),
+	}
+
+	// Generamos el where a partir de la query y el mapa
+	const where = generateWhere<EventQuery>(req.query, queryToWhereMap)
+
 	try {
-		const Events = await prisma.event.findMany({
-			select: {
-				id: true,
-				startsAt: true,
-				endsAt: true,
-				assistance: true,
-				seniorId: true,
-				professionalId: true,
-				serviceId: true,
-				centerId: true,
-				service: {
-					select: {
-						name: true,
-						color: true,
-					},
-				},
-			},
+		const events = await prisma.event.findMany({
+			where,
+			select: eventSelect,
 		})
 
-		return res.status(200).json({
-			message: "Administradores obtenidos correctamente",
-			type: "success",
-			values: {
-				Events,
-				len: Events.length,
-			},
-		})
+		return res.status(200).json({ values: events })
 	} catch (error) {
 		next(error)
 	}
@@ -81,62 +76,46 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				throw new AppError(400, "Centro no encontrado")
 			}
 		}
-		// const eventSelect: Prisma.EventSelect = {
-		// 	startsAt: true,
-		// 	endsAt: true,
-		// }
 
 		const events = await prisma.event.findMany({
 			where: { professionalId: professionalId },
 		})
 
-		if (
-			canAddEvent(events, {
+		if (!canAddEvent(events, { startsAt: new Date(startsAt), endsAt: new Date(endsAt) })) {
+			return res.status(409).json({ message: "Superposición de horas", type: "error" })
+		}
+
+		const event = await prisma.event.create({
+			data: {
 				startsAt: new Date(startsAt),
 				endsAt: new Date(endsAt),
-			})
-		) {
-			const event = await prisma.event.create({
-				data: {
-					startsAt: new Date(startsAt),
-					endsAt: new Date(endsAt),
-					professionalId,
-					serviceId: parseInt(serviceId),
-					seniorId: seniorId || null,
-					centerId: centerId ? parseInt(serviceId) : null,
-				},
-				select: {
-					id: true,
-					startsAt: true,
-					endsAt: true,
-					assistance: true,
-					seniorId: true,
-					professionalId: true,
-					serviceId: true,
-					centerId: true,
-					service: {
-						select: {
-							name: true,
-							color: true,
-						},
+				professionalId,
+				serviceId: parseInt(serviceId),
+				seniorId: seniorId || null,
+				centerId: centerId ? parseInt(serviceId) : null,
+			},
+			select: {
+				id: true,
+				startsAt: true,
+				endsAt: true,
+				assistance: true,
+				seniorId: true,
+				professionalId: true,
+				serviceId: true,
+				centerId: true,
+				service: {
+					select: {
+						name: true,
+						color: true,
 					},
 				},
-			})
+			},
+		})
 
-			//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
-			//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+		//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
+		//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
 
-			return res.status(200).json({
-				message: "Creación exitosa",
-				type: "success",
-				values: event,
-			})
-		} else {
-			return res.status(409).json({
-				message: "Superposición de horas",
-				type: "error",
-			})
-		}
+		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
 		next(error)
 	}
@@ -216,7 +195,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			return res.status(200).json({
 				message: "Actualización exitosa",
 				type: "success",
-				values: { updated: event },
+				values: { modified: event },
 			})
 		} else {
 			return res.status(409).json({
@@ -233,13 +212,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const event = await prisma.event.delete({ where: { id: parseInt(req.params.id) } })
-
 		io.emit("deletedEvent", event)
-		return res.status(200).json({
-			message: "Eliminación exitosa",
-			type: "success",
-			values: { deletedId: req.params.id },
-		})
+		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
 		next(error)
 	}
@@ -247,20 +221,15 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 
 export const reserveEvent = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log("CONTROLADOR")
-
 		const { id } = req.params
 
 		const senior = req.getExtension("user") as Senior
-		console.log("User from request:", senior)
 
 		const event = await prisma.event.findUnique({
 			where: { id: Number(id) },
 		})
 
-		if (!event) {
-			throw new AppError(404, "Evento no encontrado")
-		}
+		if (!event) throw new AppError(404, "Evento no encontrado")
 
 		const twoMonthsAgo = new Date()
 		twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
@@ -289,12 +258,8 @@ export const reserveEvent = async (req: Request, res: Response, next: NextFuncti
 				seniorId: senior.id,
 			},
 		})
-		console.log()
-		return res.status(200).json({
-			message: "Evento reservado con éxito",
-			values: updatedEvent,
-			//values: null,
-		})
+
+		return res.status(200).json({ values: updatedEvent })
 	} catch (error) {
 		next(error)
 	}

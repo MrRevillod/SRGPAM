@@ -3,6 +3,7 @@ import { prisma } from "@repo/database"
 import { Prisma, Senior } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
 import { AppError, constants, httpRequest } from "@repo/lib"
+import { generateSelect, generateWhere, seniorSelect } from "../utils/filters"
 import { deleteProfilePicture, filesToFormData, uploadProfilePicture } from "../utils/files"
 
 /// Controlador para manejar el registro de adultos mayores desde la aplicación móvil
@@ -113,21 +114,16 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 
 // Controladores CRUD para los adultos mayores
 
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// Un ejemplo de query sería: /seniors?select=name,email&validated=true
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
+	const queryToWhereMap = { validated: (value: any) => ({ equals: value === "true" }) }
+	const where = generateWhere<Prisma.SeniorWhereInput>(req.query, queryToWhereMap)
+	const selectQuery = req.query.select?.toString()
+	const select = generateSelect<Prisma.SeniorSelect>(selectQuery, seniorSelect)
+
 	try {
-		const seniors = await prisma.senior.findMany({
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				address: true,
-				birthDate: true,
-				validated: true,
-				password: false,
-				createdAt: true,
-				updatedAt: true,
-			},
-		})
+		const seniors = await prisma.senior.findMany({ where, select })
 		return res.status(200).json({ values: seniors })
 	} catch (error) {
 		next(error)
@@ -152,15 +148,13 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 		const userExists = await prisma.senior.findFirst({ where: filter })
 
 		if (userExists) {
-			const conflicts = []
-
+			const conflicts = new Array<string>()
 			if (userExists?.id === id) conflicts.push("id")
 			if (userExists?.email === email) conflicts.push("email")
-
 			throw new AppError(409, "La persona mayor ya existe", { conflicts })
 		}
 
-		const { password, ...senior } = await prisma.senior.create({
+		const senior = await prisma.senior.create({
 			data: {
 				id,
 				name,
@@ -170,6 +164,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				birthDate: new Date(birthDate),
 				validated: true,
 			},
+			select: seniorSelect,
 		})
 
 		return res.status(201).json({ values: { modified: senior } })
@@ -202,17 +197,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 				address,
 				birthDate: new Date(birthDate),
 			},
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				address: true,
-				birthDate: true,
-				validated: true,
-				password: false,
-				createdAt: true,
-				updatedAt: true,
-			},
+			select: seniorSelect,
 		})
 
 		const response = { modified: senior, image: null }

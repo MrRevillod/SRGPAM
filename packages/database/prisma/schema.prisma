@@ -34,10 +34,10 @@ model Senior {
 
 model Service {
   id          Int      @id @default(autoincrement())
-  name        String   @db.Text
+  name        String   @unique @db.VarChar(255)
   title       String   @db.Text
   description String   @db.Text
-  color       String   @db.Text    
+  color       String   @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -47,7 +47,7 @@ model Service {
 
 model Center {
   id      Int    @id @default(autoincrement())
-  name    String @db.Text
+  name    String @unique @db.VarChar(255)
   address String @db.Text
   phone   String @db.VarChar(255)
 

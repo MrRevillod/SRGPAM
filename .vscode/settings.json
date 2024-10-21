@@ -24,7 +24,7 @@
     "**/dist": true,
     "**/.turbo": true,
     "**/__tests__": true,
-    "**/migrations": true,
+    // "**/migrations": true,
     "config": true,
   },
   "explorer.fileNesting.enabled": true,

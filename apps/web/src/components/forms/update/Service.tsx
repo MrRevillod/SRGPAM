@@ -6,6 +6,7 @@ import { Modal } from "../../Modal"
 import { useModal } from "../../../context/ModalContext"
 import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ColorPicker } from "../../ColorPicker"
 import { updateService } from "../../../lib/actions"
 import { ServiceSchemas } from "../../../lib/schemas"
 import { ImageSelector } from "../../ImageSelector"
@@ -27,6 +28,7 @@ const UpdateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 				name: selectedData.name,
 				title: selectedData.title,
 				description: selectedData.description,
+				color: selectedData.color.toString().split("#")[1],
 			})
 		}
 	}, [selectedData])
@@ -43,6 +45,7 @@ const UpdateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 						type="text"
 						placeholder="¿En qué consiste el servicio?"
 					/>
+					<ColorPicker label="Color del servicio" />
 					<ImageSelector imageLabel="Imagen del servicio" />
 				</Form>
 			</FormProvider>

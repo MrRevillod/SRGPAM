@@ -1,14 +1,21 @@
 import { prisma } from "@repo/database"
+import { Prisma } from "@prisma/client"
 import { fileToFormData } from "../utils/files"
 import { AppError, httpRequest } from "@repo/lib"
 import { Request, Response, NextFunction } from "express"
+import { generateSelect, serviceSelect } from "../utils/filters"
+
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// Un ejemplo de query sería: /services?select=name,color
 
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const services = await prisma.service.findMany({
-			select: { id: true, name: true, title: true, description: true },
-		})
+	// Se extraen los campos de la query select
+	const selectQuery = req.query.select?.toString()
+	// Se mapean los campos de la query select a los campos de la base de datos
+	const select = generateSelect<Prisma.ServiceSelect>(selectQuery, serviceSelect)
 
+	try {
+		const services = await prisma.service.findMany({ select })
 		return res.status(200).json({ values: services })
 	} catch (error) {
 		next(error)
@@ -17,21 +24,24 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { name, title, description } = req.body
+		const { name, title, description, color } = req.body
 		const file = req.file
 
 		if (!file) throw new AppError(400, "No se a enviado un archivo")
 
 		const serviceExists = await prisma.service.findFirst({
-			where: { name },
+			where: { OR: [{ name }, { color }] },
 		})
 
 		if (serviceExists) {
-			throw new AppError(409, "El servicio con ese nombre ya existe", { conflicts: ["name"] })
+			const conflicts = []
+			if (serviceExists.name === name) conflicts.push("name")
+			if (serviceExists.color === color) conflicts.push("color")
+			throw new AppError(400, "Ya existe un servicio con este nombre o color", { conflicts })
 		}
 
 		const service = await prisma.service.create({
-			data: { name, title, description },
+			data: { name, title, description, color },
 		})
 
 		const response = await httpRequest<null>({
@@ -56,12 +66,23 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 export const updateById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params
-		const { name, title, description } = req.body
+		const { name, title, description, color } = req.body
+
+		const serviceExists = await prisma.service.findFirst({
+			where: { OR: [{ name }, { color }], AND: { NOT: { id: Number(id) } } },
+		})
+
+		if (serviceExists) {
+			const conflicts = []
+			if (serviceExists.name === name) conflicts.push("name")
+			if (serviceExists.color === color) conflicts.push("color")
+			throw new AppError(409, "Ya existe un servicio con este nombre o color", { conflicts })
+		}
 
 		const service = await prisma.service.update({
 			where: { id: Number(id) },
-			data: { name, title, description },
-			select: { id: true, name: true, title: true, description: true },
+			data: { name, title, description, color },
+			select: { id: true, name: true, title: true, description: true, color: true },
 		})
 
 		if (req.file) {

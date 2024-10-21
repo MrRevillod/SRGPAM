@@ -2,18 +2,19 @@ import { AxiosResponse } from "axios"
 import { GetProp, UploadProps } from "antd"
 import { Dispatch, SetStateAction } from "react"
 
+export type HexColor = `#${string}`
 export type Nullable<T> = T | null
 
 export type BaseDataType = {
 	id: string | number
 }
 
-export type LoginVariant = "ADMIN" | "PROFESSIONAL"
+export type UserRole = "ADMIN" | "PROFESSIONAL"
 
 export type LoginFormData = {
 	email: string
 	password: string
-	role: LoginVariant
+	role: UserRole
 }
 
 interface IUser {
@@ -34,6 +35,7 @@ export type Service = {
 	name: string
 	title: string
 	description: string
+	color: HexColor
 }
 
 export type Center = {
@@ -73,21 +75,25 @@ export type TableColumnType<T> = Array<{
 export type FormProps<T> = {
 	data: T[]
 	setData: Dispatch<SetStateAction<T[]>>
+	refetch?: () => void
 }
 
 export type Event = {
-	id: string // Equivalente de Int en Prisma
-	startsAt: string // DateTime en Prisma es Date en TypeScript
+	id: string
+	startsAt: string
 	endsAt: string
-	assistance: boolean // Boolean en Prisma es boolean en TS
+	assistance: boolean
 
-	createdAt: Date
-	updatedAt: Date
-
-	seniorId?: string | null // Campos opcionales en Prisma se traducen a `| null` o con `?`
+	seniorId?: string | null
 	professionalId: string
 	centerId?: number | null
 	serviceId?: number | null
+
+	service: Partial<Service>
+	center: Partial<Center>
+
+	createdAt: Date
+	updatedAt: Date
 }
 
 export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
@@ -109,4 +115,9 @@ export interface MutateActionProps {
 export type MutationResponse<T> = {
 	modified: T
 	image?: string
+}
+
+export type SuperSelectField = {
+	label: string
+	value: string
 }

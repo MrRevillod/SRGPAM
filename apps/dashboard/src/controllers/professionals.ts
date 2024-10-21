@@ -4,24 +4,24 @@ import { AppError, constants } from "@repo/lib"
 import { Prisma, Professional } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
 import { deleteProfilePicture, uploadProfilePicture } from "../utils/files"
+import { generateSelect, generateWhere, ProfessionalQuery, professionalSelect } from "../utils/filters"
 
-// Controlador para obtener todos los profesionales de la base de datos
-// se excluye el campo password de la respuesta
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// y para filtrar por claves foraneas
+
+// Un ejemplo de query sería: /professionals?select=name,email&serviceId=1
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const professionals = await prisma.professional.findMany({
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: false,
-				serviceId: true,
-				updatedAt: true,
-				createdAt: true,
-				service: { select: { title: true } },
-			},
-		})
+	// Se mapean los campos de la query where (filtro) a los campos de la base de datos
+	const queryToWhereMap = { serviceId: (value: any) => ({ equals: Number(value) }) }
+	const where = generateWhere<ProfessionalQuery>(req.query, queryToWhereMap)
 
+	// Se mapean los campos de la query select a los campos de la base de datos
+	// si no se envía un query select se seleccionan los campos por defecto
+	const selectQuery = req.query.select?.toString()
+	const select = generateSelect<Prisma.ProfessionalSelect>(selectQuery, professionalSelect)
+
+	try {
+		const professionals = await prisma.professional.findMany({ select, where })
 		return res.status(200).json({ values: professionals })
 	} catch (error) {
 		next(error)
@@ -31,7 +31,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 // Controlador para crear un nuevo profesional
 export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id, name, email } = req.body
+		const { id, name, email, serviceId } = req.body
 		const DEFAULT_PASSWORD = await hash(constants.DEFAULT_PROFESSIONAL_PASSWORD, 10)
 
 		// Verificamos si el profesional ya existe
@@ -54,19 +54,13 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			throw new AppError(409, "El profesional ya existe", { conflicts })
 		}
 
+		if (!(await prisma.service.findFirst({ where: { id: serviceId } }))) {
+			throw new AppError(409, "El servicio no existe", { conflicts: ["serviceId"] })
+		}
+
 		const professional = await prisma.professional.create({
-			data: { id, name, email, password: DEFAULT_PASSWORD },
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: false,
-				updatedAt: true,
-				createdAt: true,
-				service: {
-					select: { name: true },
-				},
-			},
+			data: { id, name, email, password: DEFAULT_PASSWORD, serviceId },
+			select: professionalSelect,
 		})
 
 		return res.status(201).json({ values: { modified: professional } })
@@ -93,19 +87,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 
 		const professional = await prisma.professional.update({
 			where: { id },
+			select: professionalSelect,
 			data: { name, email, password: updatedPassword },
-			select: {
-				id: true,
-				name: true,
-				email: true,
-				password: false,
-				serviceId: true,
-				updatedAt: true,
-				createdAt: true,
-				service: {
-					select: { name: true },
-				},
-			},
 		})
 
 		const response = { modified: professional, image: null }

@@ -1,68 +1,51 @@
-import React, { useEffect, useState } from "react"
-import { ConfigProvider, DatePicker, Space } from "antd"
-import { Controller, useFormContext } from "react-hook-form"
-import { useModal } from "../../context/ModalContext"
+import clsx from "clsx"
+import React from "react"
 import dayjs, { Dayjs } from "dayjs"
-import locale from "antd/locale/es_ES"
+import { DatePicker } from "antd"
+import { Controller, useFormContext } from "react-hook-form"
 
-const DatetimeSelect = ({ label, name, defaultValue }: { label: string; name: string; defaultValue?: Dayjs }) => {
+interface DatetimeSelectProps {
+	label: string
+	name: string
+	showTime?: boolean
+	defaultValue?: Dayjs
+}
+
+const DatetimeSelect = ({ label, name, showTime = true, defaultValue }: DatetimeSelectProps) => {
 	const {
+		control,
 		setValue,
 		formState: { errors },
-		control,
-		getValues,
-		watch, // Permite observar cambios en los valores
 	} = useFormContext()
 
-	const [date, setDate] = useState<Dayjs | null>(defaultValue || null)
-	const { isModalOpen } = useModal()
-
-	// Observar el valor de startsAt
-	const startsAtValue = watch("startsAt")
-
-	useEffect(() => {
-		// Actualiza el valor del campo cuando cambia el defaultValue
-		if (defaultValue) {
-			setValue(name, defaultValue.valueOf())
-			setDate(defaultValue)
-		} else if (name === "endsAt" && !getValues(name) && startsAtValue) {
-			// Auto rellena endsAt cuando startsAt tiene un valor y endsAt está vacío
-			setValue(name, startsAtValue)
-			setDate(dayjs(startsAtValue))
-		}
-	}, [defaultValue, name, startsAtValue])
-
-	useEffect(() => {
-		if (!isModalOpen) {
-			setDate(null)
-		}
-	}, [isModalOpen])
+	const classes = clsx(
+		errors[name] ? "border-red" : "border-gray-dark",
+		"rounded-lg text-sm focus:outline-none focus:ring-primary-green",
+		"focus:border-primary-green w-full h-10 placeholder-neutral-400",
+		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
+	)
 
 	return (
-		<Space direction="vertical" size={12}>
+		<div className="flex flex-col gap-4">
 			<div className="flex flex-row gap-2 items-center justify-between">
 				<label className="font-semibold">{label}</label>
-				{errors[name] && <div className="text-red-600 text-sm">{errors[name]?.message?.toString()}</div>}
+				{errors[name] && <div className="text-red text-sm">{errors[name]?.message?.toString()}</div>}
 			</div>
 			<Controller
 				control={control}
 				name={name}
 				render={({ field }) => (
-					<ConfigProvider locale={locale}>
-						<DatePicker
-							{...field}
-							showTime
-							value={date} // El valor que manejamos en el estado
-							defaultValue={defaultValue} // Solo inicializa el valor, pero luego depende de `value`
-							onChange={(value) => {
-								setValue(name, value?.valueOf()) // Guarda el valor como timestamp
-								setDate(value) // Actualiza el estado local
-							}}
-						/>
-					</ConfigProvider>
+					<DatePicker
+						{...field}
+						className={classes}
+						showTime={showTime}
+						value={field.value ? dayjs(field.value) : null}
+						defaultValue={defaultValue ? dayjs(defaultValue) : null}
+						onChange={(event) => setValue(name, event ? dayjs(event).toISOString() : null)}
+					/>
 				)}
 			/>
-		</Space>
+		</div>
 	)
 }
 
