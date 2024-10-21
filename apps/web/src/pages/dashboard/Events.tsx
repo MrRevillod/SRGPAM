@@ -1,82 +1,74 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
+import esLocale from "@fullcalendar/core/locales/es"
 import PageLayout from "../../layouts/PageLayout"
+import CreateEvent from "../../components/forms/create/Event"
+import UpdateEvent from "../../components/forms/update/Event"
 import FullCalendar from "@fullcalendar/react"
+import ConfirmAction from "../../components/ConfirmAction"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import timeGridPlugin from "@fullcalendar/timegrid"
 import interactionPlugin from "@fullcalendar/interaction"
-import { api } from "../../lib/axios"
-import CreateEvent from "../../components/forms/create/Event"
-import UpdateEvent from "../../components/forms/update/Event"
-import ConfirmAction from "../../components/ConfirmAction"
 
 import { Event } from "../../lib/types"
+import { message } from "antd"
 import { useModal } from "../../context/ModalContext"
+import { useRequest } from "../../hooks/useRequest"
+import { useLocation } from "react-router-dom"
 import { EventSourceInput } from "@fullcalendar/core/index.js"
-
-import esLocale from "@fullcalendar/core/locales/es"
-import { deleteEvent } from "../../lib/actions"
+import { useEffect, useState } from "react"
+import { deleteEvent, getEvents } from "../../lib/actions"
 
 const EventsPage: React.FC = () => {
-	const [fullEvents, setfullEvents] = useState<EventSourceInput>([])
-	const [events, setEvents] = useState<Event[]>([])
+	const location = useLocation()
+	const [pageQuery, setPageQuery] = useState<string>("")
 
-	const { showModal, isModalOpen } = useModal()
-	const eventsFormat = (events: any[]) => {
-		const eventos = new Array<EventSourceInput>()
-		events.forEach((element: Event) => {
-			//@ts-ignore
-			eventos.push({
-				id: element.id.toString(),
-				//@ts-ignore
-				start: element.startsAt,
-				end: element.endsAt,
-				//@ts-ignore
-				title: element.service.name,
-				//@ts-ignore
-				backgroundColor: element.service.color,
-			})
-		})
-		return eventos
-	}
-	const fetchEvents = async () => {
-		try {
-			const { data } = await api.get("/dashboard/events")
-			const evs = eventsFormat(data.values.Events) as EventSourceInput
-			setfullEvents(evs)
-			setEvents(data.values.Events)
-		} catch (err) {
-			console.log(err)
-		}
-	}
-	const handleDelete = async (event: any) => {
-		try {
-			const response = await api.delete(`/dashboard/events/${event.id}`)
-			return response
-		} catch (error) {
-			console.error("Error en el delete:", error)
-		}
+	const [events, setEvents] = useState<Event[]>([])
+	const [formattedEvents, setFormattedEvents] = useState<EventSourceInput>([])
+
+	const { showModal } = useModal()
+
+	// Se obtiene la query de la URL para utilizarla en el filtro de eventos
+	useEffect(() => {
+		setPageQuery(new URLSearchParams(location.search).toString())
+	}, [location])
+
+	const eventsFormat = (events: Event[]) => {
+		return events.map((event) => ({
+			id: event.id.toString(),
+			start: event.startsAt,
+			end: event.endsAt,
+			title: event.service.name,
+			backgroundColor: event.service.color,
+		}))
 	}
 
 	const getEvent = (eventId: string) => {
 		const selectedEvent = events.find((ev) => eventId === ev.id.toString())
 		return selectedEvent || events[0]
 	}
-	useEffect(() => {
-		// Fetch events from backend
-		fetchEvents()
-	}, [isModalOpen])
 
-	useEffect(() => {
-		const evs = eventsFormat(events) as EventSourceInput
-		setfullEvents(evs)
-	}, [events])
+	// Se obtienen los eventos de la base de datos
+	// y se formatean para ser mostrados en el calendario
+	// refetch es una función que permite volver a obtener los eventos
+	// en caso de que se realice alguna acción que modifique los eventos
+
+	const { error, refetch } = useRequest<Event[]>({
+		action: getEvents,
+		query: pageQuery,
+		onSuccess: (events) => {
+			setEvents(events as Event[])
+			setFormattedEvents(eventsFormat(events as Event[]))
+		},
+	})
+
+	if (error) message.error("Error al cargar los datos")
 
 	return (
-		<PageLayout pageTitle="Agenda y horas de atención" create={true}>
+		<PageLayout pageTitle="Agenda y horas de atención" create>
 			<FullCalendar
 				plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
 				initialView="dayGridMonth"
-				events={fullEvents}
+				events={formattedEvents}
 				eventClick={(event) => {
 					showModal("Edit", getEvent(event.event.id))
 				}}
@@ -108,13 +100,16 @@ const EventsPage: React.FC = () => {
 					},
 				}}
 			/>
-			<CreateEvent data={events} setData={setEvents} />
-			<UpdateEvent data={events} setData={setEvents} />
+
+			<CreateEvent data={events} setData={setEvents} refetch={refetch} />
+			<UpdateEvent data={events} setData={setEvents} refetch={refetch} />
+
 			<ConfirmAction<Event>
 				text="¿Estás seguro(a) de que deseas eliminar este evento?"
 				data={events}
 				setData={setEvents}
 				action={deleteEvent}
+				refetch={refetch}
 			/>
 		</PageLayout>
 	)

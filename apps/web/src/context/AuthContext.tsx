@@ -52,15 +52,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setIsAuthenticated(true)
 			setError(null)
 			setRole(res.role)
+
+			// Se almacena el token de autenticación en el localStorage
+			// para utilizarlo en caso de cerrar sesión y mantener
+			// la selección de ocupación en el formulario de inicio de sesión
+
 			localStorage.setItem("role", res.role)
 		} catch (error: any) {
 			setError(error.response?.data?.message || "Error al iniciar sesión")
 			setRole(null)
 			setUser(null)
-			setIsAuthenticated(false) // Asegurarse de actualizar este estado
+			setIsAuthenticated(false)
+		} finally {
+			setLoading(false)
 		}
-
-		setLoading(false)
 	}
 
 	// logout: Función para cerrar sesión en la aplicación
@@ -92,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		} catch (error) {
 			setUser(null)
 			setIsAuthenticated(false)
-			setRole(null) // Asegurarse de que se actualice el estado si falla
+			setRole(null)
 		}
 
 		setLoading(false)

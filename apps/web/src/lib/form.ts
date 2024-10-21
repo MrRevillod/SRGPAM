@@ -8,10 +8,6 @@ export const getContentType = (body: any) => {
 export const buildRequestBody = (data: any): FormData | FieldValues => {
 	let formData = new FormData()
 
-	if (data.birthDate) {
-		data.birthDate = new Date(data.birthDate).toISOString()
-	}
-
 	if (data.image) {
 		Object.keys(data).forEach((key) => {
 			if (key === "image") {
@@ -28,7 +24,7 @@ export const buildRequestBody = (data: any): FormData | FieldValues => {
 export const handleFormError = (error: any, setError: any) => {
 	if (error.response) {
 		message.error(error.response.data.message)
-		if (error.response.status === 409) {
+		if (error.response.status === 409 && error.response.data.values.conflicts) {
 			error.response.data.values.conflicts.forEach((element: string) => {
 				setError(element, {
 					type: "manual",

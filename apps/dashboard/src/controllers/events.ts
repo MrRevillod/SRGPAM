@@ -6,6 +6,11 @@ import { canAddEvent } from "../utils/events"
 import { Request, Response, NextFunction } from "express"
 import { EventQuery, eventSelect, generateWhere } from "../utils/filters"
 
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// y para filtrar por claves foraneas
+
+// Un ejemplo de query sería: /events?select=startsAt,endsAt&professionalId=1
+
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	// Mapa de query a where
 	// Este objecto almacena las claves posibles de la query y su transformación a where
@@ -71,10 +76,6 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 				throw new AppError(400, "Centro no encontrado")
 			}
 		}
-		// const eventSelect: Prisma.EventSelect = {
-		// 	startsAt: true,
-		// 	endsAt: true,
-		// }
 
 		const events = await prisma.event.findMany({
 			where: { professionalId: professionalId },
@@ -194,7 +195,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			return res.status(200).json({
 				message: "Actualización exitosa",
 				type: "success",
-				values: { updated: event },
+				values: { modified: event },
 			})
 		} else {
 			return res.status(409).json({
@@ -211,13 +212,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 export const deleteById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const event = await prisma.event.delete({ where: { id: parseInt(req.params.id) } })
-
 		io.emit("deletedEvent", event)
-		return res.status(200).json({
-			message: "Eliminación exitosa",
-			type: "success",
-			values: { deletedId: req.params.id },
-		})
+		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
 		next(error)
 	}
@@ -225,20 +221,15 @@ export const deleteById = async (req: Request, res: Response, next: NextFunction
 
 export const reserveEvent = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log("CONTROLADOR")
-
 		const { id } = req.params
 
 		const senior = req.getExtension("user") as Senior
-		console.log("User from request:", senior)
 
 		const event = await prisma.event.findUnique({
 			where: { id: Number(id) },
 		})
 
-		if (!event) {
-			throw new AppError(404, "Evento no encontrado")
-		}
+		if (!event) throw new AppError(404, "Evento no encontrado")
 
 		const twoMonthsAgo = new Date()
 		twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
@@ -267,12 +258,8 @@ export const reserveEvent = async (req: Request, res: Response, next: NextFuncti
 				seniorId: senior.id,
 			},
 		})
-		console.log()
-		return res.status(200).json({
-			message: "Evento reservado con éxito",
-			values: updatedEvent,
-			//values: null,
-		})
+
+		return res.status(200).json({ values: updatedEvent })
 	} catch (error) {
 		next(error)
 	}

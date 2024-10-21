@@ -15,7 +15,6 @@ import ResetPasswordPage from "./auth/ResetPassword"
 import ValidatePasswordPage from "./auth/Password"
 import SeniorRegisterRequestPage from "./dashboard/SeniorRegisterRequest"
 
-import { Loading } from "../components/Loading"
 import { useAuth } from "../context/AuthContext"
 import { UserRole } from "../lib/types"
 import { Routes, Route, Navigate, Outlet } from "react-router-dom"
@@ -31,9 +30,11 @@ interface RouteProps {
 
 const ProtectedRoute: React.FC<RouteProps> = ({ redirectTo, allowedRoles }) => {
 	// Obtenemos los datos de autenticación del contexto de autenticación
-	const { loading, isAuthenticated, role } = useAuth()
+	const { isAuthenticated, role, loading } = useAuth()
 
-	if (loading) return <Loading />
+	if (loading) {
+		return null
+	}
 
 	// Si no se especifican roles se lanza un error (desarrollo)
 	if (allowedRoles && !allowedRoles.at(0)) {
@@ -53,14 +54,12 @@ const ProtectedRoute: React.FC<RouteProps> = ({ redirectTo, allowedRoles }) => {
 }
 
 const RedirectRoute: React.FC = () => {
-	const { loading, isAuthenticated, role } = useAuth()
-
-	if (loading) return <Loading />
+	const { isAuthenticated, role } = useAuth()
 
 	// Si el usuario está autenticado, redirigirlo dependiendo del rol
 	if (isAuthenticated) {
 		// Return el componente Navigate para que funcione correctamente
-		return role === "PROFESSIONAL" ? <Navigate to="/agenda" /> : <Navigate to="/" />
+		return role === "PROFESSIONAL" ? <Navigate to="/agenda" /> : <Navigate to="/inicio" />
 	}
 
 	// Si no está autenticado, se renderiza la ruta hija (como el login)

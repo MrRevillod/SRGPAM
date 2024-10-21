@@ -1,4 +1,5 @@
 import React from "react"
+import locale from "antd/locale/es_ES"
 
 import { ConfigProvider, ThemeConfig } from "antd"
 import { useEffect, createContext, useContext, useState, ReactNode } from "react"
@@ -53,7 +54,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 	return (
 		<ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-			<ConfigProvider theme={tokens}>{children}</ConfigProvider>
+			<ConfigProvider locale={locale} theme={tokens}>
+				{children}
+			</ConfigProvider>
 		</ThemeContext.Provider>
 	)
 }

@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
-const sendMail = async (to: string, subject: string, html: string) => {
+export const sendMail = async (to: string, subject: string, html: string) => {
 	const mailOptions = {
 		from: PROJECT_EMAIL_ADDRESS,
 		to,
@@ -30,5 +30,3 @@ const sendMail = async (to: string, subject: string, html: string) => {
 		throw new Error("Error al enviar el correo")
 	}
 }
-
-export default sendMail

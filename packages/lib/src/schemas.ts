@@ -13,14 +13,14 @@ export const SeniorSchemas = {
 		email: rules.emailSchema,
 		name: rules.nameSchema,
 		address: rules.addressSchema,
-		birthDate: rules.birthDateSchema,
+		birthDate: rules.dateTimeSchema,
 	}),
 
 	Update: z
 		.object({
 			name: rules.nameSchema,
 			address: rules.addressSchema,
-			birthDate: rules.birthDateSchema,
+			birthDate: rules.dateTimeSchema,
 			password: rules.optionalPinSchema,
 			confirmPassword: rules.optionalPinSchema,
 		})
@@ -35,11 +35,13 @@ export const ServiceSchemas = {
 		name: rules.nameServiceSchema,
 		title: rules.titleServiceSchema,
 		description: rules.descriptionSchema,
+		color: rules.colorSchema,
 	}),
 	Update: z.object({
 		name: rules.nameServiceSchema,
 		title: rules.titleServiceSchema,
 		description: rules.descriptionSchema,
+		color: rules.colorSchema,
 	}),
 }
 
@@ -55,6 +57,7 @@ export const CentersSchemas = {
 		phone: rules.phoneSchema,
 	}),
 }
+
 export const AdministratorSchemas = {
 	Create: z.object({
 		id: rules.rutSchema,
@@ -80,20 +83,43 @@ export const EventSchemas = {
 		startsAt: rules.dateTimeSchema,
 		endsAt: rules.dateTimeSchema,
 		professionalId: rules.rutSchema,
-		serviceId: z.number(),
+		serviceId: z.number({ message: "El servicio es obligatorio" }),
 		seniorId: z.optional(rules.rutSchema),
-		centerId: z.optional(z.number()),
+		centerId: z.number({ message: "El centro es obligatorio" }),
 	}),
-	Update: z.object({
-		startsAt: rules.dateTimeSchema,
-		endsAt: rules.dateTimeSchema,
-		professionalId: rules.rutSchema,
-		serviceId: z.number(),
-		assistance: z.optional(z.boolean().nullable()),
-		seniorId: z.optional(rules.rutSchema),
-		centerId: z.optional(z.number().nullable()),
-	}),
+	Update: z
+		.object({
+			startsAt: rules.dateTimeSchema,
+			endsAt: rules.dateTimeSchema,
+			professionalId: rules.rutSchema,
+			serviceId: z.number(),
+			assistance: z.boolean(),
+			seniorId: z.optional(rules.rutSchema),
+			centerId: z.number(),
+		})
+		.refine((data) => data.startsAt < data.endsAt, {
+			message: "La fecha de inicio no puede ser mayor a la fecha de finalización",
+			path: ["startsAt", "endsAt"],
+		}),
 }
 
-export const ProfessionalSchemas = AdministratorSchemas
+export const ProfessionalSchemas = {
+	Create: z.object({
+		id: rules.rutSchema,
+		name: rules.nameSchema,
+		email: rules.emailSchema,
+		serviceId: z.number({ message: "La profesión es obligatoria" }),
+	}),
 
+	Update: z
+		.object({
+			name: rules.nameSchema,
+			email: rules.emailSchema,
+			password: rules.optionalPasswordSchema,
+			confirmPassword: rules.optionalPasswordSchema,
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Las contraseñas ingresadas no coinciden",
+			path: ["confirmPassword"],
+		}),
+}

@@ -27,9 +27,13 @@ export const isValidRut = (rut: string): boolean => {
 	return verifier === expectedVerifier
 }
 
-export const rutSchema = z.string().refine(isValidRut, {
-	message: "El RUT ingresado no es válido",
-})
+export const rutSchema = z
+	.string()
+	.min(1, { message: "Campo obligatorio" })
+	.refine(isValidRut, {
+		message: "El RUT ingresado no es válido",
+		path: ["rut", "professionalId", "seniorId"],
+	})
 
 export const emailSchema = z.string().email("El correo electrónico ingresado no es válido")
 
@@ -42,6 +46,22 @@ export const optionalPinSchema = z.string().refine((value) => value === "" || /^
 })
 
 export const optionalPasswordSchema = z
+	.string()
+	.refine(
+		(value) =>
+			value === "" ||
+			(value.length >= 8 &&
+				/[A-Z]/.test(value) &&
+				/[a-z]/.test(value) &&
+				/[0-9]/.test(value) &&
+				/[\W_]/.test(value)),
+		{
+			message:
+				"La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial.",
+		},
+	)
+
+export const passwordSchema = z
 	.string()
 	.refine(
 		(value) =>
@@ -72,10 +92,10 @@ export const descriptionSchema = z
 
 export const addressSchema = z.string().min(4, "La dirección debe tener al menos 4 caracteres")
 
-export const birthDateSchema = z.date({
-	invalid_type_error: "La fecha de nacimiento ingresada no es válida",
-	required_error: "La fecha de nacimiento es obligatoria ",
-})
+export const isValidDate = (value: string): boolean => {
+	const date = new Date(value)
+	return !isNaN(date.getTime())
+}
 
 export const nameServiceSchema = z
 	.string()
@@ -131,4 +151,11 @@ export const imageSchemaUpdate = z
 	})
 	.refine((file) => !file || (file?.size || 0) <= MAX_IMAGE_SIZE, {
 		message: "El tamaño máximo de la imagen es de 5 MB",
+	})
+
+export const colorSchema = z
+	.string()
+	.regex(/^#?[0-9A-Fa-f]{6}$/, "El color debe ser un hexadecimal válido")
+	.transform((val) => {
+		return val.startsWith("#") ? val : `#${val}`
 	})

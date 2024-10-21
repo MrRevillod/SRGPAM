@@ -1,73 +1,79 @@
-import React, { useEffect, useState } from "react"
-import { Form } from "../Form"
+import dayjs from "dayjs"
+import React from "react"
+import DatetimeSelect from "../../ui/DatetimeSelect"
+
 import "react-datetime/css/react-datetime.css"
-import { EventSchemas } from "../../../lib/schemas"
-import { FormProvider, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Event, FormProps, Professional, Service } from "../../../lib/types"
-import { api } from "../../../lib/axios"
-import { SuperSelect } from "../../ui/SuperSelect"
+
+import { Form } from "../Form"
 import { Modal } from "../../Modal"
 import { useModal } from "../../../context/ModalContext"
-import DatetimeSelect from "../../ui/DatetimeSelect"
-import dayjs from "dayjs"
+import { useRequest } from "../../../hooks/useRequest"
+import { SuperSelect } from "../../ui/SuperSelect"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { EventSchemas } from "../../../lib/schemas"
 import { BooleanSelect } from "../../ui/BooleanSelect"
-import { updateEvent } from "../../../lib/actions"
+import { useState, useEffect } from "react"
+import { selectDataFormatter } from "../../../lib/formatters"
+import { FormProvider, useForm } from "react-hook-form"
+import { getCenters, getProfessionals, updateEvent } from "../../../lib/actions"
+import { Center, Event, FormProps, Professional, SuperSelectField } from "../../../lib/types"
 
-type SelectValues = {
-	value: string | number
-	label: string
-}
-const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
+// Este formulario corresponde a la actualización de un evento
+// Se utiliza el componente Modal para mostrar el formulario
+// y se utiliza el componente Form para manejar la lógica del formulario
+
+// Recibe una función refetch que permite volver a obtener los eventos al actualizar un evento
+
+const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
+	const [centers, setCenters] = useState<SuperSelectField[]>([])
+	const [professionals, setProfessionals] = useState<SuperSelectField[]>([])
+
 	const methods = useForm({
 		resolver: zodResolver(EventSchemas.Update),
 	})
 
-	const { selectedData } = useModal()
-	const [centers, setCenters] = useState<SelectValues[]>()
-	const [professionals, setProfessionals] = useState<SelectValues[]>()
+	const { selectedData, isModalOpen, modalType } = useModal()
 
-	const getProfessionals = async () => {
-		const res = await api.get("/dashboard/professionals")
-		const values = await res.data.values
-		const proffesionals_tem = new Array<SelectValues>()
-		values.forEach((pfs: Professional) => {
-			proffesionals_tem.push({
-				label: pfs.name,
-				value: pfs.id,
-			})
-		})
-		setProfessionals(proffesionals_tem)
-	}
+	// Se obtienen los profesionales y centros de atención para mostrarlos en los select
+	// Solo se obtienen si el modal está abierto y es de tipo Edit
+	// y si el evento seleccionado tiene una Id.
 
-	const getCenters = async () => {
-		const res = await api.get("/dashboard/centers")
-		const values = await res.data.values
+	useRequest<Professional[]>({
+		action: getProfessionals,
+		query: `serviceId=${selectedData?.serviceId}&select=name,id`,
+		onSuccess: (data) => selectDataFormatter({ data, setData: setProfessionals }),
+		trigger: isModalOpen && modalType === "Edit" && selectedData?.serviceId,
+	})
 
-		const temp = new Array<SelectValues>()
+	// En ambos casos se utiliza una query para obtener solo los campos necesarios
+	// esto se hace para evitar traer información innecesaria de la base de datos
+	// además mejorando el rendimiento de la aplicación.
 
-		values.forEach((pfs: Service) => {
-			temp.push({
-				label: pfs.name,
-				value: pfs.id,
-			})
-		})
-		setCenters(temp)
-	}
+	useRequest<Center[]>({
+		action: getCenters,
+		query: "select=name,id",
+		onSuccess: (data) => selectDataFormatter({ data, setData: setCenters }),
+		trigger: isModalOpen && modalType === "Edit",
+	})
+
+	// selectDataFormatter es una función que recibe un array de objetos
+	// y devuelve un array de objetos con la estructura necesaria para los select
 
 	useEffect(() => {
 		if (selectedData) {
-			methods.setValue("serviceId", selectedData.serviceId, { shouldDirty: true })
+			methods.reset({
+				startsAt: dayjs(selectedData.startsAt).toISOString(),
+				endsAt: dayjs(selectedData.endsAt).toISOString(),
+			})
 		}
-		getProfessionals()
-		getCenters()
-		console.log(selectedData)
 	}, [selectedData])
+
+	// console.log(methods.watch())
 
 	return (
 		<Modal type="Edit" title="Editar un evento">
 			<FormProvider {...methods}>
-				<Form data={[]} setData={() => {}} action={updateEvent} actionType="update" deletable>
+				<Form action={updateEvent} actionType="update" refetch={refetch} deletable>
 					<SuperSelect
 						label="Seleccione el profesional"
 						name="professionalId"
@@ -81,20 +87,23 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ data, setData }) => {
 						options={centers}
 						defaultValue={selectedData?.centerId}
 					/>
-					<div className="flex  gap-2 justify-between">
-						<DatetimeSelect
-							label="Seleccione fecha y hora de inicio del evento"
-							name="startsAt"
-							defaultValue={dayjs(selectedData?.startsAt)}
-						/>
-						<DatetimeSelect
-							label="Seleccione fecha y hora de término del evento"
-							name="endsAt"
-							defaultValue={dayjs(selectedData?.endsAt)}
-						/>
+					<SuperSelect
+						label="Seleccione el servicio"
+						name="serviceId"
+						options={[
+							{
+								label: selectedData?.service?.name,
+								value: selectedData?.serviceId,
+							},
+						]}
+						defaultValue={selectedData?.serviceId}
+					/>
+					<div className="flex gap-2 justify-between">
+						<DatetimeSelect label="Inicio del evento" name="startsAt" />
+						<DatetimeSelect label="Finalización del evento" name="endsAt" />
 					</div>
 					<BooleanSelect
-						name={"assistance"}
+						name="assistance"
 						defaultValue={selectedData?.assistance}
 						options={[
 							{ label: "Asistió", value: true },

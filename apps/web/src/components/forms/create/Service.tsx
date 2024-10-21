@@ -4,6 +4,7 @@ import { Form } from "../Form"
 import { Input } from "../../ui/Input"
 import { Modal } from "../../Modal"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ColorPicker } from "../../ColorPicker"
 import { createService } from "../../../lib/actions"
 import { ImageSelector } from "../../ImageSelector"
 import { ServiceSchemas } from "../../../lib/schemas"
@@ -15,18 +16,21 @@ const CreateService: React.FC<FormProps<Service>> = ({ data, setData }) => {
 		resolver: zodResolver(ServiceSchemas.Create),
 	})
 
+	// console.log(methods.watch())
+
 	return (
 		<Modal type="Create" title="Añadir nuevo servicio al sistema">
 			<FormProvider {...methods}>
 				<Form<Service> data={data} setData={setData} action={createService} actionType="create">
-					<Input name="name" label="Nombre del Servicio" type="text" placeholder="Nombre del servicio" />
-					<Input name="title" label="Título del Servicio" type="text" placeholder="Abogados" />
+					<Input name="name" label="Nombre del Servicio" type="text" placeholder="Asesoría Legal" />
+					<Input name="title" label="Título del Servicio" type="text" placeholder="Abogado(a)" />
 					<Input
 						name="description"
 						label="Descripción"
 						type="text"
 						placeholder="Descripción breve del servicio"
 					/>
+					<ColorPicker label="Color del servicio" />
 					<ImageSelector imageLabel="Imagen del servicio" />
 				</Form>
 			</FormProvider>

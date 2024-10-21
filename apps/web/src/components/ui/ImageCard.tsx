@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react"
-import { MenuProps, Dropdown } from "antd"
-import { IMAGE_BASE_URL } from "../../lib/axios"
+import clsx from "clsx"
+import React from "react"
+
 import { useModal } from "../../context/ModalContext"
+import { IMAGE_BASE_URL } from "../../lib/axios"
+import { useEffect, useState } from "react"
+import { MenuProps, Dropdown } from "antd"
 
 interface ImageCardProps {
 	title: string
@@ -11,9 +14,12 @@ interface ImageCardProps {
 	updatable?: boolean
 	deletable?: boolean
 	item: any
+	onCardClick?: (item: any) => void
 }
 
-export const ImageCard = ({ imagePath, title, description, other, updatable, deletable, item }: ImageCardProps) => {
+export const ImageCard = ({ imagePath, title, description, other, ...props }: ImageCardProps) => {
+	const { updatable, deletable, item, onCardClick } = props
+
 	const [imageSrc, setImagePath] = useState<string>(`${IMAGE_BASE_URL}${imagePath}/${item.id}.webp`)
 	const { showModal, cachedData, modalType, isModalOpen } = useModal()
 
@@ -34,29 +40,30 @@ export const ImageCard = ({ imagePath, title, description, other, updatable, del
 		},
 	].filter(Boolean) as MenuProps["items"]
 
+	const cardClasses = clsx(
+		onCardClick &&
+			"cursor-pointer hover:shadow-xl hover:bg-opacity-75 transition-transform transform hover:-translate-y-1 duration-300 ease-in-out",
+		"relative overflow-hidden bg-opacity-50 rounded-lg shadow-lg max-w-2xl mx-auto w-full max-h-[280px]",
+	)
+
 	return (
-		<div className="relative overflow-hidden bg-opacity-50 rounded-lg shadow-lg max-w-2xl mx-auto w-full max-h-[280px]">
-			<div
-				className="absolute inset-0 bg-cover bg-center z-0"
-				style={{ backgroundImage: `url(${imageSrc})` }}
-				aria-hidden="false"
-			/>
-			<div className="-mt-4 relative bg-black bg-opacity-50 min-h-[300px] p-8 flex flex-col justify-end z-10">
-				<div className="flex flex-row justify-between items-center w-full">
-					<h2 className="text-3xl font-bold text-white mb-2 truncate" title={title}>
-						{title}
-					</h2>
-					<Dropdown trigger={["click"]} menu={{ items: menuItems }} placement="bottomRight">
-						<div className="flex flex-col justify-between gap-1 cursor-pointer p-4 ml-2">
-							<div className="w-1 h-1 bg-gray-light rounded-full"></div>
-							<div className="w-1 h-1 bg-gray-light rounded-full"></div>
-							<div className="w-1 h-1 bg-gray-light rounded-full"></div>
-						</div>
-					</Dropdown>
+		<Dropdown trigger={["contextMenu"]} menu={{ items: menuItems }} placement="bottomRight">
+			<div className={cardClasses} onClick={() => onCardClick && onCardClick(item)}>
+				<div
+					className="absolute inset-0 bg-cover bg-center z-0"
+					style={{ backgroundImage: `url(${imageSrc})` }}
+					aria-hidden="false"
+				/>
+				<div className="-mt-4 relative bg-black bg-opacity-50 min-h-[300px] p-8 flex flex-col justify-end z-10">
+					<div className="flex flex-row justify-between items-center w-full">
+						<h2 className="text-3xl font-bold text-white mb-2 truncate" title={title}>
+							{title}
+						</h2>
+					</div>
+					<p className="text-gray-light mb-4 line-clamp-3">{description}</p>
+					{other && <p className="text-gray-light">{other}</p>}
 				</div>
-				<p className="text-gray-light mb-4">{description}</p>
-				{other && <p className="text-gray-light">{other}</p>}
 			</div>
-		</div>
+		</Dropdown>
 	)
 }

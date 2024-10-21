@@ -1,14 +1,18 @@
 import { prisma } from "@repo/database"
+import { Prisma } from "@prisma/client"
 import { fileToFormData } from "../utils/files"
 import { AppError, httpRequest } from "@repo/lib"
+import { centerSelect, generateSelect } from "../utils/filters"
 import { Request, Response, NextFunction } from "express"
 
+// Controlador de tipo select puede recibir un query para seleccionar campos específicos
+// Un ejemplo de query sería: /centers?select=name,email
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const centers = await prisma.center.findMany({
-			select: { id: true, name: true, address: true, phone: true },
-		})
+	const selectQuery = req.query.select?.toString()
+	const select = generateSelect<Prisma.CenterSelect>(selectQuery, centerSelect)
 
+	try {
+		const centers = await prisma.center.findMany({ select })
 		return res.status(200).json({ values: centers })
 	} catch (error) {
 		next(error)

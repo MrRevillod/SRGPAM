@@ -12,6 +12,7 @@ import { SeniorSchemas } from "../../lib/schemas"
 import { message, Image } from "antd"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import DatetimeSelect from "../../components/ui/DatetimeSelect"
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()
@@ -87,7 +88,7 @@ const SeniorRegisterRequestPage: React.FC = () => {
 							readOnly={true}
 						/>
 						<Input name="address" label="Dirección" type="text" placeholder="Dirección" />
-						<DatePicker name="birthDate" label="Fecha de nacimiento" />
+						<DatetimeSelect name="birthDate" label="Fecha de nacimiento" showTime={false} />
 
 						<div className="flex flex-col gap-8">
 							<p>
