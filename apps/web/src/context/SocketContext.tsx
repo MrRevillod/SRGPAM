@@ -14,12 +14,12 @@ export const SocketProvider = ({ children }: { children?: ReactNode }) => {
 	const [socket, setSocket] = useState<Socket>()
 
 	useEffect(() => {
-		if (isAuthenticated) {
+		if (isAuthenticated && !socket) {
 			const newSocket = io(import.meta.env.DASHBOARD_SERVICE_URL || "http://localhost:5000", {
 				query: { userId: user?.id, userRole: role },
             })
             newSocket.on("connect", () => {
-                console.log("Socket conectado:", socket)
+                console.log("Socket conectado:", newSocket)
             })
         
             newSocket.on("disconnect", (reason) => {
@@ -32,9 +32,6 @@ export const SocketProvider = ({ children }: { children?: ReactNode }) => {
                 }
             })
         
-            newSocket.on("newEvent", (event) => {
-                console.log(event)
-            })
 
 			setSocket(newSocket)
 		}

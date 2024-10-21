@@ -60,7 +60,7 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 	// y devuelve un array de objetos con la estructura necesaria para los select
 
 	useEffect(() => {
-		if (selectedData) {
+        if (selectedData) {
 			methods.reset({
 				startsAt: dayjs(selectedData.startsAt).toISOString(),
 				endsAt: dayjs(selectedData.endsAt).toISOString(),

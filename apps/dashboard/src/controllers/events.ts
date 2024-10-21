@@ -5,7 +5,6 @@ import { AppError } from "@repo/lib"
 import { canAddEvent } from "../utils/events"
 import { Request, Response, NextFunction } from "express"
 import { EventQuery, eventSelect, generateWhere } from "../utils/filters"
-
 // Controlador de tipo select puede recibir un query para seleccionar campos específicos
 // y para filtrar por claves foraneas
 
@@ -260,6 +259,32 @@ export const reserveEvent = async (req: Request, res: Response, next: NextFuncti
 		})
 
 		return res.status(200).json({ values: updatedEvent })
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const cancelReserve = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { id } = req.params
+
+		// const senior = req.getExtension("user") as Senior
+
+		// const event = await prisma.event.findUnique({
+		// 	where: { id: Number(id), seniorId: senior.id },
+		// })
+
+		// if (!event) throw new AppError(404, "Evento no encontrado")/
+
+		const updatedEvent = await prisma.event.update({
+			where: { id: Number(id) },
+			data: {
+				seniorId: null,
+			},
+		})
+
+		io.to("ADMIN").emit("updatedEvent", updatedEvent)
+		return res.status(200).json({ modified: updatedEvent })
 	} catch (error) {
 		next(error)
 	}
