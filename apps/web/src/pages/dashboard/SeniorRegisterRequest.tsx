@@ -48,8 +48,9 @@ const SeniorRegisterRequestPage: React.FC = () => {
 				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
-				message.error("Error al aceptar la solicitud. Intente nuevamente.")
-				console.error("Error al aceptar la solicitud:", error)
+				message.error(error.response.data.message)
+				navigate("/dashboard/personas-mayores/nuevos")
+				console.error("Error al aceptar la solicitud:", error.response)
 			},
 		})
 	}
@@ -61,7 +62,8 @@ const SeniorRegisterRequestPage: React.FC = () => {
 				navigate("/personas-mayores/nuevos")
 			},
 			onError: (error) => {
-				message.error("Error al denegar la solicitud. Intente nuevamente.")
+				message.error(error.response.data.message)
+				navigate("/dashboard/personas-mayores/nuevos")
 				console.error("Error al denegar la solicitud:", error)
 			},
 		})

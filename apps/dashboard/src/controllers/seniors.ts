@@ -71,12 +71,17 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 		const { name, address, birthDate } = req.body
 
 		// Se verifica si el adulto mayor existe
-		if (!(await prisma.senior.findUnique({ where: { id } }))) {
+		const senior = await prisma.senior.findUnique({ where: { id } })
+
+		if (!senior) {
 			throw new AppError(400, "Adulto mayor no encontrado")
 		}
 
 		// Si la solicitud es rechazada, se eliminan los archivos enviados
 		// y se elimina el adulto mayor de la base de datos
+		if (senior.validated) {
+			throw new AppError(409, "Esta solicitud ya ha sido validada")
+		}
 
 		if (!validated) {
 			const storageResponse = await httpRequest({
@@ -90,18 +95,18 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 			}
 
 			await prisma.senior.delete({ where: { id } })
-			return res.status(200).json({ message: "La solicitud ha sido denegada" })
+			return res.status(200).json({ message: "La solicitud ha sido denegada", values: {} })
 		}
 
 		// Si la solicitud es aceptada, se actualiza el campo validated a true
-		// Esto significa que el adulto mayor ya puede acceder a la aplicación
+		// Esto significa que el adulto mayor ya puede acceder a la aplicaciÃ³n
 
 		await prisma.senior.update({
 			where: { id },
 			data: { name, address, birthDate, validated },
 		})
 
-		return res.status(200).json({ message: "La solicitud ha sido aceptada" })
+		return res.status(200).json({ message: "La solicitud ha sido aceptada", values: {} })
 	} catch (error: unknown) {
 		next(error)
 	}

@@ -67,9 +67,16 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		// estructurarse de forma diferente
 		const body = buildRequestBody(formData)
 
+		if (JSON.stringify(formData) === JSON.stringify(body)) {
+			console.log(message.error)
+			message.error("No se han realizado cambios")
+			return
+		}
+
 		// Se realiza la acción con los datos del recurso y el body
 		// onSuccess se ejecuta si la acción se realiza correctamente
 		// onError se ejecuta si ocurre un error
+
 		await mutation.mutate({
 			params: { id: selectedData?.id || null, body },
 			onSuccess: (res) => {
