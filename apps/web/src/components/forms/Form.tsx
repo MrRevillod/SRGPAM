@@ -48,6 +48,12 @@ export const Form = <T extends BaseDataType>({
 	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
 		const body = buildRequestBody(formData)
 
+		if (JSON.stringify(formData) === JSON.stringify(body)) {
+			console.log(message.error)
+			message.error("No se han realizado cambios")
+			return
+		}
+
 		await mutation.mutate({
 			params: { id: selectedData?.id || null, body },
 			onSuccess: (res) => {
