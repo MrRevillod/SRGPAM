@@ -67,8 +67,7 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		// estructurarse de forma diferente
 		const body = buildRequestBody(formData)
 
-		if (JSON.stringify(formData) === JSON.stringify(body)) {
-			console.log(message.error)
+		if (JSON.stringify(selectedData) === JSON.stringify(body)) {
 			message.error("No se han realizado cambios")
 			return
 		}
