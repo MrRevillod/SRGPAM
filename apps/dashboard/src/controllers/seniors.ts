@@ -118,16 +118,18 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 // Un ejemplo de query sería: /seniors?select=name,email&validated=true
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
 	const queryToWhereMap = {
+		id: (value: any) => ({ contains: value }),
 		name: (value: any) => ({ contains: value }),
 		validated: (value: any) => ({ equals: value === "true" }),
 	}
+
 	const where = generateWhere<Prisma.SeniorWhereInput>(req.query, queryToWhereMap)
 	const selectQuery = req.query.select?.toString()
 	const select = generateSelect<Prisma.SeniorSelect>(selectQuery, seniorSelect)
 
 	const take = req.query.limit ? Number(req.query.limit) : undefined
 
-	if (where.name && where.name.contains === "") {
+	if (where.OR && where.OR.length === 0) {
 		return res.status(200).json({ values: [] })
 	}
 

@@ -46,9 +46,9 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 	// del input en tiempo real y se puede utilizar para realizar peticiones
 	// en un orden específico
 
+	const selectedCenter = methods.watch("centerId")
 	const selectedService = methods.watch("serviceId")
 	const selectedProfessional = methods.watch("professionalId")
-	const selectedCenter = methods.watch("centerId")
 
 	// Los hooks useRequest se utilizan para obtener los servicios, profesionales y centros
 	// reciben un trigger que actua como un disparador de un useEffect
@@ -76,14 +76,14 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 		action: getCenters,
 		query: "select=name,id",
 		onSuccess: (data) => selectDataFormatter({ data, setData: setCenters }),
-		trigger: baseTrigger && !!selectedService && !!selectedProfessional,
+		trigger: baseTrigger,
 	})
 
 	// Se obtienen las personas mayores cuando se abre el modal y
 	// se selecciona un servicio, un profesional y un centro
 	useRequest<Senior[]>({
 		action: getSeniors,
-		query: `name=${seniorsSearch}&select=name,id&limit=5`,
+		query: `name=${seniorsSearch}&id=${seniorsSearch}&select=name,id&limit=5`,
 		onSuccess: (data) => selectDataFormatter({ data, setData: setSeniors }),
 		trigger: baseTrigger && !!selectedService && !!selectedProfessional && !!selectedCenter,
 	})
@@ -98,6 +98,11 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 			methods.setValue("endsAt", dayjs(startsAt).add(2, "hour").toISOString())
 		}
 	}, [startsAt])
+
+	useEffect(() => {
+		if (!selectedUrlCenter) return
+		methods.setValue("centerId", Number(selectedUrlCenter))
+	}, [selectedUrlCenter])
 
 	return (
 		<Modal type="Create" title="Crear un nuevo evento">
