@@ -117,13 +117,22 @@ export const handleSeniorRequest = async (req: Request, res: Response, next: Nex
 // Controlador de tipo select puede recibir un query para seleccionar campos específicos
 // Un ejemplo de query sería: /seniors?select=name,email&validated=true
 export const getAll = async (req: Request, res: Response, next: NextFunction) => {
-	const queryToWhereMap = { validated: (value: any) => ({ equals: value === "true" }) }
+	const queryToWhereMap = {
+		name: (value: any) => ({ contains: value }),
+		validated: (value: any) => ({ equals: value === "true" }),
+	}
 	const where = generateWhere<Prisma.SeniorWhereInput>(req.query, queryToWhereMap)
 	const selectQuery = req.query.select?.toString()
 	const select = generateSelect<Prisma.SeniorSelect>(selectQuery, seniorSelect)
 
+	const take = req.query.limit ? Number(req.query.limit) : undefined
+
+	if (where.name && where.name.contains === "") {
+		return res.status(200).json({ values: [] })
+	}
+
 	try {
-		const seniors = await prisma.senior.findMany({ where, select })
+		const seniors = await prisma.senior.findMany({ where, select, take })
 		return res.status(200).json({ values: seniors })
 	} catch (error) {
 		next(error)

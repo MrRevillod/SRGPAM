@@ -94,8 +94,6 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 				return
 			}
 		} */
-		// Enviar el formulario si hay cambios
-		// await sendForm(body)
 
 		// Se realiza la acción con los datos del recurso y el body
 		// onSuccess se ejecuta si la acción se realiza correctamente
