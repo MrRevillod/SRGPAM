@@ -67,11 +67,39 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		// estructurarse de forma diferente
 		const body = buildRequestBody(formData)
 
-		if (JSON.stringify(formData) === JSON.stringify(body)) {
-			console.log(message.error)
-			message.error("No se han realizado cambios")
-			return
+		//Form antiguo=selectedData----Form nuevo= la nueva body o formData
+		let hasChanges = false
+		//Se ejecuta solo si esta en funcion el update
+		if (actionType === "update") {
+			for (const key in formData) {
+				//Si el formulario antiguo es = al nuevo lanzara el error
+				if (selectedData[key] === formData[key]) {
+					hasChanges = false
+					//Si no existe el antiguo y el nuevo si saldra correcto
+				} else if (!selectedData[key] && formData[key]) {
+					hasChanges = true
+				}
+
+				if (selectedData[key] && formData[key] !== selectedData[key]) {
+					hasChanges = true
+				} else if (formData[key] !== selectedData[key]) {
+					break
+				}
+			}
+			//Error cuando no se actualiza nada en el formulario
+			if (!hasChanges) {
+				message.error("No se han realizado cambios")
+				return
+			}
 		}
+		// Enviar el formulario si hay cambios
+		// await sendForm(body)
+
+		//if (JSON.stringify(formData) === JSON.stringify(body)) {
+		//	console.log(message.error)
+		//	message.error("No se han realizado cambios")
+		//	return
+		//}
 
 		// Se realiza la acción con los datos del recurso y el body
 		// onSuccess se ejecuta si la acción se realiza correctamente
