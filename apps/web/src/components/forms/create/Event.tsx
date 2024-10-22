@@ -102,7 +102,7 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 	return (
 		<Modal type="Create" title="Crear un nuevo evento">
 			<FormProvider {...methods}>
-				<Form data={data} setData={setData} action={createEvent} actionType="update" refetch={refetch}>
+				<Form data={data} setData={setData} action={createEvent} actionType="create" refetch={refetch}>
 					<SuperSelect label="Seleccione un servicio" name="serviceId" options={services} />
 					<SuperSelect label="Seleccione un profesional" name="professionalId" options={professionals} />
 					<SuperSelect
