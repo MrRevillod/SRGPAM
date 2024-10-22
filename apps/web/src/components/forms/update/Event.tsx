@@ -60,31 +60,27 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 	// y devuelve un array de objetos con la estructura necesaria para los select
 
 	useEffect(() => {
-		if (selectedData) {
-			methods.reset({
-				startsAt: dayjs(selectedData.startsAt).toISOString(),
-				endsAt: dayjs(selectedData.endsAt).toISOString(),
-			})
-		} else {
-			methods.reset()
-		}
+		if (!selectedData) return
+
+		methods.reset({
+			professionalId: selectedData?.professionalId,
+			centerId: selectedData?.centerId,
+			serviceId: selectedData?.serviceId,
+			assistance: selectedData?.assistance,
+			startsAt: dayjs(selectedData?.startsAt).toISOString(),
+			endsAt: dayjs(selectedData?.endsAt).toISOString(),
+		})
 	}, [selectedData])
 
 	return (
 		<Modal type="Edit" title="Editar un evento">
 			<FormProvider {...methods}>
 				<Form action={updateEvent} actionType="update" refetch={refetch} deletable>
-					<SuperSelect
-						label="Seleccione el profesional"
-						name="professionalId"
-						options={professionals}
-						defaultValue={selectedData?.professionalId}
-					/>
+					<SuperSelect label="Seleccione el profesional" name="professionalId" options={professionals} />
 					<SuperSelect
 						label="Seleccione el centro de atención (opcional)"
 						name="centerId"
 						options={centers}
-						defaultValue={selectedData?.centerId}
 					/>
 					<SuperSelect
 						label="Seleccione el servicio"
@@ -95,7 +91,6 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 								value: selectedData?.serviceId,
 							},
 						]}
-						defaultValue={selectedData?.serviceId}
 					/>
 					<div className="flex gap-2 justify-between">
 						<DatetimeSelect label="Inicio del evento" name="startsAt" />
@@ -103,7 +98,6 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 					</div>
 					<BooleanSelect
 						name="assistance"
-						defaultValue={selectedData?.assistance}
 						options={[
 							{ label: "Asistió", value: true },
 							{ label: "No asistió", value: false },

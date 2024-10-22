@@ -10,11 +10,10 @@ interface SuperSelectProps {
 	name: string
 	label: string
 	options: any
-	defaultValue?: any
 	setSearch?: Dispatch<SetStateAction<string>>
 }
 
-export const SuperSelect = ({ name, label, options, defaultValue, setSearch }: SuperSelectProps) => {
+export const SuperSelect = ({ name, label, options, setSearch }: SuperSelectProps) => {
 	const {
 		reset,
 		control,
@@ -29,25 +28,13 @@ export const SuperSelect = ({ name, label, options, defaultValue, setSearch }: S
 		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
 	)
 
-	const { isModalOpen } = useModal()
+	const { selectedData } = useModal()
 
 	const clientFilterFn = (input: string, option: any) => {
 		return (option?.label as string).toLowerCase().includes(input.toLowerCase())
 	}
 
 	const filterOption = setSearch ? false : clientFilterFn
-
-	useEffect(() => {
-		if (!defaultValue) {
-			setValue(name, undefined)
-		} else {
-			setValue(name, defaultValue)
-		}
-	}, [defaultValue, name])
-
-	useEffect(() => {
-		if (isModalOpen) reset()
-	}, [isModalOpen])
 
 	return (
 		<>
@@ -58,7 +45,6 @@ export const SuperSelect = ({ name, label, options, defaultValue, setSearch }: S
 			<Controller
 				control={control}
 				name={name}
-				defaultValue={defaultValue}
 				render={({ field }) => (
 					<Select
 						{...field}

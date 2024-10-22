@@ -9,22 +9,20 @@ type Opt = {
 
 type Props = {
 	name: string
-	defaultValue: Boolean
 	options: Array<Opt>
 }
 
-export const BooleanSelect: React.FC<Props> = ({ name, defaultValue, options }) => {
+export const BooleanSelect: React.FC<Props> = ({ name, options }) => {
 	const { control } = useFormContext()
 
 	return (
 		<Controller
 			control={control}
 			name={name}
-			defaultValue={defaultValue}
 			render={({ field }) => (
 				<Radio.Group
 					value={field.value}
-					defaultValue={defaultValue}
+					defaultValue={field.value}
 					onChange={(ev) => field.onChange(ev.target.value)}
 				>
 					{options.map((op, index) => (
