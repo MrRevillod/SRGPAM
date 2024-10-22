@@ -3,10 +3,20 @@ import * as SecureStore from "expo-secure-store"
 
 export const storeTokens = async (accessToken: string, refreshToken: string) => {
 	try {
+		const expirationTime = Date.now() + 14 * 60 * 1000
 		await AsyncStorage.setItem("accessToken", accessToken)
 		await AsyncStorage.setItem("refreshToken", refreshToken)
+		await SecureStore.setItemAsync("tokenExp", expirationTime.toString())
 	} catch (error) {
 		console.error("No se pudieron almacenar los tokens", error)
+	}
+}
+
+export const replaceAccessToken = async (newAccessToken: string) => {
+	try {
+		await AsyncStorage.setItem("accessToken", newAccessToken)
+	} catch (error) {
+		console.error("No se pudo reemplazar el access token", error)
 	}
 }
 
@@ -27,6 +37,24 @@ export const getRefreshToken = async (): Promise<string | null> => {
 	} catch (error) {
 		console.error("Error al obtener el refresh token", error)
 		return null
+	}
+}
+
+export const removeTokens = async () => {
+	try {
+		await AsyncStorage.removeItem("accessToken")
+		await AsyncStorage.removeItem("refreshToken")
+		console.log("Borrando tokens...")
+	} catch (error) {
+		console.error("No se pudieron eliminar los tokens", error)
+	}
+}
+
+export const removeUser = async () => {
+	try {
+		await AsyncStorage.removeItem("user")
+	} catch (error) {
+		console.error("No se pudo eliminar el usuario", error)
 	}
 }
 

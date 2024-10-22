@@ -1,21 +1,34 @@
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry"
-import { getAccessToken, getRefreshToken } from "./storage"
+import { getAccessToken, getRefreshToken, replaceAccessToken, storeTokens } from "./storage"
+import { isTokenExp } from "./validation"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { SERVER_URL } from "@/constants/colors"
 import { Alert } from "react-native"
 import { AuthResponse } from "./types"
+import { useAuth } from "@/contexts/authContext"
 
 export const makeAuthenticatedRequest = async (
 	url: string,
 	method: "GET" | "POST" | "PUT" | "DELETE",
-	showAlert: boolean,
+	showAlert: boolean = true,
 	options: AxiosRequestConfig = {},
 ): Promise<AxiosResponse | null> => {
 	try {
-		const accessToken = await getAccessToken()
+		let accessToken = await getAccessToken()
+		const isExp = await isTokenExp()
 		const refreshToken = await getRefreshToken()
 
-		if (!accessToken || !refreshToken) {
+		// Si el token ha expirado, intentamos renovarlo
+		if (isExp && accessToken) {
+			try {
+				accessToken = await renewAccessToken()
+			} catch (error) {
+				throw new Error("No se pudo renovar el token. Necesita autenticarse nuevamente.")
+			}
+		}
+
+		// Verifica si aún está en proceso de carga o los tokens no están disponibles
+		if (!accessToken && !refreshToken) {
 			throw new Error("Tokens no disponibles, el usuario necesita autenticarse de nuevo")
 		}
 
@@ -24,7 +37,7 @@ export const makeAuthenticatedRequest = async (
 			Authorization: `Bearer ${accessToken}, Bearer ${refreshToken}`,
 		}
 
-		const response = await axios<AuthResponse>({
+		const response = await axios({
 			url: url,
 			method,
 			...options,
@@ -33,10 +46,10 @@ export const makeAuthenticatedRequest = async (
 
 		return response
 	} catch (error: any) {
-		if (showAlert && error.response.data.message) {
+		if (showAlert && error.response?.data?.message) {
 			Alert.alert("Error", error.response.data.message)
 		}
-		console.error(error.response.data.message)
+		console.error(error)
 		return null
 	}
 }
@@ -68,5 +81,25 @@ export const checkUniqueField = async (field: string, getValues: any, trigger: a
 			}
 			return false
 		}
+	}
+}
+
+const renewAccessToken = async () => {
+	try {
+		const accessToken = await getAccessToken()
+		const refreshToken = await getRefreshToken()
+		if (!refreshToken) throw new Error("No hay refresh token disponible")
+
+		const response = await axios.get(`${SERVER_URL}/api/auth/refresh`, {
+			headers: { Authorization: `Bearer ${accessToken}, Bearer ${refreshToken}` },
+		})
+		const { newAccessToken } = response.data
+
+		await replaceAccessToken(newAccessToken)
+
+		return newAccessToken
+	} catch (error) {
+		console.error("Error al renovar el token", error)
+		throw error
 	}
 }
