@@ -36,7 +36,7 @@ interface FormProps<T> {
 export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormProps<T>) => {
 	const { action, children, actionType, deletable, refetch } = props
 
-	const { handleSubmit, reset, setError, clearErrors, watch } = useFormContext()
+	const { handleSubmit, reset, setError, clearErrors } = useFormContext()
 	const { handleOk, handleCancel, selectedData, handleDelete } = useModal()
 
 	const [imageFile, setImageFile] = useState<UploadFile[]>([])
@@ -67,33 +67,28 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		// estructurarse de forma diferente
 		const body = buildRequestBody(formData)
 
-		//Form antiguo=selectedData----Form nuevo= la nueva body o formData
-		/* let hasChanges = false
-		//Se ejecuta solo si esta en funcion el update
-		if (actionType === "update") {
-			console.log("Watch", watch())
-			console.log("SelectedData", selectedData)
-			for (const key in formData) {
-				//Si el formulario antiguo es = al nuevo lanzara el error
-				if (selectedData[key] === formData[key]) {
-					hasChanges = false
-					//Si no existe el antiguo y el nuevo si saldra correcto
-				} else if (!selectedData[key] && formData[key]) {
-					hasChanges = true
-				}
+		let hasChanges = false
 
+		if (actionType === "update") {
+			for (const key in formData) {
+				// 1. Si existe en selectedData y es diferente a formData[key], hay cambios
 				if (selectedData[key] && formData[key] !== selectedData[key]) {
 					hasChanges = true
-				} else if (formData[key] !== selectedData[key]) {
-					break
+					break // Si ya hay un cambio, no es necesario seguir verificando
+				}
+
+				// 2. Si el campo no existe en selectedData pero sÃ­ en formData, hay cambios
+				if (!selectedData[key] && formData[key]) {
+					hasChanges = true
+					break // Si ya hay un cambio, no es necesario seguir verificando
 				}
 			}
-			//Error cuando no se actualiza nada en el formulario
+
+			// Si no se detectaron cambios
 			if (!hasChanges) {
-				message.error("No se han realizado cambios")
-				return
+				return message.error("No se han realizado cambios")
 			}
-		} */
+		}
 
 		// Se realiza la acción con los datos del recurso y el body
 		// onSuccess se ejecuta si la acción se realiza correctamente

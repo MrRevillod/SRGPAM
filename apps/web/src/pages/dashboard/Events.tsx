@@ -12,12 +12,12 @@ import interactionPlugin from "@fullcalendar/interaction"
 import { Event } from "../../lib/types"
 import { message } from "antd"
 import { useModal } from "../../context/ModalContext"
+import { useSocket } from "../../context/SocketContext"
 import { useRequest } from "../../hooks/useRequest"
 import { useLocation } from "react-router-dom"
 import { EventSourceInput } from "@fullcalendar/core/index.js"
 import { useEffect, useState } from "react"
 import { deleteEvent, getEvents } from "../../lib/actions"
-import { useSocket } from "../../context/SocketContext"
 
 const EventsPage: React.FC = () => {
 	const location = useLocation()
@@ -26,11 +26,8 @@ const EventsPage: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([])
 	const [formattedEvents, setFormattedEvents] = useState<EventSourceInput>([])
 
-	const { showModal } = useModal()
-
 	const { socket } = useSocket()
-
-
+	const { showModal } = useModal()
 
 	// Se obtiene la query de la URL para utilizarla en el filtro de eventos
 	useEffect(() => {
@@ -64,13 +61,10 @@ const EventsPage: React.FC = () => {
 			setEvents(events as Event[])
 			setFormattedEvents(eventsFormat(events as Event[]))
 		},
-    })
-    
-    socket?.off("updatedEvent")
-	socket?.on("updatedEvent", (event) => {
-        //console.log("SOCKET:updatedEvent", event)
-        refetch()
 	})
+
+	socket?.off("updatedEvent")
+	socket?.on("updatedEvent", () => refetch())
 
 	if (error) message.error("Error al cargar los datos")
 
@@ -113,7 +107,7 @@ const EventsPage: React.FC = () => {
 			/>
 
 			<CreateEvent data={events} setData={setEvents} refetch={refetch} />
-			<UpdateEvent data={events} setData={setEvents} refetch={refetch} />
+			<UpdateEvent data={events} setData={setEvents} refetch={() => {}} />
 
 			<ConfirmAction<Event>
 				text="¿Estás seguro(a) de que deseas eliminar este evento?"

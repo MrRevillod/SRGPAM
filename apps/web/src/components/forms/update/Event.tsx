@@ -60,15 +60,15 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 	// y devuelve un array de objetos con la estructura necesaria para los select
 
 	useEffect(() => {
-        if (selectedData) {
+		if (selectedData) {
 			methods.reset({
 				startsAt: dayjs(selectedData.startsAt).toISOString(),
 				endsAt: dayjs(selectedData.endsAt).toISOString(),
 			})
+		} else {
+			methods.reset()
 		}
 	}, [selectedData])
-
-	// console.log(methods.watch())
 
 	return (
 		<Modal type="Edit" title="Editar un evento">
@@ -80,7 +80,6 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 						options={professionals}
 						defaultValue={selectedData?.professionalId}
 					/>
-
 					<SuperSelect
 						label="Seleccione el centro de atención (opcional)"
 						name="centerId"
@@ -109,7 +108,6 @@ const UpdateEvent: React.FC<FormProps<Event>> = ({ refetch }) => {
 							{ label: "Asistió", value: true },
 							{ label: "No asistió", value: false },
 						]}
-						setValue={methods.setValue}
 					/>
 				</Form>
 			</FormProvider>

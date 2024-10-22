@@ -189,7 +189,7 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 			})
 
 			console.log(event)
-			io.emit("updatedEvent", event)
+			io.to("ADMIN").emit("updatedEvent", event)
 
 			return res.status(200).json({
 				message: "Actualización exitosa",

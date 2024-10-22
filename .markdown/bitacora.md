@@ -6,6 +6,9 @@ Tareas:
 
 - Investigar documentación de librería seleccionada para gráficos y estadisticas en react https://github.com/ant-design/ant-design-charts
 
+- Añadir rut al select de senior
+- Ver que pasa con los oncancel y los select
+
 Objetivo general:
 
 - Crear sistema de agendamiento desde el lado móvil del sistema.

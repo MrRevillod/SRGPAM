@@ -76,6 +76,7 @@ export const useRequest = <T,>({ action, ...props }: useRequestProps<T>): useReq
 			setData(response.data.values as T)
 			setError(null)
 			setStatus(response.status)
+
 			if (onSuccess) onSuccess(response.data.values as T)
 		} catch (err: any) {
 			if (err.response?.data) {
