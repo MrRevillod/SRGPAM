@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import * as SecureStore from "expo-secure-store"
 
+export const expTime = process.env.TOKEN_EXPIRE_TIME
+
 export const storeTokens = async (accessToken: string, refreshToken: string) => {
 	try {
 		await AsyncStorage.setItem("accessToken", accessToken)

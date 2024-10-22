@@ -1,9 +1,10 @@
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry"
 import { getAccessToken, getRefreshToken } from "./storage"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
-import { SERVER_URL } from "@/constants/colors"
 import { Alert } from "react-native"
 import { AuthResponse } from "./types"
+
+export const SERVER_URL = `http://${process.env.EXPO_PUBLIC_SERVER_ADDRESS}`
 
 export const makeAuthenticatedRequest = async (
 	url: string,

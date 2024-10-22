@@ -1,5 +1,4 @@
-import { View, StyleSheet } from "react-native"
-import Input from "@/components/input"
+import { StyleSheet } from "react-native"
 import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import Colors from "@/components/colors"

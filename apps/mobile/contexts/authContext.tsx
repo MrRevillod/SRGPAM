@@ -1,4 +1,4 @@
-import { SERVER_URL } from "@/constants/colors"
+import { SERVER_URL } from "@/utils/request"
 import { makeAuthenticatedRequest } from "@/utils/request"
 import { storeTokens, storeUser } from "@/utils/storage"
 import { loginSeniorFormData, User } from "@/utils/types"
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const { message, values } = response.data
 			const { accessToken, refreshToken, publicUser } = values
 			storeTokens(accessToken, refreshToken)
-			setUser(publicUser)
+			storeUser(publicUser)
 			setRole("SENIOR")
 			Alert.alert("Éxito", message)
 		} catch (error: any) {

@@ -1,8 +1,6 @@
 const tintColorLight = "#2f95dc"
 const tintColorDark = "#fff"
 
-export const SERVER_URL = `http://${process.env.EXPO_PUBLIC_SERVER_ADDRESS}`
-
 export default {
 	light: {
 		text: "#000",

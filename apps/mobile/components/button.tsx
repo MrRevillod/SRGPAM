@@ -2,7 +2,7 @@ import React from "react"
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, Dimensions } from "react-native"
 import Colors from "@/components/colors"
 
-const { width, height } = Dimensions.get("window")
+const { height } = Dimensions.get("window")
 
 type CustomButtonProps = {
 	title: string
