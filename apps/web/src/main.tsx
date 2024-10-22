@@ -11,6 +11,7 @@ import { StyleProvider } from "@ant-design/cssinjs"
 // import { SocketProvider } from "./context/SocketContext"
 
 import "./main.css"
+import { SocketProvider } from "./context/SocketContext"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 
@@ -19,13 +20,13 @@ root.render(
 		<StyleProvider>
 			<ThemeProvider>
 				<AuthProvider>
-					{/* <SocketProvider> */}
-					<ModalProvider>
-						<AppLayout>
-							<Router />
-						</AppLayout>
-					</ModalProvider>
-					{/* </SocketProvider> */}
+					<SocketProvider>
+						<ModalProvider>
+							<AppLayout>
+								<Router />
+							</AppLayout>
+						</ModalProvider>
+					</SocketProvider>
 				</AuthProvider>
 			</ThemeProvider>
 		</StyleProvider>
