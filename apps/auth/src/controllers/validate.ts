@@ -36,7 +36,6 @@ export const refreshController = async (req: Request, res: Response, next: NextF
 
 		// De lo contrario se verifica el token de refresco
 		// De ser valido, se genera un nuevo token de acceso que se envia en una cookie
-
 		res.cookie("ACCESS_TOKEN", newAccessToken, {
 			expires: expireDate,
 			httpOnly: true,
@@ -48,6 +47,18 @@ export const refreshController = async (req: Request, res: Response, next: NextF
 			Pragma: "no-cache",
 			Expires: "0",
 		})
+
+		const authHeader = req.headers["authorization"]
+		if (authHeader && authHeader.startsWith("Bearer ")) {
+			return res.status(200).json({
+				message: "Token de acceso actualizado",
+				type: "success",
+				values: {
+					role: payload.role,
+					newAccessToken: newAccessToken,
+				},
+			})
+		}
 
 		return res.status(200).json({
 			message: "Token de acceso actualizado",
