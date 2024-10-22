@@ -36,7 +36,7 @@ interface FormProps<T> {
 export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormProps<T>) => {
 	const { action, children, actionType, deletable, refetch } = props
 
-	const { handleSubmit, reset, setError, clearErrors } = useFormContext()
+	const { handleSubmit, reset, setError, clearErrors, watch } = useFormContext()
 	const { handleOk, handleCancel, selectedData, handleDelete } = useModal()
 
 	const [imageFile, setImageFile] = useState<UploadFile[]>([])
@@ -68,9 +68,11 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		const body = buildRequestBody(formData)
 
 		//Form antiguo=selectedData----Form nuevo= la nueva body o formData
-		let hasChanges = false
+		/* let hasChanges = false
 		//Se ejecuta solo si esta en funcion el update
 		if (actionType === "update") {
+			console.log("Watch", watch())
+			console.log("SelectedData", selectedData)
 			for (const key in formData) {
 				//Si el formulario antiguo es = al nuevo lanzara el error
 				if (selectedData[key] === formData[key]) {
@@ -91,15 +93,9 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 				message.error("No se han realizado cambios")
 				return
 			}
-		}
+		} */
 		// Enviar el formulario si hay cambios
 		// await sendForm(body)
-
-		//if (JSON.stringify(formData) === JSON.stringify(body)) {
-		//	console.log(message.error)
-		//	message.error("No se han realizado cambios")
-		//	return
-		//}
 
 		// Se realiza la acción con los datos del recurso y el body
 		// onSuccess se ejecuta si la acción se realiza correctamente
