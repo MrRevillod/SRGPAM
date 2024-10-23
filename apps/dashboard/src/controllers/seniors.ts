@@ -122,13 +122,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 		name: (value: any) => ({ contains: value }),
 		validated: (value: any) => ({ equals: Number(value) === 1 }),
 	}
+
 	const where = generateWhere<Prisma.SeniorWhereInput>(req.query, queryToWhereMap)
 	const selectQuery = req.query.select?.toString()
 	const select = generateSelect<Prisma.SeniorSelect>(selectQuery, seniorSelect)
 
 	const take = req.query.limit ? Number(req.query.limit) : undefined
-
-	console.log(where)
 
 	if (where.OR && where.OR.length === 0) {
 		return res.status(200).json({ values: [] })

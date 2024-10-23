@@ -10,6 +10,7 @@ interface SuperSelectProps {
 	label: string
 	options: any
 	setSearch?: Dispatch<SetStateAction<string>>
+	defaultValue?: any
 }
 
 export const SuperSelect = ({ name, label, options, setSearch }: SuperSelectProps) => {

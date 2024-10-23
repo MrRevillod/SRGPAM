@@ -12,14 +12,11 @@ export type QueryMap<T> = { [K in keyof T]: (value: any) => any }
 export const generateWhere = <T extends Query>(query: T, queryMap: QueryMap<T>) => {
 	const orConditions = [] as any[]
 
-	// Se itera sobre las keys del query ejemplo (?a=1&b=2) => { a: 1, b: 2 }
 	Object.keys(query).forEach((key) => {
-		// Se verifica si la key existe en el queryMap y de existir
 		if (queryMap[key as keyof T]) {
 			const filter = queryMap[key as keyof T](query[key as keyof T])
 			if (filter !== null) orConditions.push({ [key]: filter })
 		}
-		// se extrae el valor de la key y se aplica el filtro correspondiente
 	})
 
 	return orConditions.length ? { OR: orConditions } : {}
