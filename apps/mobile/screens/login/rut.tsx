@@ -4,7 +4,7 @@ import GeneralView from "@/components/generalView"
 import CustomButton from "@/components/button"
 import { commonProps } from "@/utils/types"
 
-const RUT = ({ navigation, control, errors }: commonProps) => {
+const RUT = ({ navigation }: commonProps) => {
 	return (
 		<GeneralView
 			title="Datos del Registro"
@@ -13,7 +13,7 @@ const RUT = ({ navigation, control, errors }: commonProps) => {
 			textDescription="Su RUT debe ingresarse sin puntos ni guión."
 		>
 			<View style={styles.container}>
-				<Input name="rut" placeholder="Ingresa tu RUT" control={control} errors={errors} />
+				<Input name="rut" placeholder="Ingresa tu RUT" />
 				<CustomButton title="Siguiente" onPress={() => navigation.navigate("Pin")} />
 			</View>
 		</GeneralView>

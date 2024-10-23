@@ -1,14 +1,20 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import RUT from "@/screens/login/rut"
 import Pin from "@/screens/login/pin"
-import { useForm } from "react-hook-form"
+import { FormProvider, useForm } from "react-hook-form"
 import React, { useEffect, useState } from "react"
 import { getStorageRUT } from "@/utils/storage"
 import { View, ActivityIndicator } from "react-native"
 
 const Stack = createNativeStackNavigator()
 
-const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: any; handleSubmit: any; errors: any; setValue: any }) => {
+const Login = () => {
+	const methods = useForm({
+		defaultValues: {
+			rut: "",
+			password: "",
+		},
+	})
 	const [rut, setRUT] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 
@@ -33,37 +39,19 @@ const FormNavigator = ({ control, handleSubmit, errors, setValue }: { control: a
 	}
 
 	return (
-		<Stack.Navigator screenOptions={{ headerShown: false }}>
-			{rut !== null ? (
-				<Stack.Screen name="Pin">
-					{(props) => <Pin {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} rutSenior={rut} />}
-				</Stack.Screen>
-			) : (
-				<>
-					<Stack.Screen name="RUT">{(props) => <RUT {...props} control={control} errors={errors} />}</Stack.Screen>
-					<Stack.Screen name="Pin">
-						{(props) => <Pin {...props} control={control} errors={errors} setValue={setValue} handleSubmit={handleSubmit} />}
-					</Stack.Screen>
-				</>
-			)}
-		</Stack.Navigator>
+		<FormProvider {...methods}>
+			<Stack.Navigator screenOptions={{ headerShown: false }}>
+				{rut !== null ? (
+					<Stack.Screen name="Pin" component={Pin} initialParams={{ rutSenior: rut }} />
+				) : (
+					<>
+						<Stack.Screen name="RUT" component={RUT} />
+						<Stack.Screen name="Pin" component={Pin} />
+					</>
+				)}
+			</Stack.Navigator>
+		</FormProvider>
 	)
-}
-
-const Login = () => {
-	const {
-		control,
-		handleSubmit,
-		setValue,
-		formState: { errors },
-	} = useForm({
-		defaultValues: {
-			rut: "",
-			password: "",
-		},
-	})
-
-	return <FormNavigator control={control} handleSubmit={handleSubmit} errors={errors} setValue={setValue} />
 }
 
 export default Login

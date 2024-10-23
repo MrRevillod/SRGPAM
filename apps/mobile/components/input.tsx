@@ -1,19 +1,24 @@
 import React from "react"
 import { View, TextInput, Text } from "react-native"
-import { Controller } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form"
 import { StyleSheet } from "react-native"
 import Colors from "@/components/colors"
 
 type InputFieldProps = {
 	name: string
 	placeholder: string
-	control: any
-	errors: any
 	secureTextEntry?: boolean
 	children?: React.ReactNode
+	// Props para evitar problemas con use form context, eliminar cuando se aplique a registro tambien (por eso estan)
+	control?: any
+	errors?: any
 }
 
-const Input = ({ name, placeholder, control, errors, secureTextEntry = false, children }: InputFieldProps) => {
+const Input = ({ name, placeholder, secureTextEntry = false, children }: InputFieldProps) => {
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext()
 	return (
 		<View>
 			<Controller
@@ -29,7 +34,7 @@ const Input = ({ name, placeholder, control, errors, secureTextEntry = false, ch
 							onChangeText={onChange}
 							secureTextEntry={secureTextEntry}
 						/>
-						{errors[name] && <Text style={{ color: "red" }}>{errors[name].message}</Text>}
+						{errors[name] && typeof errors[name].message === "string" && <Text style={{ color: "red" }}>{errors[name].message}</Text>}
 					</>
 				)}
 			/>

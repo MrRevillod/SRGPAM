@@ -8,8 +8,7 @@ import { Controller } from "react-hook-form"
 import * as mime from "react-native-mime-types"
 import axios from "axios"
 import Feather from "@expo/vector-icons/Feather"
-
-import { SERVER_URL } from "@/constants/colors"
+import { SERVER_URL } from "@/utils/request"
 
 const Social = ({ navigation, route, control, setValue, errors, getValues, trigger, handleSubmit }: commonProps) => {
 	const [isPhotoValid, setPhotoValid] = useState<boolean>(false)

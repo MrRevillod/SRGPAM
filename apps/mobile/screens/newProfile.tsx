@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { View, StyleSheet, Text, Alert, Image } from "react-native"
 import { Controller, useForm } from "react-hook-form"
-import { SERVER_URL } from "@/constants/colors"
+import { SERVER_URL } from "@/utils/request"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { profileSchema } from "@/utils/validation"
 

@@ -1,4 +1,4 @@
-import { SERVER_URL } from "@/constants/colors"
+import { SERVER_URL } from "@/utils/request"
 import { makeAuthenticatedRequest } from "@/utils/request"
 import { storeTokens, storeUser, removeTokens, removeUser } from "@/utils/storage" // Importamos removeTokens y removeUser
 import { loginSeniorFormData, User } from "@/utils/types"
@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			const response = await axios.post(`${SERVER_URL}/api/auth/login-senior`, credentials)
 			const { message, values } = response.data
 			const { accessToken, refreshToken, publicUser } = values
+
 			if (response) {
 				storeTokens(accessToken, refreshToken)
 				setIsAuthenticated(true)
@@ -40,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				setRole("SENIOR")
 				Alert.alert("Éxito", message)
 			}
+
 		} catch (error: any) {
 			error.response.data.message && Alert.alert("Error", error.response.data.message)
 		}
