@@ -13,6 +13,8 @@ router.get("/", validateRole(["ADMIN", "PROFESSIONAL", "SENIOR"]), events.getAll
 router.post("/", validateSchema(Create), events.create) //newEvent
 router.patch("/:id", validateSchema(Update), events.updateById) //updateEvent
 router.patch("/:id/reservate", validateRole(["SENIOR"]), events.reserveEvent)
+router.patch("/:id/cancel", events.cancelReserve)
+
 router.delete("/:id", events.deleteById) //updateEvent
 
 export default router

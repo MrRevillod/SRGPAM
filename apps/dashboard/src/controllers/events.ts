@@ -25,11 +25,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 	const where = generateWhere<EventQuery>(req.query, queryToWhereMap)
 
 	try {
-		const events = await prisma.event.findMany({
-			where,
-			select: eventSelect,
-		})
-
+		const events = await prisma.event.findMany({ where, select: eventSelect })
 		return res.status(200).json({ values: events })
 	} catch (error) {
 		next(error)
@@ -112,8 +108,8 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
-		//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+		io.to("ADMIN").emit("newEvent", event as any)
+		io.to("anyClientId").emit("newEvent", event as any)
 
 		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
@@ -189,14 +185,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 				},
 			})
 
-			console.log(event)
-			io.emit("updatedEvent", event)
-
-			return res.status(200).json({
-				message: "Actualización exitosa",
-				type: "success",
-				values: { modified: event },
-			})
+			io.to("ADMIN").emit("updatedEvent", event)
+			return res.status(200).json({ values: { modified: event } })
 		} else {
 			return res.status(409).json({
 				message: "Superposición de horas",
@@ -260,6 +250,32 @@ export const reserveEvent = async (req: Request, res: Response, next: NextFuncti
 		})
 
 		return res.status(200).json({ values: updatedEvent })
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const cancelReserve = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { id } = req.params
+
+		// const senior = req.getExtension("user") as Senior
+
+		// const event = await prisma.event.findUnique({
+		// 	where: { id: Number(id), seniorId: senior.id },
+		// })
+
+		// if (!event) throw new AppError(404, "Evento no encontrado")/
+
+		const updatedEvent = await prisma.event.update({
+			where: { id: Number(id) },
+			data: {
+				seniorId: null,
+			},
+		})
+
+		io.to("ADMIN").emit("updatedEvent", updatedEvent)
+		return res.status(200).json({ modified: updatedEvent })
 	} catch (error) {
 		next(error)
 	}

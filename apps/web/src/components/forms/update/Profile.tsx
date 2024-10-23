@@ -49,8 +49,6 @@ const UpdateProfile: React.FC<UpdateProfileProps> = ({ setImageSrc, setShowUpdat
 	})
 
 	const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
-		console.log(formData)
-
 		const originalData = {
 			name: user?.name,
 			email: user?.email,

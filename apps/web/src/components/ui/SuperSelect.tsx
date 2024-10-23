@@ -2,19 +2,21 @@ import clsx from "clsx"
 import React from "react"
 
 import { Select } from "antd"
+import { Dispatch, SetStateAction } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 
 interface SuperSelectProps {
 	name: string
 	label: string
 	options: any
+	setSearch?: Dispatch<SetStateAction<string>>
 	defaultValue?: any
 }
 
-export const SuperSelect = ({ name, label, options, defaultValue }: SuperSelectProps) => {
+export const SuperSelect = ({ name, label, options, setSearch }: SuperSelectProps) => {
 	const {
-		formState: { errors },
 		control,
+		formState: { errors },
 	} = useFormContext()
 
 	const classes = clsx(
@@ -23,6 +25,12 @@ export const SuperSelect = ({ name, label, options, defaultValue }: SuperSelectP
 		"focus:border-primary-green w-full h-10 placeholder-neutral-400",
 		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
 	)
+
+	const clientFilterFn = (input: string, option: any) => {
+		return (option?.label as string).toLowerCase().includes(input.toLowerCase())
+	}
+
+	const filterOption = setSearch ? false : clientFilterFn
 
 	return (
 		<>
@@ -33,7 +41,6 @@ export const SuperSelect = ({ name, label, options, defaultValue }: SuperSelectP
 			<Controller
 				control={control}
 				name={name}
-				defaultValue={defaultValue}
 				render={({ field }) => (
 					<Select
 						{...field}
@@ -42,10 +49,13 @@ export const SuperSelect = ({ name, label, options, defaultValue }: SuperSelectP
 						showSearch
 						placeholder={"Selecciona una opcion"}
 						options={options}
-						filterOption={(input, option) =>
-							((option?.label as string) ?? "").toLowerCase().includes(input.toLowerCase())
-						}
-						onChange={(value) => field.onChange(value)}
+						filterOption={filterOption}
+						onSearch={(value) => {
+							setSearch && setSearch(value)
+						}}
+						onChange={(value) => {
+							field.onChange(value)
+						}}
 					/>
 				)}
 			/>

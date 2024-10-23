@@ -53,13 +53,17 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 	// handleCancel: Función que se ejecuta al hacer click en el botón de cancelar del modal
 	const handleCancel = () => {
+		setModalType(null)
 		setSelectedData(null)
 		setIsModalOpen(false)
+		setCachedData(null)
 	}
 
 	const handleClose = () => {
+		setModalType(null)
 		setSelectedData(null)
 		setIsModalOpen(false)
+		setCachedData(null)
 	}
 
 	const handleDelete = () => {

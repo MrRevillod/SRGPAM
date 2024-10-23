@@ -16,12 +16,9 @@ const NewSeniorsPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Senior[]>({
 		action: getSeniors,
-		query: "validated=false",
+		query: "validated=0",
+		onSuccess: (data) => setSeniors(data),
 	})
-
-	useEffect(() => {
-		if (data) setSeniors(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 

@@ -74,13 +74,15 @@ const Profile = ({ navigation }: any) => {
 	const age = calculateAge(birthDate)
 
 	const deleteAccount = async () => {
-		console.log(id)
 		try {
-			await makeAuthenticatedRequest(`${SERVER_URL}/api/dashboard/seniors/${id}`, "DELETE", true)
-			await AsyncStorage.removeItem("user")
-			navigation.navigate("Login")
+			const response = await makeAuthenticatedRequest(`${SERVER_URL}/api/dashboard/seniors/${id}`, "DELETE")
+			if (response?.status === 200) {
+				Alert.alert("Cuenta Eliminada", "Su cuenta ha sido eliminada exitosamente")
+				await AsyncStorage.removeItem("user")
+				navigation.navigate("Login")
+			}
 		} catch (error) {
-			console.error("Error al eliminar la cuenta", error)
+			console.error(error)
 		}
 	}
 

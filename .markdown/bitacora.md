@@ -1,14 +1,22 @@
 # Detalles por solucionar
 
-- [] Revisar valicaciones de zod del lado frontend
-- [] Añadir react-image-crop en el proyecto para estandarizar el tamaño de las imagenes
-- [] Revisar textos y fallos de ortografía en la aplicación
-- [] Al actualizar antes de enviar ver si algo cambió, si no, no enviar (listo en profile)
-- [] Hacer que los get all acepten un query para filtrar
-- [] Añadir validación de edad en el formulario de registro de personas mayores -> puede requerir un cambio en el backend
+Tareas:
 
-- [] Mejorar filtros de prisma (select)
-- [] Cuando un admin esté revisando una solicitud, esta debe desaparecer de la lista de
-  solicitudes, ó distribuir entre los admins
+- Revisar textos y fallos de ortografía en la aplicación
 
-- Validaciones de imagenes zod
+- Investigar documentación de librería seleccionada para gráficos y estadisticas en react https://github.com/ant-design/ant-design-charts
+
+- Añadir rut al select de senior
+- Ver que pasa con los oncancel y los select
+- añadir archivar
+
+Objetivo general:
+
+- Crear sistema de agendamiento desde el lado móvil del sistema.
+
+Objetivos específicos:
+
+- Crear vista de menu de inicio funcional en la aplicación móvil
+- Crear vista de perfil de usuario en la aplicación móvil (usando authcontext)
+- Crear vista de selección de centro en la aplicación móvil
+- Crear vista de eventos en la aplicación móvil (Listar eventos divididos por servicios)

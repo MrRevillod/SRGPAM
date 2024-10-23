@@ -31,7 +31,6 @@ export interface User extends Senior {
 }
 
 export type AuthResponse = {
-	values: object
 	role: "Senior"
 	user: User
 }

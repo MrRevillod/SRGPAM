@@ -67,10 +67,27 @@ export const Form = <T extends BaseDataType>({ data, setData, ...props }: FormPr
 		// estructurarse de forma diferente
 		const body = buildRequestBody(formData)
 
-		if (JSON.stringify(formData) === JSON.stringify(body)) {
-			console.log(message.error)
-			message.error("No se han realizado cambios")
-			return
+		let hasChanges = false
+
+		if (actionType === "update") {
+			for (const key in formData) {
+				// 1. Si existe en selectedData y es diferente a formData[key], hay cambios
+				if (selectedData[key] && formData[key] !== selectedData[key]) {
+					hasChanges = true
+					break // Si ya hay un cambio, no es necesario seguir verificando
+				}
+
+				// 2. Si el campo no existe en selectedData pero sÃ­ en formData, hay cambios
+				if (!selectedData[key] && formData[key]) {
+					hasChanges = true
+					break // Si ya hay un cambio, no es necesario seguir verificando
+				}
+			}
+
+			// Si no se detectaron cambios
+			if (!hasChanges) {
+				return message.error("No se han realizado cambios")
+			}
 		}
 
 		// Se realiza la acción con los datos del recurso y el body

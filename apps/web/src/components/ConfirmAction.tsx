@@ -10,8 +10,8 @@ import { MutateAction, BaseDataType, MutationResponse } from "../lib/types"
 
 interface ConfirmActionProps<T> {
 	text: string
-	data: T | T[]
-	setData: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
+	data?: T | T[]
+	setData?: Dispatch<SetStateAction<T | null>> | Dispatch<SetStateAction<T[]>>
 	action: MutateAction
 	refetch?: () => void
 }
@@ -27,7 +27,7 @@ const ConfirmDelete = <T extends BaseDataType>({ text, data, setData, action, re
 		await mutation.mutate({
 			params: { id: selectedData?.id || null },
 			onSuccess: (res) => {
-				if (!refetch) {
+				if (!refetch && data && setData) {
 					const { modified: deleted } = res
 
 					if (!deleted) {

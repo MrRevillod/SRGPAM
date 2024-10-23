@@ -8,7 +8,7 @@ import { ModalProvider } from "./context/ModalContext"
 import { BrowserRouter } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
 import { StyleProvider } from "@ant-design/cssinjs"
-// import { SocketProvider } from "./context/SocketContext"
+import { SocketProvider } from "./context/SocketContext"
 
 import "./main.css"
 
@@ -19,13 +19,13 @@ root.render(
 		<StyleProvider>
 			<ThemeProvider>
 				<AuthProvider>
-					{/* <SocketProvider> */}
-					<ModalProvider>
-						<AppLayout>
-							<Router />
-						</AppLayout>
-					</ModalProvider>
-					{/* </SocketProvider> */}
+					<SocketProvider>
+						<ModalProvider>
+							<AppLayout>
+								<Router />
+							</AppLayout>
+						</ModalProvider>
+					</SocketProvider>
 				</AuthProvider>
 			</ThemeProvider>
 		</StyleProvider>

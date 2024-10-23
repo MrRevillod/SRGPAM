@@ -19,7 +19,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ pageTitle, create, data, search
 			<Helmet>
 				<title>{pageTitle} - Dirección de personas mayores de la municipalidad de Temuco</title>
 			</Helmet>
-			<section className="pt-12 px-20 flex flex-col gap-4 w-full">
+			<section className="pt-8 px-20 flex flex-col gap-2 w-full">
 				<PageHeader
 					pageTitle={pageTitle}
 					create={create}
@@ -27,7 +27,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ pageTitle, create, data, search
 					data={data}
 					setData={setData}
 				/>
-				<section className="w-full">{children}</section>
+				<section className="w-full bg-white dark:bg-primary-dark rounded-lg p-4 shadow-md">{children}</section>
 			</section>
 		</Fragment>
 	)

@@ -26,7 +26,7 @@ const UpdateSenior: React.FC<FormProps<Senior>> = ({ data, setData }) => {
 				name: selectedData.name,
 				email: selectedData.email,
 				address: selectedData.address,
-				birthDate: dayjs(selectedData.birthDate),
+				birthDate: dayjs(selectedData.birthDate).toISOString(),
 				password: "",
 				confirmPassword: "",
 			})

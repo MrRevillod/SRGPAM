@@ -26,9 +26,9 @@ const Header: React.FC = () => {
 	const linkClasses = `text-neutral-200 font-base hover:text-neutral-50`
 
 	return (
-		<Navbar fluid className="pt-5 h-20 w-full bg-primary dark:bg-primary-darker rounded-none">
-			<Navbar.Brand className="ml-14 pl-2">
-				<img src="/logo-white.webp" alt="logo" width="60" />
+		<Navbar fluid className="py-4 h-18 w-full bg-primary dark:bg-primary-darker rounded-none">
+			<Navbar.Brand className="ml-14 pl-4">
+				<img src="/logo-white.webp" alt="logo" width="50" />
 			</Navbar.Brand>
 
 			<Show when={isAuthenticated && user !== null}>

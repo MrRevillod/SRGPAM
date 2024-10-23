@@ -7,9 +7,9 @@ import ConfirmAction from "../../components/ConfirmAction"
 
 import { Senior } from "../../lib/types"
 import { message } from "antd"
+import { useState } from "react"
 import { useRequest } from "../../hooks/useRequest"
 import { SeniorsColumns } from "../../lib/columns"
-import { useState, useEffect } from "react"
 import { deleteSenior, getSeniors } from "../../lib/actions"
 
 const SeniorsPage: React.FC = () => {
@@ -17,11 +17,9 @@ const SeniorsPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Senior[]>({
 		action: getSeniors,
+		query: "validated=1",
+		onSuccess: (data) => setSeniors(data),
 	})
-
-	useEffect(() => {
-		if (data) setSeniors(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 
