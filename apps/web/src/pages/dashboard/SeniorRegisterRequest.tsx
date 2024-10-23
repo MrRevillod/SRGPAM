@@ -1,18 +1,17 @@
 import React from "react"
 import PageLayout from "../../layouts/PageLayout"
+import DatetimeSelect from "../../components/ui/DatetimeSelect"
 
 import { api } from "../../lib/axios"
 import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { useEffect } from "react"
-import { DatePicker } from "../../components/ui/InputDate"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "../../hooks/useMutation"
 import { SeniorSchemas } from "../../lib/schemas"
 import { message, Image } from "antd"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FieldValues, FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import DatetimeSelect from "../../components/ui/DatetimeSelect"
 
 const SeniorRegisterRequestPage: React.FC = () => {
 	const location = useLocation()

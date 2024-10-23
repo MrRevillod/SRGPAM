@@ -35,6 +35,7 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 		resolver: zodResolver(EventSchemas.Create),
 	})
 
+	const { watch, setValue } = methods
 	const { isModalOpen, modalType } = useModal()
 
 	// Se obtiene el id del centro de la url, con el fin de seleccionarlo por defecto
@@ -46,9 +47,9 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 	// del input en tiempo real y se puede utilizar para realizar peticiones
 	// en un orden específico
 
-	const selectedService = methods.watch("serviceId")
-	const selectedProfessional = methods.watch("professionalId")
-	const selectedCenter = methods.watch("centerId")
+	const selectedCenter = watch("centerId")
+	const selectedService = watch("serviceId")
+	const selectedProfessional = watch("professionalId")
 
 	// Los hooks useRequest se utilizan para obtener los servicios, profesionales y centros
 	// reciben un trigger que actua como un disparador de un useEffect
@@ -76,14 +77,14 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 		action: getCenters,
 		query: "select=name,id",
 		onSuccess: (data) => selectDataFormatter({ data, setData: setCenters }),
-		trigger: baseTrigger && !!selectedService && !!selectedProfessional,
+		trigger: baseTrigger,
 	})
 
 	// Se obtienen las personas mayores cuando se abre el modal y
 	// se selecciona un servicio, un profesional y un centro
 	useRequest<Senior[]>({
 		action: getSeniors,
-		query: `name=${seniorsSearch}&select=name,id&limit=5`,
+		query: `name=${seniorsSearch}&id=${seniorsSearch}&select=name,id&limit=5`,
 		onSuccess: (data) => selectDataFormatter({ data, setData: setSeniors }),
 		trigger: baseTrigger && !!selectedService && !!selectedProfessional && !!selectedCenter,
 	})
@@ -91,13 +92,15 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 	// Se obtiene el valor del input startsAt
 	// y se agrega 2 horas al valor de endsAt ya que esto brinda una mejor experiencia
 
-	const startsAt = methods.watch("startsAt")
+	const startsAt = watch("startsAt")
 
 	useEffect(() => {
-		if (startsAt) {
-			methods.setValue("endsAt", dayjs(startsAt).add(2, "hour").toISOString())
-		}
+		if (startsAt) setValue("endsAt", dayjs(startsAt).add(2, "hour").toISOString())
 	}, [startsAt])
+
+	useEffect(() => {
+		if (selectedUrlCenter) setValue("centerId", Number(selectedUrlCenter))
+	}, [selectedUrlCenter])
 
 	return (
 		<Modal type="Create" title="Crear un nuevo evento">
@@ -105,12 +108,7 @@ const CreateEvent: React.FC<FormProps<Event>> = ({ data, setData, refetch }) => 
 				<Form data={data} setData={setData} action={createEvent} actionType="create" refetch={refetch}>
 					<SuperSelect label="Seleccione un servicio" name="serviceId" options={services} />
 					<SuperSelect label="Seleccione un profesional" name="professionalId" options={professionals} />
-					<SuperSelect
-						label="Seleccione un centro de atención"
-						name="centerId"
-						options={centers}
-						defaultValue={selectedUrlCenter ? Number(selectedUrlCenter) : undefined}
-					/>
+					<SuperSelect label="Seleccione un centro de atención" name="centerId" options={centers} />
 					<SuperSelect
 						label="Seleccione una persona mayor"
 						name="seniorId"

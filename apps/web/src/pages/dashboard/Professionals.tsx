@@ -7,10 +7,10 @@ import CreateProfessional from "../../components/forms/create/Professional"
 import UpdateProfessional from "../../components/forms/update/Professional"
 
 import { message } from "antd"
+import { useState } from "react"
 import { useRequest } from "../../hooks/useRequest"
 import { Professional } from "../../lib/types"
 import { ProfessionalColumns } from "../../lib/columns"
-import { useState, useEffect } from "react"
 import { deleteProfessional, getProfessionals } from "../../lib/actions"
 
 const ProfessionalsPage: React.FC = () => {
@@ -18,11 +18,8 @@ const ProfessionalsPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Professional[]>({
 		action: getProfessionals,
+		onSuccess: (data) => setProfessionals(data),
 	})
-
-	useEffect(() => {
-		if (data) setProfessionals(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 

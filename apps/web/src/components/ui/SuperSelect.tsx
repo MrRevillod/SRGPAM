@@ -1,8 +1,7 @@
 import clsx from "clsx"
-import React, { useEffect } from "react"
+import React from "react"
 
 import { Select } from "antd"
-import { useModal } from "../../context/ModalContext"
 import { Dispatch, SetStateAction } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 
@@ -15,9 +14,7 @@ interface SuperSelectProps {
 
 export const SuperSelect = ({ name, label, options, setSearch }: SuperSelectProps) => {
 	const {
-		reset,
 		control,
-		setValue,
 		formState: { errors },
 	} = useFormContext()
 
@@ -27,8 +24,6 @@ export const SuperSelect = ({ name, label, options, setSearch }: SuperSelectProp
 		"focus:border-primary-green w-full h-10 placeholder-neutral-400",
 		"text-dark dark:text-light mb-1 border-1 bg-light dark:bg-primary-dark",
 	)
-
-	const { selectedData } = useModal()
 
 	const clientFilterFn = (input: string, option: any) => {
 		return (option?.label as string).toLowerCase().includes(input.toLowerCase())

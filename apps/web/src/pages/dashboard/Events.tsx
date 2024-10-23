@@ -63,8 +63,14 @@ const EventsPage: React.FC = () => {
 		},
 	})
 
+	socket?.off("newEvent")
+	socket?.on("newEvent", () => refetch())
+
 	socket?.off("updatedEvent")
 	socket?.on("updatedEvent", () => refetch())
+
+	socket?.off("deletedEvent")
+	socket?.on("deletedEvent", () => refetch())
 
 	if (error) message.error("Error al cargar los datos")
 
@@ -106,15 +112,14 @@ const EventsPage: React.FC = () => {
 				}}
 			/>
 
-			<CreateEvent data={events} setData={setEvents} refetch={refetch} />
-			<UpdateEvent data={events} setData={setEvents} refetch={() => {}} />
+			<CreateEvent data={events} setData={setEvents} />
+			<UpdateEvent data={events} setData={setEvents} />
 
 			<ConfirmAction<Event>
 				text="¿Estás seguro(a) de que deseas eliminar este evento?"
 				data={events}
 				setData={setEvents}
 				action={deleteEvent}
-				refetch={refetch}
 			/>
 		</PageLayout>
 	)

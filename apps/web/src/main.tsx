@@ -8,10 +8,9 @@ import { ModalProvider } from "./context/ModalContext"
 import { BrowserRouter } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
 import { StyleProvider } from "@ant-design/cssinjs"
-// import { SocketProvider } from "./context/SocketContext"
+import { SocketProvider } from "./context/SocketContext"
 
 import "./main.css"
-import { SocketProvider } from "./context/SocketContext"
 
 const root = ReactDOM.createRoot(document.getElementById("root")!)
 

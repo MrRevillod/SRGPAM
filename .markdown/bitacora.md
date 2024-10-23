@@ -8,6 +8,7 @@ Tareas:
 
 - Añadir rut al select de senior
 - Ver que pasa con los oncancel y los select
+- añadir archivar
 
 Objetivo general:
 

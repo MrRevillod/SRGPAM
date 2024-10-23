@@ -17,7 +17,7 @@ const SeniorsPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Senior[]>({
 		action: getSeniors,
-		query: "validated=true",
+		query: "validated=1",
 		onSuccess: (data) => setSeniors(data),
 	})
 

@@ -5,6 +5,7 @@ import { AppError } from "@repo/lib"
 import { canAddEvent } from "../utils/events"
 import { Request, Response, NextFunction } from "express"
 import { EventQuery, eventSelect, generateWhere } from "../utils/filters"
+
 // Controlador de tipo select puede recibir un query para seleccionar campos específicos
 // y para filtrar por claves foraneas
 
@@ -24,11 +25,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 	const where = generateWhere<EventQuery>(req.query, queryToWhereMap)
 
 	try {
-		const events = await prisma.event.findMany({
-			where,
-			select: eventSelect,
-		})
-
+		const events = await prisma.event.findMany({ where, select: eventSelect })
 		return res.status(200).json({ values: events })
 	} catch (error) {
 		next(error)
@@ -111,8 +108,8 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			},
 		})
 
-		//io.to("ADMIN").emit("newEvent", event) FUNCIONANDO
-		//io.to("anyClientId").emit("newEvent", event) FUNCIONANDO
+		io.to("ADMIN").emit("newEvent", event as any)
+		io.to("anyClientId").emit("newEvent", event as any)
 
 		return res.status(200).json({ values: { modified: event } })
 	} catch (error) {
@@ -188,14 +185,8 @@ export const updateById = async (req: Request, res: Response, next: NextFunction
 				},
 			})
 
-			console.log(event)
 			io.to("ADMIN").emit("updatedEvent", event)
-
-			return res.status(200).json({
-				message: "Actualización exitosa",
-				type: "success",
-				values: { modified: event },
-			})
+			return res.status(200).json({ values: { modified: event } })
 		} else {
 			return res.status(409).json({
 				message: "Superposición de horas",

@@ -4,12 +4,12 @@ import CreateService from "../../components/forms/create/Service"
 import UpdateService from "../../components/forms/update/Service"
 import ConfirmDelete from "../../components/ConfirmAction"
 
-import { ImageCard } from "../../components/ui/ImageCard"
 import { message } from "antd"
 import { Service } from "../../lib/types"
+import { useState } from "react"
+import { ImageCard } from "../../components/ui/ImageCard"
 import { CardLayout } from "../../components/CardLayout"
 import { useRequest } from "../../hooks/useRequest"
-import { useEffect, useState } from "react"
 import { deleteService, getServices } from "../../lib/actions"
 
 const ServicesPage: React.FC = () => {
@@ -17,11 +17,8 @@ const ServicesPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Service[]>({
 		action: getServices,
+		onSuccess: (data) => setServices(data),
 	})
-
-	useEffect(() => {
-		if (data) setServices(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 

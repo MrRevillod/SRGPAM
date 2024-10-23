@@ -19,7 +19,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, create, searchKeys, 
 	const { showModal } = useModal()
 
 	return (
-		<section className="flex flex-col gap-4 w-full mb-4 px-4 py-4 bg-white rounded-lg shadow-sm">
+		<section className="flex flex-col gap-4 w-full mb-4 px-4 py-4 bg-white dark:bg-primary-dark rounded-lg shadow-sm">
 			<div
 				className={clsx(
 					"flex w-full gap-4 justify-between",

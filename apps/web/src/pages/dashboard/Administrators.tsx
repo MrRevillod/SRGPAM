@@ -6,9 +6,9 @@ import UpdateAdministrator from "../../components/forms/update/Administrator"
 import CreateAdministrator from "../../components/forms/create/Administrator"
 
 import { message } from "antd"
+import { useState } from "react"
 import { useRequest } from "../../hooks/useRequest"
 import { Administrator } from "../../lib/types"
-import { useState, useEffect } from "react"
 import { AdministratorColumns } from "../../lib/columns"
 import { deleteAdministrator, getAdministrators } from "../../lib/actions"
 
@@ -17,11 +17,8 @@ const AdministratorsPage: React.FC = () => {
 
 	const { error, loading, data } = useRequest<Administrator[]>({
 		action: getAdministrators,
+		onSuccess: (data) => setAdministrators(data),
 	})
-
-	useEffect(() => {
-		if (data) setAdministrators(data)
-	}, [data])
 
 	if (error) message.error("Error al cargar los datos")
 
